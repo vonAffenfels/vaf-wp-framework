@@ -1,0 +1,14 @@
+# IDEs
+.idea
+.vscode
+/.vagrant
+
+# Composer
+vendor
+npm-debug.log
+yarn-error.log
+auth.json
+
+# Misc
+.DS_Store
+.phpdoc
