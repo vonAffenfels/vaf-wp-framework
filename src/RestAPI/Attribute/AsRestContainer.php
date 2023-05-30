@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Library\RestAPI\Attribute;
+namespace VAF\WP\Framework\RestAPI\Attribute;
 
 use Attribute;
 

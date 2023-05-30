@@ -1,8 +1,8 @@
 <?php
 
-namespace VAF\WP\Library\Shortcode;
+namespace VAF\WP\Framework\Shortcode;
 
-use VAF\WP\Library\Kernel\WordpressKernel;
+use VAF\WP\Framework\Kernel\WordpressKernel;
 
 final class Loader
 {

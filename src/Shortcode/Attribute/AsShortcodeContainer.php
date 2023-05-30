@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Library\Shortcode\Attribute;
+namespace VAF\WP\Framework\Shortcode\Attribute;
 
 use Attribute;
 

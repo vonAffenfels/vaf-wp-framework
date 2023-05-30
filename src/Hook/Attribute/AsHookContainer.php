@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Library\Hook\Attribute;
+namespace VAF\WP\Framework\Hook\Attribute;
 
 use Attribute;
 

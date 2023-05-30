@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Library\Kernel;
+namespace VAF\WP\Framework\Kernel;
 
 use Closure;
 use Exception;

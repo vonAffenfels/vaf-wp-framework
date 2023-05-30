@@ -1,8 +1,8 @@
 <?php
 
-namespace VAF\WP\Library\Hook;
+namespace VAF\WP\Framework\Hook;
 
-use VAF\WP\Library\Kernel\WordpressKernel;
+use VAF\WP\Framework\Kernel\WordpressKernel;
 
 final class Loader
 {

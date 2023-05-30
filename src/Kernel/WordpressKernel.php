@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Library\Kernel;
+namespace VAF\WP\Framework\Kernel;
 
 use Exception;
 use ReflectionClass;
@@ -8,12 +8,12 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use VAF\WP\Library\Hook\Attribute\AsHookContainer;
-use VAF\WP\Library\Hook\Loader as HookLoader;
-use VAF\WP\Library\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
-use VAF\WP\Library\Shortcode\Attribute\AsShortcodeContainer;
-use VAF\WP\Library\Shortcode\Loader as ShortcodeLoader;
-use VAF\WP\Library\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
+use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
+use VAF\WP\Framework\Hook\Loader as HookLoader;
+use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
+use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
+use VAF\WP\Framework\Shortcode\Loader as ShortcodeLoader;
+use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
 
 abstract class WordpressKernel extends Kernel
 {

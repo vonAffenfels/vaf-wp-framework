@@ -1,10 +1,10 @@
 <?php
 
-namespace VAF\WP\Library;
+namespace VAF\WP\Framework;
 
 use Exception;
-use VAF\WP\Library\Kernel\Kernel;
-use VAF\WP\Library\Kernel\PluginKernel;
+use VAF\WP\Framework\Kernel\Kernel;
+use VAF\WP\Framework\Kernel\PluginKernel;
 
 abstract class Plugin extends BaseWordpress
 {

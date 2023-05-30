@@ -1,10 +1,10 @@
 <?php
 
-namespace VAF\WP\Library;
+namespace VAF\WP\Framework;
 
 use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use VAF\WP\Library\Kernel\Kernel;
+use VAF\WP\Framework\Kernel\Kernel;
 
 abstract class BaseWordpress
 {

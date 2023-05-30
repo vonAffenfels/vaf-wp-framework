@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Library\RestAPI;
+namespace VAF\WP\Framework\RestAPI;
 
 enum RestRouteMethod
 {

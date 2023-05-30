@@ -1,9 +1,9 @@
 <?php
 
-namespace VAF\WP\Library\RestAPI\Attribute;
+namespace VAF\WP\Framework\RestAPI\Attribute;
 
 use Attribute;
-use VAF\WP\Library\RestAPI\RestRouteMethod;
+use VAF\WP\Framework\RestAPI\RestRouteMethod;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class RestRoute

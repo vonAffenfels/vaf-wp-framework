@@ -1,11 +1,11 @@
 <?php
 
-namespace VAF\WP\Library\Kernel;
+namespace VAF\WP\Framework\Kernel;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use VAF\WP\Library\Plugin;
+use VAF\WP\Framework\Plugin;
 
 class PluginKernel extends WordpressKernel
 {

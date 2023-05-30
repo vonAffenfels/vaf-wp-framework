@@ -1,12 +1,12 @@
 <?php
 
-namespace VAF\WP\Library\Hook;
+namespace VAF\WP\Framework\Hook;
 
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use VAF\WP\Library\Hook\Attribute\Hook;
+use VAF\WP\Framework\Hook\Attribute\Hook;
 
 final class LoaderCompilerPass implements CompilerPassInterface
 {

@@ -1,8 +1,8 @@
 {
-  "name": "vonaffenfels/vaf-wp-library",
+  "name": "vonaffenfels/vaf-wp-framework",
   "type": "project",
-  "description": "Library to simplify plugin development",
-  "homepage": "https://github.com/vonAffenfels/vaf-wp-library",
+  "description": "Framework to simplify plugin development",
+  "homepage": "https://github.com/vonAffenfels/vaf-wp-framework",
   "authors": [
     {
       "name": "Christoph Friedrich",
@@ -11,7 +11,7 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/vonAffenfels/vaf-wp-library/issues"
+    "issues": "https://github.com/vonAffenfels/vaf-wp-framework/issues"
   },
   "keywords": [
     "composer",
@@ -19,7 +19,7 @@
     "wp",
     "vonaffenfels",
     "vaf",
-    "library"
+    "framework"
   ],
   "config": {
     "optimize-autoloader": true,
@@ -33,7 +33,7 @@
   "prefer-stable": true,
   "autoload": {
     "psr-4": {
-      "VAF\\WP\\Library\\": "src/"
+      "VAF\\WP\\Framework\\": "src/"
     }
   },
   "scripts": {

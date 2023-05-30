@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Library\Shortcode;
+namespace VAF\WP\Framework\Shortcode;
 
 use Exception;
 use ReflectionClass;
@@ -9,7 +9,7 @@ use ReflectionMethod;
 use ReflectionUnionType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use VAF\WP\Library\Shortcode\Attribute\Shortcode;
+use VAF\WP\Framework\Shortcode\Attribute\Shortcode;
 
 final class LoaderCompilerPass implements CompilerPassInterface
 {

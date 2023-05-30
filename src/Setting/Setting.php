@@ -1,8 +1,8 @@
 <?php
 
-namespace VAF\WP\Library\Setting;
+namespace VAF\WP\Framework\Setting;
 
-use VAF\WP\Library\BaseWordpress;
+use VAF\WP\Framework\BaseWordpress;
 
 abstract class Setting
 {
