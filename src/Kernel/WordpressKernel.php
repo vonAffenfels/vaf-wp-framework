@@ -11,9 +11,13 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
+use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
+use VAF\WP\Framework\Setting\Attribute\AsSettingContainer;
+use VAF\WP\Framework\Setting\SettingCompilerPass;
 use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
 use VAF\WP\Framework\Shortcode\Loader as ShortcodeLoader;
 use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
+use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
 
 abstract class WordpressKernel extends Kernel
 {
@@ -26,6 +30,13 @@ abstract class WordpressKernel extends Kernel
         /** @var ShortcodeLoader $shortcodeLoader */
         $shortcodeLoader = $this->getContainer()->get('shortcode.loader');
         $shortcodeLoader->registerShortcodes();
+
+        // Registering REST routes
+        add_action('rest_api_init', function () {
+            /** @var RestAPILoader $restApiLoader */
+            //$restApiLoader = $this->getContainer()->get('restapi.loader');
+            //$restApiLoader->registerRestRoutes();
+        });
     }
 
     /**
@@ -54,6 +65,8 @@ abstract class WordpressKernel extends Kernel
 
         $this->registerHookContainer($builder);
         $this->registerShortcodeContainer($builder);
+        $this->registerSettingsContainer($builder);
+        //$this->registerRestAPIContainer($builder);
     }
 
     /**
@@ -62,6 +75,22 @@ abstract class WordpressKernel extends Kernel
     private function getConfigDir(): string
     {
         return $this->getProjectDir() . '/config';
+    }
+
+    private function registerSettingsContainer(ContainerBuilder $builder): void
+    {
+        $builder->addCompilerPass(new SettingCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsSettingContainer::class,
+            static function (
+                ChildDefinition $defintion,
+                AsSettingContainer $attribute,
+                ReflectionClass $reflector
+            ): void {
+                $defintion->addTag('setting.container');
+            }
+        );
     }
 
     private function registerShortcodeContainer(ContainerBuilder $builder): void
@@ -100,6 +129,24 @@ abstract class WordpressKernel extends Kernel
                 ReflectionClass $reflector
             ): void {
                 $defintion->addTag('hook.container');
+            }
+        );
+    }
+
+    private function registerRestAPIContainer(ContainerBuilder $builder): void
+    {
+        $builder->register('restapi.loader', RestAPILoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsRestContainer::class,
+            static function (
+                ChildDefinition $definition,
+                AsRestContainer $attribute,
+                ReflectionClass $reflector
+            ): void {
+                $definition->addTag('restapi.container');
             }
         );
     }
