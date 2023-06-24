@@ -48,7 +48,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $methodName = $method->getName();
 
-            // Check if the Hook attribute is present
+            // Check if the Shortcode attribute is present
             $attribute = $method->getAttributes(Shortcode::class);
             if (empty($attribute)) {
                 continue;

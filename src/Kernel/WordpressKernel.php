@@ -12,6 +12,7 @@ use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
 use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
+use VAF\WP\Framework\RestAPI\LoaderCompilerPass as RestAPILoaderCompilerPass;
 use VAF\WP\Framework\Setting\Attribute\AsSettingContainer;
 use VAF\WP\Framework\Setting\CompilerPass as SettingCompilerpass;
 use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
@@ -33,8 +34,8 @@ abstract class WordpressKernel extends Kernel
         // Registering REST routes
         add_action('rest_api_init', function () {
             /** @var RestAPILoader $restApiLoader */
-            //$restApiLoader = $this->getContainer()->get('restapi.loader');
-            //$restApiLoader->registerRestRoutes();
+            $restApiLoader = $this->getContainer()->get('restapi.loader');
+            $restApiLoader->registerRestRoutes();
         });
     }
 
@@ -65,7 +66,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerHookContainer($builder);
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
-        //$this->registerRestAPIContainer($builder);
+        $this->registerRestAPIContainer($builder);
     }
 
     /**
@@ -137,6 +138,8 @@ abstract class WordpressKernel extends Kernel
         $builder->register('restapi.loader', RestAPILoader::class)
             ->setPublic(true)
             ->setAutowired(true);
+
+        $builder->addCompilerPass(new RestAPILoaderCompilerPass());
 
         $builder->registerAttributeForAutoconfiguration(
             AsRestContainer::class,

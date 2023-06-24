@@ -2,7 +2,7 @@
 
 namespace VAF\WP\Framework\RestAPI;
 
-enum RestRouteMethod
+enum RestRouteMethod: string
 {
-    case GET;
+    case GET = 'GET';
 }
