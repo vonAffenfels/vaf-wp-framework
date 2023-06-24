@@ -2,7 +2,6 @@
 
 namespace VAF\WP\Framework\Kernel;
 
-use Exception;
 use ReflectionClass;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -12,12 +11,12 @@ use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
+use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
 use VAF\WP\Framework\Setting\Attribute\AsSettingContainer;
-use VAF\WP\Framework\Setting\SettingCompilerPass;
+use VAF\WP\Framework\Setting\CompilerPass as SettingCompilerpass;
 use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
 use VAF\WP\Framework\Shortcode\Loader as ShortcodeLoader;
 use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
-use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
 
 abstract class WordpressKernel extends Kernel
 {
@@ -79,7 +78,7 @@ abstract class WordpressKernel extends Kernel
 
     private function registerSettingsContainer(ContainerBuilder $builder): void
     {
-        $builder->addCompilerPass(new SettingCompilerPass());
+        $builder->addCompilerPass(new SettingCompilerpass());
 
         $builder->registerAttributeForAutoconfiguration(
             AsSettingContainer::class,
