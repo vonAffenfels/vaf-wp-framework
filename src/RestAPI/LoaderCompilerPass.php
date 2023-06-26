@@ -14,6 +14,8 @@ use VAF\WP\Framework\RestAPI\Attribute\RestRoute;
 
 final class LoaderCompilerPass implements CompilerPassInterface
 {
+    private array $allowedTypes = ['int', 'string', 'bool'];
+
     /**
      * @throws Exception
      */
@@ -64,6 +66,9 @@ final class LoaderCompilerPass implements CompilerPassInterface
             /** @var RestRoute $instance */
             $instance = $attribute[0]->newInstance();
 
+            $params = [];
+            $paramsLower = [];
+            $paramTypes = [];
             $serviceParams = [];
 
             foreach ($method->getParameters() as $parameter) {
@@ -80,22 +85,38 @@ final class LoaderCompilerPass implements CompilerPassInterface
                     );
                 }
 
-                if (!$container->has($type->getName())) {
+                if (
+                    !in_array($type->getName(), $this->allowedTypes)
+                    && !$container->has($type->getName())
+                ) {
                     throw new Exception(
                         sprintf(
                             'Parameter type "%s" for RestRoute "%s"%s is not allowed. ' .
-                            'Only registered service classes are allowed',
+                            'Only %s or registered service classes are allowed',
                             $type->getName(),
                             (!empty($containerAttribute->namespace)) ?
                                 sprintf(' of namespace "%s"', $containerAttribute->namespace) :
                                 '',
-                            $instance->uri
+                            $instance->uri,
+                            '"' . implode('", "', $this->allowedTypes) . '"'
                         )
                     );
                 }
 
-                $container->findDefinition($type->getName())->setPublic(true);
-                $serviceParams[$parameter->getName()] = $type->getName();
+                if (in_array($type->getName(), $this->allowedTypes)) {
+                    # Handle internal parameter types
+                    # Parameter of those types can be passed as parameter to the method
+
+                    $name = $parameter->getName();
+                    $lowerName = strtolower($name);
+
+                    $params[$lowerName] = $parameter->getDefaultValue();
+                    $paramsLower[$lowerName] = $name;
+                    $paramTypes[$lowerName] = $type->getName();
+                } else {
+                    $container->findDefinition($type->getName())->setPublic(true);
+                    $serviceParams[$parameter->getName()] = $type->getName();
+                }
             }
 
             $data[] = [
@@ -103,6 +124,9 @@ final class LoaderCompilerPass implements CompilerPassInterface
                 'method' => $instance->method,
                 'uri' => $instance->uri,
                 'namespace' => $containerAttribute->namespace,
+                'params' => $params,
+                'paramsLower' => $paramsLower,
+                'paramTypes' => $paramTypes,
                 'serviceParams' => $serviceParams
             ];
         }

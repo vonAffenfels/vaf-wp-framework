@@ -36,10 +36,36 @@ final class Loader
 
                 $options = [
                     'methods' => $restRoute['method']->value,
-                    'callback' => function (WP_REST_Request $request) use ($serviceId, $methodName, $params): array {
+                    'callback' => function (WP_REST_Request $request) use (
+                        $serviceId,
+                        $methodName,
+                        $params,
+                        $restRoute
+                    ): array {
                         $return = [
                             'success' => false
                         ];
+
+                        foreach ($restRoute['params'] as $name => $default) {
+                            $value = $request->get_param($name) ?: $default;
+
+                            # Handle type
+                            switch ($restRoute['paramTypes'][$name]) {
+                                case 'int':
+                                    $value = (int)$value;
+                                    break;
+
+                                case 'bool':
+                                    $value = in_array(strtolower($value), ['1', 'on', 'true']);
+                                    break;
+
+                                case 'string':
+                                default:
+                                    # Nothing to do as $value is already a string
+                                    break;
+                            }
+                            $params[$restRoute['paramsLower'][$name]] = $value;
+                        }
 
                         try {
                             $container = $this->kernel->getContainer()->get($serviceId);
