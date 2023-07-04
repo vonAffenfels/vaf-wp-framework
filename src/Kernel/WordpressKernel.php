@@ -10,9 +10,12 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
+use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
+use VAF\WP\Framework\Menu\Loader as MenuLoader;
+use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
-use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
 use VAF\WP\Framework\RestAPI\LoaderCompilerPass as RestAPILoaderCompilerPass;
+use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
 use VAF\WP\Framework\Setting\Attribute\AsSettingContainer;
 use VAF\WP\Framework\Setting\CompilerPass as SettingCompilerpass;
 use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
@@ -36,6 +39,12 @@ abstract class WordpressKernel extends Kernel
             /** @var RestAPILoader $restApiLoader */
             $restApiLoader = $this->getContainer()->get('restapi.loader');
             $restApiLoader->registerRestRoutes();
+        });
+
+        add_action('admin_menu', function () {
+            /** @var MenuLoader $menuLoader */
+            $menuLoader = $this->getContainer()->get('menu.loader');
+            $menuLoader->registerMenus();
         });
     }
 
@@ -67,6 +76,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
         $this->registerRestAPIContainer($builder);
+        $this->registerMenuContainer($builder);
     }
 
     /**
@@ -89,6 +99,26 @@ abstract class WordpressKernel extends Kernel
                 ReflectionClass $reflector
             ): void {
                 $defintion->addTag('setting.container');
+            }
+        );
+    }
+
+    private function registerMenuContainer(ContainerBuilder $builder): void
+    {
+        $builder->register('menu.loader', MenuLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new MenuLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsMenuContainer::class,
+            static function (
+                ChildDefinition $definition,
+                AsMenuContainer $attribute,
+                ReflectionClass $reflector
+            ): void {
+                $definition->addTag('menu.container');
             }
         );
     }
