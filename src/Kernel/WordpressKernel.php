@@ -21,6 +21,12 @@ use VAF\WP\Framework\Setting\CompilerPass as SettingCompilerpass;
 use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
 use VAF\WP\Framework\Shortcode\Loader as ShortcodeLoader;
 use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
+use VAF\WP\Framework\Template\Attribute\AsTemplate;
+use VAF\WP\Framework\Template\Attribute\AsTemplateEngine;
+use VAF\WP\Framework\Template\Engine\PHTMLEngine;
+use VAF\WP\Framework\Template\EngineCompilerPass;
+use VAF\WP\Framework\Template\TemplateCompilerPass;
+use VAF\WP\Framework\Template\TemplateRenderer;
 
 abstract class WordpressKernel extends Kernel
 {
@@ -72,6 +78,8 @@ abstract class WordpressKernel extends Kernel
             $container->import($configDir . '/{services}.php');
         }
 
+        $this->registerTemplateServices($builder);
+
         $this->registerHookContainer($builder);
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
@@ -85,6 +93,43 @@ abstract class WordpressKernel extends Kernel
     private function getConfigDir(): string
     {
         return $this->getProjectDir() . '/config';
+    }
+
+    private function registerTemplateServices(ContainerBuilder $builder): void
+    {
+        $builder->register(TemplateRenderer::class, TemplateRenderer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->register(PHTMLEngine::class, PHTMLEngine::class)
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->addTag('template.engine');
+
+        $builder->addCompilerPass(new EngineCompilerPass());
+        $builder->addCompilerPass(new TemplateCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsTemplateEngine::class,
+            static function (
+                ChildDefinition $definition,
+                AsTemplateEngine $attribute,
+                ReflectionClass $reflector
+            ): void {
+                $definition->addTag('template.engine');
+            }
+        );
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsTemplate::class,
+            static function (
+                ChildDefinition $definition,
+                AsTemplate $attribute,
+                ReflectionClass $reflector
+            ): void {
+                $definition->setArgument('$templateFile', $attribute->templateFile);
+            }
+        );
     }
 
     private function registerSettingsContainer(ContainerBuilder $builder): void

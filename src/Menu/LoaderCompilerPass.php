@@ -3,7 +3,6 @@
 namespace VAF\WP\Framework\Menu;
 
 use Exception;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
@@ -60,7 +59,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $methodName = $method->getName();
 
             // Check if the Hook attribute is present
-            $attribute = $method->getAttributes(MenuItem::class, ReflectionAttribute::IS_INSTANCEOF);
+            $attribute = $method->getAttributes(MenuItem::class);
             if (empty($attribute)) {
                 continue;
             }

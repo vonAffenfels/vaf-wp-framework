@@ -6,7 +6,8 @@ use Attribute;
 use VAF\WP\Framework\Utils\Capabilities;
 use VAF\WP\Framework\Utils\Dashicons;
 
-abstract class MenuItem
+#[Attribute(Attribute::TARGET_METHOD)]
+class MenuItem
 {
     public function __construct(
         public readonly string $menuTitle,
