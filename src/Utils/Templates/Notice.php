@@ -1,11 +1,12 @@
 <?php
 
-namespace VAF\WP\Framework\Template;
+namespace VAF\WP\Framework\Utils\Templates;
 
 use VAF\WP\Framework\Template\Attribute\AsTemplate;
+use VAF\WP\Framework\Template\Template;
 use VAF\WP\Framework\Utils\NoticeType;
 
-#[AsTemplate(templateFile: '@vaf-wp-framework/notice')]
+#[AsTemplate(templateFile: '@vaf-wp-framework/utils/notice')]
 final class Notice extends Template
 {
     public function setContent(string $content): self

@@ -27,8 +27,8 @@ use VAF\WP\Framework\Template\Attribute\AsTemplate;
 use VAF\WP\Framework\Template\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\Template\Engine\PHTMLEngine;
 use VAF\WP\Framework\Template\EngineCompilerPass;
-use VAF\WP\Framework\Template\Notice;
 use VAF\WP\Framework\Template\TemplateRenderer;
+use VAF\WP\Framework\Utils\Templates\Notice;
 
 abstract class WordpressKernel extends Kernel
 {
