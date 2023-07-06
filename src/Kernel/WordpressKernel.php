@@ -27,6 +27,7 @@ use VAF\WP\Framework\Template\Attribute\AsTemplate;
 use VAF\WP\Framework\Template\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\Template\Engine\PHTMLEngine;
 use VAF\WP\Framework\Template\EngineCompilerPass;
+use VAF\WP\Framework\Template\Notice;
 use VAF\WP\Framework\Template\TemplateRenderer;
 
 abstract class WordpressKernel extends Kernel
@@ -121,6 +122,11 @@ abstract class WordpressKernel extends Kernel
             ->setPublic(true)
             ->setAutowired(true)
             ->addTag('template.engine');
+
+        $builder->register(Notice::class, Notice::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $builder->setAlias('template.notice', Notice::class);
 
         $builder->addCompilerPass(new EngineCompilerPass());
 
