@@ -123,11 +123,6 @@ abstract class WordpressKernel extends Kernel
             ->setAutowired(true)
             ->addTag('template.engine');
 
-        $builder->register(Notice::class, Notice::class)
-            ->setPublic(true)
-            ->setAutowired(true);
-        $builder->setAlias('template.notice', Notice::class);
-
         $builder->addCompilerPass(new EngineCompilerPass());
 
         $builder->registerAttributeForAutoconfiguration(
@@ -151,6 +146,12 @@ abstract class WordpressKernel extends Kernel
                 $definition->setArgument('$templateFile', $attribute->templateFile);
             }
         );
+
+        $builder->register(Notice::class, Notice::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true);
+        $builder->setAlias('template.notice', Notice::class)
+            ->setPublic(true);
     }
 
     private function registerSettingsContainer(ContainerBuilder $builder): void
