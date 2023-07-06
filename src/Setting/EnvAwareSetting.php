@@ -16,11 +16,16 @@ abstract class EnvAwareSetting extends Setting
 
     protected function get(?string $key = null)
     {
-        if (is_null($this->envValue)) {
-            return parent::get($key);
+        if ($this->isFromEnv()) {
+            return is_null($key) ? $this->envValue : ($this->envValue[$key] ?? $this->default);
         }
 
-        return is_null($key) ? $this->envValue : $this->envValue[$key];
+        return parent::get($key);
+    }
+
+    final public function isFromEnv(): bool
+    {
+        return !is_null($this->envValue);
     }
 
     abstract protected function parseEnv();

@@ -15,7 +15,7 @@ abstract class Setting
     public function __construct(
         private readonly string $name,
         private readonly BaseWordpress $base,
-        private readonly mixed $default = null
+        protected readonly mixed $default = null
     ) {
     }
 
