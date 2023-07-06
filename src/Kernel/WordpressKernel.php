@@ -107,7 +107,6 @@ abstract class WordpressKernel extends Kernel
             ->addTag('template.engine');
 
         $builder->addCompilerPass(new EngineCompilerPass());
-        $builder->addCompilerPass(new TemplateCompilerPass());
 
         $builder->registerAttributeForAutoconfiguration(
             AsTemplateEngine::class,
