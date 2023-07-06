@@ -10,6 +10,8 @@ abstract class Setting
 
     private mixed $value = null;
 
+    private bool $dirty = false;
+
     public function __construct(
         private readonly string $name,
         private readonly BaseWordpress $base,
@@ -32,8 +34,42 @@ abstract class Setting
         return is_null($key) ? $this->value : ($this->value[$key] ?? $this->default);
     }
 
-    final public function __invoke()
+    protected function set($value, ?string $key = null, bool $doSave = true): self
     {
-        return $this->get();
+        if (is_null($key)) {
+            $this->value = $value;
+        } else {
+            if (!is_array($this->value)) {
+                $this->value = [$value];
+            }
+            $this->value[$key] = $value;
+        }
+
+        $this->dirty = true;
+
+        if ($doSave) {
+            $this->save();
+        }
+
+        return $this;
+    }
+
+    private function save(): void
+    {
+        if ($this->dirty) {
+            update_option($this->getOptionName(), $this->value);
+            $this->dirty = false;
+        }
+    }
+
+    final public function __invoke(...$args)
+    {
+        if (count($args) === 1) {
+            // Provided parameter
+            // So save the setting
+            return $this->set($args[0]);
+        } else {
+            return $this->get();
+        }
     }
 }
