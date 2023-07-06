@@ -9,14 +9,9 @@ use VAF\WP\Framework\Plugin;
 
 class PluginKernel extends WordpressKernel
 {
-    public function __construct(string $projectDir, bool $debug, private readonly Plugin $plugin)
-    {
-        parent::__construct($projectDir, $debug);
-    }
-
     protected function bootHandler(): void
     {
-        $this->getContainer()->set('plugin', $this->plugin);
+        $this->getContainer()->set('plugin', $this->base);
 
         parent::bootHandler();
     }
@@ -27,17 +22,17 @@ class PluginKernel extends WordpressKernel
         ContainerBuilder $builder
     ): void {
         if (!$builder->hasDefinition('plugin')) {
-            $builder->register('plugin', $this->plugin::class)
+            $builder->register('plugin', $this->base::class)
                 ->setAutoconfigured(true)
                 ->setSynthetic(true)
                 ->setPublic(true);
         }
 
-        $builder->addObjectResource($this->plugin);
-        $builder->setAlias($this->plugin::class, 'plugin')->setPublic(true);
+        $builder->addObjectResource($this->base);
+        $builder->setAlias($this->base::class, 'plugin')->setPublic(true);
 
         // Register all parent classes of plugin as aliases
-        foreach (class_parents($this->plugin) as $parent) {
+        foreach (class_parents($this->base) as $parent) {
             if (!$builder->hasAlias($parent)) {
                 $builder->setAlias($parent, 'plugin');
             }

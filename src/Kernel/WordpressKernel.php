@@ -7,6 +7,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
@@ -25,11 +26,15 @@ use VAF\WP\Framework\Template\Attribute\AsTemplate;
 use VAF\WP\Framework\Template\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\Template\Engine\PHTMLEngine;
 use VAF\WP\Framework\Template\EngineCompilerPass;
-use VAF\WP\Framework\Template\TemplateCompilerPass;
 use VAF\WP\Framework\Template\TemplateRenderer;
 
 abstract class WordpressKernel extends Kernel
 {
+    public function __construct(string $projectDir, bool $debug, protected readonly BaseWordpress $base)
+    {
+        parent::__construct($projectDir, $debug);
+    }
+
     protected function bootHandler(): void
     {
         /** @var HookLoader $hookLoader */
@@ -85,6 +90,8 @@ abstract class WordpressKernel extends Kernel
         $this->registerSettingsContainer($builder);
         $this->registerRestAPIContainer($builder);
         $this->registerMenuContainer($builder);
+
+        $this->base->configureContainer($builder);
     }
 
     /**

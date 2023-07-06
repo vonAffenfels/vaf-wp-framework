@@ -3,6 +3,7 @@
 namespace VAF\WP\Framework;
 
 use Exception;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use VAF\WP\Framework\Kernel\Kernel;
 
@@ -23,13 +24,16 @@ abstract class BaseWordpress
         $this->kernel->boot();
     }
 
+    public function configureContainer(ContainerBuilder $builder): void
+    {
+    }
+
     abstract protected function createKernel(): Kernel;
 
     final public function getDebug(): bool
     {
         return $this->debug;
     }
-
 
     final public function getPath(): string
     {
