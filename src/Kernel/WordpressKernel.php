@@ -14,9 +14,10 @@ use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
 use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
 use VAF\WP\Framework\Menu\Loader as MenuLoader;
 use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
+use VAF\WP\Framework\Request;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
-use VAF\WP\Framework\RestAPI\LoaderCompilerPass as RestAPILoaderCompilerPass;
 use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
+use VAF\WP\Framework\RestAPI\LoaderCompilerPass as RestAPILoaderCompilerPass;
 use VAF\WP\Framework\Setting\Attribute\AsSettingContainer;
 use VAF\WP\Framework\Setting\CompilerPass as SettingCompilerpass;
 use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
@@ -83,6 +84,7 @@ abstract class WordpressKernel extends Kernel
             $container->import($configDir . '/{services}.php');
         }
 
+        $this->registerRequestService($builder);
         $this->registerTemplateServices($builder);
 
         $this->registerHookContainer($builder);
@@ -100,6 +102,13 @@ abstract class WordpressKernel extends Kernel
     private function getConfigDir(): string
     {
         return $this->getProjectDir() . '/config';
+    }
+
+    private function registerRequestService(ContainerBuilder $builder): void
+    {
+        $builder->register(Request::class, Request::class)
+            ->setPublic(true)
+            ->setAutowired(true);
     }
 
     private function registerTemplateServices(ContainerBuilder $builder): void
