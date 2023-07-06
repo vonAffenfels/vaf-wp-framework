@@ -54,7 +54,7 @@ abstract class Setting
         return $this;
     }
 
-    private function save(): void
+    final public function save(): void
     {
         if ($this->dirty) {
             update_option($this->getOptionName(), $this->value);
