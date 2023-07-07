@@ -54,4 +54,9 @@ abstract class BaseWordpress
     {
         return $this->kernel->getContainer();
     }
+
+    public function getAssetUrl(string $asset): string
+    {
+        return $this->url . 'public/' . $asset;
+    }
 }

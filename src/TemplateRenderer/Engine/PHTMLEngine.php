@@ -1,8 +1,8 @@
 <?php
 
-namespace VAF\WP\Framework\Template\Engine;
+namespace VAF\WP\Framework\TemplateRenderer\Engine;
 
-use VAF\WP\Framework\Template\Attribute\AsTemplateEngine;
+use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
 
 #[AsTemplateEngine(extension: 'phtml')]
 final class PHTMLEngine extends TemplateEngine

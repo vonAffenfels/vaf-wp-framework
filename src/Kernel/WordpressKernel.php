@@ -23,11 +23,12 @@ use VAF\WP\Framework\Setting\CompilerPass as SettingCompilerpass;
 use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
 use VAF\WP\Framework\Shortcode\Loader as ShortcodeLoader;
 use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
-use VAF\WP\Framework\Template\Attribute\AsTemplate;
-use VAF\WP\Framework\Template\Attribute\AsTemplateEngine;
-use VAF\WP\Framework\Template\Engine\PHTMLEngine;
-use VAF\WP\Framework\Template\EngineCompilerPass;
-use VAF\WP\Framework\Template\TemplateRenderer;
+use VAF\WP\Framework\Template\Attribute\IsTemplate;
+use VAF\WP\Framework\Template\Attribute\UseScript;
+use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
+use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
+use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
+use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Notice;
 
 abstract class WordpressKernel extends Kernel
@@ -86,7 +87,8 @@ abstract class WordpressKernel extends Kernel
         }
 
         $this->registerRequestService($builder);
-        $this->registerTemplateServices($builder);
+        $this->registerTemplateRenderer($builder);
+        $this->registerTemplate($builder);
 
         $this->registerHookContainer($builder);
         $this->registerShortcodeContainer($builder);
@@ -112,7 +114,41 @@ abstract class WordpressKernel extends Kernel
             ->setAutowired(true);
     }
 
-    private function registerTemplateServices(ContainerBuilder $builder): void
+    private function registerTemplate(ContainerBuilder $builder): void
+    {
+        $builder->registerAttributeForAutoconfiguration(
+            IsTemplate::class,
+            static function (
+                ChildDefinition $definition,
+                IsTemplate $attribute,
+                ReflectionClass $reflector
+            ): void {
+                $definition->setArgument('$templateFile', $attribute->templateFile);
+            }
+        );
+
+        $builder->registerAttributeForAutoconfiguration(
+            UseScript::class,
+            static function (
+                ChildDefinition $definition,
+                UseScript $attribute,
+                ReflectionClass $reflector
+            ): void {
+                $definition->addMethodCall('addScript', [
+                    '$src' => $attribute->src,
+                    '$deps' => $attribute->deps
+                ]);
+            }
+        );
+
+        $builder->register(Notice::class, Notice::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true);
+        $builder->setAlias('template.notice', Notice::class)
+            ->setPublic(true);
+    }
+
+    private function registerTemplateRenderer(ContainerBuilder $builder): void
     {
         $builder->register(TemplateRenderer::class, TemplateRenderer::class)
             ->setPublic(true)
@@ -135,23 +171,6 @@ abstract class WordpressKernel extends Kernel
                 $definition->addTag('template.engine');
             }
         );
-
-        $builder->registerAttributeForAutoconfiguration(
-            AsTemplate::class,
-            static function (
-                ChildDefinition $definition,
-                AsTemplate $attribute,
-                ReflectionClass $reflector
-            ): void {
-                $definition->setArgument('$templateFile', $attribute->templateFile);
-            }
-        );
-
-        $builder->register(Notice::class, Notice::class)
-            ->setAutoconfigured(true)
-            ->setAutowired(true);
-        $builder->setAlias('template.notice', Notice::class)
-            ->setPublic(true);
     }
 
     private function registerSettingsContainer(ContainerBuilder $builder): void

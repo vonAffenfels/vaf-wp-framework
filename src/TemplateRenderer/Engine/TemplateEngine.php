@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Framework\Template\Engine;
+namespace VAF\WP\Framework\TemplateRenderer\Engine;
 
 abstract class TemplateEngine
 {

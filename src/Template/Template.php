@@ -2,11 +2,13 @@
 
 namespace VAF\WP\Framework\Template;
 
+use VAF\WP\Framework\BaseWordpress;
+use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
+
 abstract class Template
 {
-    private array $data = [];
-
     final public function __construct(
+        private readonly BaseWordpress $base,
         private readonly TemplateRenderer $renderer,
         private readonly string $templateFile
     ) {
@@ -14,7 +16,7 @@ abstract class Template
 
     final public function render(): string
     {
-        return $this->renderer->render($this->templateFile, $this->data);
+        return $this->renderer->render($this->templateFile, $this->getContextData());
     }
 
     final public function output(): void
@@ -22,8 +24,13 @@ abstract class Template
         echo $this->render();
     }
 
-    final protected function setData(string $key, $value): void
+    final public function addScript(string $src, array $deps = []): self
     {
-        $this->data[$key] = $value;
+        $handle = $this->base->getName() . '_' . pathinfo($src, PATHINFO_FILENAME);
+        $src = $this->base->getAssetUrl($src);
+        wp_enqueue_script($handle, $src, $deps, false, true);
+        return $this;
     }
+
+    abstract protected function getContextData(): array;
 }

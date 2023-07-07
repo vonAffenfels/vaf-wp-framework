@@ -1,12 +1,12 @@
 <?php
 
-namespace VAF\WP\Framework\Template;
+namespace VAF\WP\Framework\TemplateRenderer;
 
 use Exception;
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use VAF\WP\Framework\Template\Attribute\AsTemplateEngine;
+use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
 
 final class EngineCompilerPass implements CompilerPassInterface
 {

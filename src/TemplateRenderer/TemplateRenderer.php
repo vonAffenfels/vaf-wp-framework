@@ -1,9 +1,9 @@
 <?php
 
-namespace VAF\WP\Framework\Template;
+namespace VAF\WP\Framework\TemplateRenderer;
 
 use InvalidArgumentException;
-use VAF\WP\Framework\Template\Engine\TemplateEngine;
+use VAF\WP\Framework\TemplateRenderer\Engine\TemplateEngine;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Plugin;
 

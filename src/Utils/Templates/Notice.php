@@ -2,28 +2,41 @@
 
 namespace VAF\WP\Framework\Utils\Templates;
 
-use VAF\WP\Framework\Template\Attribute\AsTemplate;
+use VAF\WP\Framework\Template\Attribute\IsTemplate;
 use VAF\WP\Framework\Template\Template;
 use VAF\WP\Framework\Utils\NoticeType;
 
-#[AsTemplate(templateFile: '@vaf-wp-framework/utils/notice')]
+#[IsTemplate(templateFile: '@vaf-wp-framework/utils/notice')]
 final class Notice extends Template
 {
+    private string $content = '';
+    private bool $isDismissible = true;
+    private NoticeType $type = NoticeType::INFO;
+
+    protected function getContextData(): array
+    {
+        return [
+            'content' => $this->content,
+            'isDismissible' => $this->isDismissible,
+            'type' => $this->type
+        ];
+    }
+
     public function setContent(string $content): self
     {
-        $this->setData('content', $content);
+        $this->content = $content;
         return $this;
     }
 
     public function setIsDismissible(bool $value): self
     {
-        $this->setData('isDismissible', $value);
+        $this->isDismissible = $value;
         return $this;
     }
 
     public function setType(NoticeType $type): self
     {
-        $this->setData('type', $type);
+        $this->type = $type;
         return $this;
     }
 }
