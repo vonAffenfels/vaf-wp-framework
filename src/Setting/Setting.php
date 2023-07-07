@@ -31,7 +31,7 @@ abstract class Setting
             $this->loaded = true;
         }
 
-        return is_null($key) ? $this->value : ($this->value[$key] ?? $this->default);
+        return is_null($key) ? $this->value : ($this->value[$key] ?? $this->default[$key]);
     }
 
     protected function set($value, ?string $key = null, bool $doSave = true): self
