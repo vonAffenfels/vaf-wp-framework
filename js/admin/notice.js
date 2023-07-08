@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { __ } from '@wordpress/i18n';
 
 export const NOTICE_TYPE = {
     ERROR: 'notice-error',
@@ -21,6 +22,8 @@ export function showNotice(content, type = NOTICE_TYPE.INFO, isDismissible = tru
 
     if (isDismissible) {
         elOuterDiv.addClass('is-dismissible');
+
+        console.log(__('Dismiss this notice.'));
     }
 
     elOuterDiv.append(elContent);
