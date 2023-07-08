@@ -60,17 +60,6 @@ abstract class WordpressKernel extends Kernel
             $menuLoader = $this->getContainer()->get('menu.loader');
             $menuLoader->registerMenus();
         });
-
-        add_action('admin_print_footer_scripts', function () {
-            $this->outputAdminScript('notice.js');
-        });
-    }
-
-    private function outputAdminScript(string $script): void
-    {
-        $file = trailingslashit(dirname(realpath(__FILE__))) . '../../public/js/admin/' . $script;
-        $content = file_get_contents($file);
-        echo '<script type="text/javascript">' . $content . '</script>';
     }
 
     /**
