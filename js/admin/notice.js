@@ -25,10 +25,7 @@ export function showNotice(content, type = NOTICE_TYPE.INFO, isDismissible = tru
 
     elOuterDiv.append(elContent);
 
-    console.log("notice", elOuterDiv);
-
     const noticeList = $('.notice');
-    console.log("NOTICE LIST", noticeList);
     if (noticeList.length === 0) {
         // No notice is there. So we insert it as the first child into #wpbody-content
         const elWpBodyContent = $('#wpbody-content');
