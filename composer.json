@@ -39,9 +39,6 @@
   "scripts": {
     "test": [
       "phpcs"
-    ],
-    "post-update-cmd": [
-      "npm i"
     ]
   },
   "require": {

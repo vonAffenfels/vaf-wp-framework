@@ -1,5 +1,6 @@
 import $ from 'jquery';
-import { __ } from '@wordpress/i18n';
+
+const { __ } = wp.i18n;
 
 export const NOTICE_TYPE = {
     ERROR: 'notice-error',
@@ -23,7 +24,17 @@ export function showNotice(content, type = NOTICE_TYPE.INFO, isDismissible = tru
     if (isDismissible) {
         elOuterDiv.addClass('is-dismissible');
 
-        console.log(__('Dismiss this notice.'));
+        const button = $('<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>');
+        button.find('.screen-reader-text').text(__('Dismiss this notice.'));
+        button.on('click.wp-dismiss-notice', (event) => {
+            event.preventDefault();
+            elOuterDiv.fadeTo(100, 0, function () {
+                elOuterDiv.slideUp(100, function () {
+                    elOuterDiv.remove();
+                });
+            });
+        });
+        elOuterDiv.append(button);
     }
 
     elOuterDiv.append(elContent);
