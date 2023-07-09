@@ -2,7 +2,6 @@
 
 namespace VAF\WP\Framework\Kernel;
 
-use ReflectionClass;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,9 +29,13 @@ use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
 use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Notice;
+use WP;
 
 abstract class WordpressKernel extends Kernel
 {
+    private const QUERY_VAR_JS = '_vaf_js';
+    private const QUERY_VAR_CSS = '_vaf_css';
+
     public function __construct(string $projectDir, bool $debug, protected readonly BaseWordpress $base)
     {
         parent::__construct($projectDir, $debug);
@@ -59,6 +62,45 @@ abstract class WordpressKernel extends Kernel
             /** @var MenuLoader $menuLoader */
             $menuLoader = $this->getContainer()->get('menu.loader');
             $menuLoader->registerMenus();
+        });
+
+        $this->registerAssetHandler();
+    }
+
+    private function registerAssetHandler(): void
+    {
+        add_filter('query_vars', function (array $publicQueryVars): array {
+            $publicQueryVars[] = self::QUERY_VAR_JS . '_' . $this->base->getName();
+            $publicQueryVars[] = self::QUERY_VAR_CSS . '_' . $this->base->getName();
+            return $publicQueryVars;
+        });
+
+        add_action('parse_request', function (WP $wp) {
+            $js = $wp->query_vars[self::QUERY_VAR_JS . '_' . $this->base->getName()] ?? null;
+            $css = $wp->query_vars[self::QUERY_VAR_CSS . '_' . $this->base->getName()] ?? null;
+
+            if (!empty($js) && empty($css)) {
+                $contentType = 'text/javascript';
+                $minFile = realpath(dirname(__FILE__) . '/../../js/' . $js . '.min.js');
+                $devFile = realpath(dirname(__FILE__) . '/../../js/' . $js . '.js');
+            } elseif (empty($js) && !empty($css)) {
+                $contentType = 'text/stylesheet';
+                $minFile = realpath(dirname(__FILE__) . '/../../css/' . $css . '.min.js');
+                $devFile = realpath(dirname(__FILE__) . '/../../css/' . $css . '.js');
+            } else {
+                // Can't handle both on the same time
+                return;
+            }
+
+            header('Content-Type: ' . $contentType);
+
+            if (!$this->base->getDebug() && file_exists($minFile)) {
+                $data = file_get_contents($minFile);
+            } else {
+                $data = file_get_contents($devFile);
+            }
+            echo $data;
+            exit;
         });
     }
 
@@ -120,8 +162,7 @@ abstract class WordpressKernel extends Kernel
             IsTemplate::class,
             static function (
                 ChildDefinition $definition,
-                IsTemplate $attribute,
-                ReflectionClass $reflector
+                IsTemplate $attribute
             ): void {
                 $definition->setArgument('$templateFile', $attribute->templateFile);
             }
@@ -131,8 +172,7 @@ abstract class WordpressKernel extends Kernel
             UseScript::class,
             static function (
                 ChildDefinition $definition,
-                UseScript $attribute,
-                ReflectionClass $reflector
+                UseScript $attribute
             ): void {
                 $definition->addMethodCall('addScript', [
                     '$src' => $attribute->src,
@@ -164,9 +204,7 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsTemplateEngine::class,
             static function (
-                ChildDefinition $definition,
-                AsTemplateEngine $attribute,
-                ReflectionClass $reflector
+                ChildDefinition $definition
             ): void {
                 $definition->addTag('template.engine');
             }
@@ -180,9 +218,7 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsSettingContainer::class,
             static function (
-                ChildDefinition $defintion,
-                AsSettingContainer $attribute,
-                ReflectionClass $reflector
+                ChildDefinition $defintion
             ): void {
                 $defintion->addTag('setting.container');
             }
@@ -200,9 +236,7 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsMenuContainer::class,
             static function (
-                ChildDefinition $definition,
-                AsMenuContainer $attribute,
-                ReflectionClass $reflector
+                ChildDefinition $definition
             ): void {
                 $definition->addTag('menu.container');
             }
@@ -220,9 +254,7 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsShortcodeContainer::class,
             static function (
-                ChildDefinition $defintion,
-                AsShortcodeContainer $attribute,
-                ReflectionClass $reflector
+                ChildDefinition $defintion
             ): void {
                 $defintion->addTag('shortcode.container');
             }
@@ -240,9 +272,7 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsHookContainer::class,
             static function (
-                ChildDefinition $defintion,
-                AsHookContainer $attribute,
-                ReflectionClass $reflector
+                ChildDefinition $defintion
             ): void {
                 $defintion->addTag('hook.container');
             }
@@ -260,9 +290,7 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsRestContainer::class,
             static function (
-                ChildDefinition $definition,
-                AsRestContainer $attribute,
-                ReflectionClass $reflector
+                ChildDefinition $definition
             ): void {
                 $definition->addTag('restapi.container');
             }
