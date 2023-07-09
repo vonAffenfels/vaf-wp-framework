@@ -80,12 +80,12 @@ abstract class WordpressKernel extends Kernel
 
     private function getAssetJsUrl(string $file): string
     {
-        return sprintf('index.php?%s_%s=%s', self::QUERY_VAR_JS, $this->base->getName(), $file);
+        return sprintf('%s/index.php?%s_%s=%s', home_url(), self::QUERY_VAR_JS, $this->base->getName(), $file);
     }
 
     private function getAssetCssUrl(string $file): string
     {
-        return sprintf('index.php?%s_%s=%s', self::QUERY_VAR_CSS, $this->base->getName(), $file);
+        return sprintf('%s/index.php?%s_%s=%s', home_url(), self::QUERY_VAR_CSS, $this->base->getName(), $file);
     }
 
     private function registerAssetHandler(): void
