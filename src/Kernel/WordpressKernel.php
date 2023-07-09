@@ -65,6 +65,27 @@ abstract class WordpressKernel extends Kernel
         });
 
         $this->registerAssetHandler();
+
+        // Register admin scripts
+        if (is_admin()) {
+            wp_register_script(
+                $this->base->getName() . '/admin/notice',
+                $this->getAssetJsUrl('admin/notice'),
+                ['jquery'],
+                null,
+                true
+            );
+        }
+    }
+
+    private function getAssetJsUrl(string $file): string
+    {
+        return sprintf('index.php?%s_%s=%s', self::QUERY_VAR_JS, $this->base->getName(), $file);
+    }
+
+    private function getAssetCssUrl(string $file): string
+    {
+        return sprintf('index.php?%s_%s=%s', self::QUERY_VAR_CSS, $this->base->getName(), $file);
     }
 
     private function registerAssetHandler(): void
