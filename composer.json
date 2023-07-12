@@ -34,7 +34,11 @@
   "autoload": {
     "psr-4": {
       "VAF\\WP\\Framework\\": "src/"
-    }
+    },
+    "files": [
+      "templates",
+      "js"
+    ]
   },
   "scripts": {
     "test": [
