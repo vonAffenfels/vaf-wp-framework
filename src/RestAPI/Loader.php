@@ -46,8 +46,25 @@ final class Loader
                             'success' => false
                         ];
 
-                        foreach ($restRoute['params'] as $name => $default) {
-                            $value = $request->get_param($name) ?: $default;
+                        foreach ($restRoute['params'] as $name) {
+                            if (!isset($restRoute['paramsDefault'][$name]) && !$request->has_param($name)) {
+                                throw new Exception(
+                                    sprintf(
+                                        'Parameter "%s" for RestRoute "%s"%s not provided and without default value.',
+                                        $restRoute['paramsLower'][$name],
+                                        $restRoute['uri'],
+                                        (!empty($restRoute['namespace'] ?? '')) ?
+                                            sprintf(' of namespace "%s"', $restRoute['namespace']) :
+                                            ''
+                                    )
+                                );
+                            }
+
+                            if ($request->has_param($name)) {
+                                $value = $request->get_param($name);
+                            } else {
+                                $value = $restRoute['paramsDefault'][$name];
+                            }
 
                             # Handle type
                             switch ($restRoute['paramTypes'][$name]) {

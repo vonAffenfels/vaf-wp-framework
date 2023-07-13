@@ -67,6 +67,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $instance = $attribute[0]->newInstance();
 
             $params = [];
+            $paramsDefault = [];
             $paramsLower = [];
             $paramTypes = [];
             $serviceParams = [];
@@ -94,10 +95,10 @@ final class LoaderCompilerPass implements CompilerPassInterface
                             'Parameter type "%s" for RestRoute "%s"%s is not allowed. ' .
                             'Only %s or registered service classes are allowed',
                             $type->getName(),
+                            $instance->uri,
                             (!empty($containerAttribute->namespace)) ?
                                 sprintf(' of namespace "%s"', $containerAttribute->namespace) :
                                 '',
-                            $instance->uri,
                             '"' . implode('", "', $this->allowedTypes) . '"'
                         )
                     );
@@ -110,7 +111,11 @@ final class LoaderCompilerPass implements CompilerPassInterface
                     $name = $parameter->getName();
                     $lowerName = strtolower($name);
 
-                    $params[$lowerName] = $parameter->getDefaultValue();
+                    if ($parameter->isOptional()) {
+                        $paramsDefault[$lowerName] = $parameter->getDefaultValue();
+                    }
+
+                    $params[] = $lowerName;
                     $paramsLower[$lowerName] = $name;
                     $paramTypes[$lowerName] = $type->getName();
                 } else {
@@ -126,6 +131,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
                 'namespace' => $containerAttribute->namespace,
                 'params' => $params,
                 'paramsLower' => $paramsLower,
+                'paramsDefault' => $paramsDefault,
                 'paramTypes' => $paramTypes,
                 'serviceParams' => $serviceParams
             ];
