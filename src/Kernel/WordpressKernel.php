@@ -63,66 +63,6 @@ abstract class WordpressKernel extends Kernel
             $menuLoader = $this->getContainer()->get('menu.loader');
             $menuLoader->registerMenus();
         });
-
-        $this->registerAssetHandler();
-
-        // Register admin scripts
-        if (is_admin()) {
-            wp_register_script(
-                $this->base->getName() . '/admin/notice',
-                $this->getAssetJsUrl('admin/notice'),
-                ['jquery'],
-                null,
-                true
-            );
-        }
-    }
-
-    private function getAssetJsUrl(string $file): string
-    {
-        return sprintf('%s/index.php?%s_%s=%s', home_url(), self::QUERY_VAR_JS, $this->base->getName(), $file);
-    }
-
-    private function getAssetCssUrl(string $file): string
-    {
-        return sprintf('%s/index.php?%s_%s=%s', home_url(), self::QUERY_VAR_CSS, $this->base->getName(), $file);
-    }
-
-    private function registerAssetHandler(): void
-    {
-        add_filter('query_vars', function (array $publicQueryVars): array {
-            $publicQueryVars[] = self::QUERY_VAR_JS . '_' . $this->base->getName();
-            $publicQueryVars[] = self::QUERY_VAR_CSS . '_' . $this->base->getName();
-            return $publicQueryVars;
-        });
-
-        add_action('parse_request', function (WP $wp) {
-            $js = $wp->query_vars[self::QUERY_VAR_JS . '_' . $this->base->getName()] ?? null;
-            $css = $wp->query_vars[self::QUERY_VAR_CSS . '_' . $this->base->getName()] ?? null;
-
-            if (!empty($js) && empty($css)) {
-                $contentType = 'text/javascript';
-                $minFile = realpath(dirname(__FILE__) . '/../../js/' . $js . '.min.js');
-                $devFile = realpath(dirname(__FILE__) . '/../../js/' . $js . '.js');
-            } elseif (empty($js) && !empty($css)) {
-                $contentType = 'text/stylesheet';
-                $minFile = realpath(dirname(__FILE__) . '/../../css/' . $css . '.min.js');
-                $devFile = realpath(dirname(__FILE__) . '/../../css/' . $css . '.js');
-            } else {
-                // Can't handle both on the same time
-                return;
-            }
-
-            header('Content-Type: ' . $contentType);
-
-            if (!$this->base->getDebug() && file_exists($minFile)) {
-                $data = file_get_contents($minFile);
-            } else {
-                $data = file_get_contents($devFile);
-            }
-            echo $data;
-            exit;
-        });
     }
 
     /**

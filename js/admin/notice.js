@@ -9,7 +9,7 @@ export const NOTICE_TYPE = {
     INFO: 'notice-info'
 };
 
-export function showNotice(content, type = NOTICE_TYPE.INFO, isDismissible = true)
+export function showNotice(content, type = NOTICE_TYPE.INFO, isDismissible = true, autoDismis = 0)
 {
     if (Object.values(NOTICE_TYPE).indexOf(type) === -1) {
         console.error('Notice type [' + type + '] not supported!');
@@ -24,15 +24,28 @@ export function showNotice(content, type = NOTICE_TYPE.INFO, isDismissible = tru
     if (isDismissible) {
         elOuterDiv.addClass('is-dismissible');
 
-        const button = $('<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>');
-        button.find('.screen-reader-text').text(__('Dismiss this notice.'));
-        button.on('click.wp-dismiss-notice', (event) => {
-            event.preventDefault();
+        function dismisNotice()
+        {
             elOuterDiv.fadeTo(100, 0, function () {
                 elOuterDiv.slideUp(100, function () {
                     elOuterDiv.remove();
                 });
             });
+            if (dismisTimer) {
+                clearTimeout(dismisTimer);
+            }
+        }
+
+        let dismisTimer = null;
+        if (autoDismis) {
+            dismisTimer = setTimeout(dismisNotice, autoDismis);
+        }
+
+        const button = $('<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>');
+        button.find('.screen-reader-text').text(__('Dismiss this notice.'));
+        button.on('click.wp-dismiss-notice', (event) => {
+            event.preventDefault();
+            dismisNotice();
         });
         elOuterDiv.append(button);
     }
