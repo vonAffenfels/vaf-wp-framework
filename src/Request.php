@@ -69,6 +69,12 @@ final class Request
         return $params[$key] ?? $default;
     }
 
+    final public function hasParam(string $key, int $type = self::TYPE_ALL): bool
+    {
+        $params = $this->getParams($type);
+        return isset($params[$key]);
+    }
+
     /**
      * Returns true if request is an ajax request.
      *

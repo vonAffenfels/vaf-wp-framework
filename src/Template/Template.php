@@ -32,7 +32,7 @@ abstract class Template
 
         foreach ($adminAjaxActions as $ajaxAction) {
             $completeActionName = $this->base->getName() . '_' . $ajaxAction;
-            wp_localize_script($handle, $completeActionName, [
+            wp_localize_script($handle, str_replace('-', '_', $completeActionName), [
                 'ajaxurl' => admin_url('admin-ajax.php'),
                 'data' => [
                     '_ajax_nonce' => wp_create_nonce($ajaxAction),

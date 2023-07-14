@@ -93,18 +93,21 @@ final class LoaderCompilerPass implements CompilerPassInterface
                     );
                 }
 
+                $isServiceParam = false;
+                if ($container->has($type->getName())) {
+                    $container->findDefinition($type->getName())->setPublic(true);
+                    $isServiceParam = true;
+                }
+
                 $parameterBag->addParam(
                     new Parameter(
                         name: $parameter->getName(),
                         type: $type->getName(),
                         isOptional: $parameter->isOptional(),
-                        default: $parameter->isOptional() ? $parameter->getDefaultValue() : null
+                        default: $parameter->isOptional() ? $parameter->getDefaultValue() : null,
+                        isServiceParam: $isServiceParam
                     )
                 );
-
-                if ($container->has($type->getName())) {
-                    $container->findDefinition($type->getName())->setPublic(true);
-                }
             }
 
             $data[] = [
