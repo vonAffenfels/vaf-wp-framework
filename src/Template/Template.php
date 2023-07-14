@@ -24,11 +24,20 @@ abstract class Template
         echo $this->render();
     }
 
-    final public function addScript(string $src, array $deps = []): self
+    final public function addScript(string $src, array $deps = [], array $adminAjaxActions = []): self
     {
         $handle = $this->base->getName() . '_' . pathinfo($src, PATHINFO_FILENAME);
         $src = $this->base->getAssetUrl($src);
         wp_enqueue_script($handle, $src, $deps, false, true);
+
+        foreach ($adminAjaxActions as $ajaxAction) {
+            wp_localize_script($handle, $this->base->getName() . '_' . $ajaxAction, [
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                '_ajax_nonce' => wp_create_nonce($ajaxAction),
+                'action' => $ajaxAction
+            ]);
+        }
+
         return $this;
     }
 

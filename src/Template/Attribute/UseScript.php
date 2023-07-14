@@ -9,7 +9,8 @@ class UseScript
 {
     public function __construct(
         public readonly string $src,
-        public readonly array $deps = []
+        public readonly array $deps = [],
+        public readonly array $adminAjaxActions = []
     ) {
     }
 }

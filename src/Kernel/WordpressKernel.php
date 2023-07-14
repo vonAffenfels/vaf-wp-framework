@@ -23,6 +23,7 @@ use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
 use VAF\WP\Framework\Shortcode\Loader as ShortcodeLoader;
 use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
 use VAF\WP\Framework\Template\Attribute\IsTemplate;
+use VAF\WP\Framework\Template\Attribute\UseAdminAjax;
 use VAF\WP\Framework\Template\Attribute\UseScript;
 use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
@@ -137,7 +138,8 @@ abstract class WordpressKernel extends Kernel
             ): void {
                 $definition->addMethodCall('addScript', [
                     '$src' => $attribute->src,
-                    '$deps' => $attribute->deps
+                    '$deps' => $attribute->deps,
+                    '$adminAjaxActions' => $attribute->adminAjaxActions
                 ]);
             }
         );
