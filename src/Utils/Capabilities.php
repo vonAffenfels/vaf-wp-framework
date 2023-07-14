@@ -4,6 +4,9 @@ namespace VAF\WP\Framework\Utils;
 
 enum Capabilities: string
 {
+    # None
+    case NONE = '';
+
     # Super Admin
     case CREATE_SITES = 'create_sites';
     case DELETE_SITES = 'delete_sites';

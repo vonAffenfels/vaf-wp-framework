@@ -33,8 +33,10 @@ abstract class Template
         foreach ($adminAjaxActions as $ajaxAction) {
             wp_localize_script($handle, $this->base->getName() . '_' . $ajaxAction, [
                 'ajaxurl' => admin_url('admin-ajax.php'),
-                '_ajax_nonce' => wp_create_nonce($ajaxAction),
-                'action' => $ajaxAction
+                'data' => [
+                    '_ajax_nonce' => wp_create_nonce($ajaxAction),
+                    'action' => $ajaxAction
+                ]
             ]);
         }
 
