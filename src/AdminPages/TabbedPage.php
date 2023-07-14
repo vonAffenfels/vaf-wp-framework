@@ -6,7 +6,6 @@ use VAF\WP\Framework\Kernel\WordpressKernel;
 use VAF\WP\Framework\Request;
 use VAF\WP\Framework\System\Parameters\Parameter;
 use VAF\WP\Framework\System\Parameters\ParameterBag;
-use VAF\WP\Framework\Utils\HttpResponseCodes;
 use VAF\WP\Framework\Utils\Templates\Admin\TabbedPage as Template;
 
 abstract class TabbedPage
