@@ -35,6 +35,7 @@ use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
 use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Admin\Notice;
+use VAF\WP\Framework\Utils\Templates\Admin\TabbedPage as TabbedPageTemplate;
 
 abstract class WordpressKernel extends Kernel
 {
@@ -152,9 +153,6 @@ abstract class WordpressKernel extends Kernel
             }
         );
 
-        $builder->registerForAutoconfiguration(TabbedPage::class)
-            ->addTag('isTabbedPage');
-
         $builder->register(Notice::class, Notice::class)
             ->setAutoconfigured(true)
             ->setAutowired(true);
@@ -229,6 +227,10 @@ abstract class WordpressKernel extends Kernel
                 $defintion->addTag('adminpages.tabbed');
             }
         );
+
+        $builder->register(TabbedPageTemplate::class, TabbedPageTemplate::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true);
     }
 
     private function registerMenuContainer(ContainerBuilder $builder): void
