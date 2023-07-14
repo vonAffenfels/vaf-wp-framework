@@ -50,6 +50,10 @@ abstract class WordpressKernel extends Kernel
         $shortcodeLoader = $this->getContainer()->get('shortcode.loader');
         $shortcodeLoader->registerShortcodes();
 
+        /** @var AdminAjaxLoader $adminAjaxLoader */
+        $adminAjaxLoader = $this->getContainer()->get('adminajax.loader');
+        $adminAjaxLoader->registerAdminAjaxActions();
+
         // Registering REST routes
         add_action('rest_api_init', function () {
             /** @var RestAPILoader $restApiLoader */

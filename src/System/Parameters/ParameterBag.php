@@ -23,4 +23,13 @@ class ParameterBag
             return $param->toArray();
         }, $this->params);
     }
+
+    public static function fromArray(array $data): self
+    {
+        $bag = new ParameterBag();
+        foreach ($data as $param) {
+            $bag->addParam(Parameter::fromArray($param));
+        }
+        return $bag;
+    }
 }

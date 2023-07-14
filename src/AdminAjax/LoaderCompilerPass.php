@@ -110,7 +110,8 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $data[] = [
                 'callback' => $methodName,
                 'action' => $instance->action,
-                'params' => $parameterBag->toArray()
+                'params' => $parameterBag->toArray(),
+                'capability' => $instance->capability
             ];
         }
 

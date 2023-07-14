@@ -10,7 +10,7 @@ class IsAdminAjaxAction
 {
     public function __construct(
         public readonly string $action,
-        public readonly ?Capabilities $capabilities = null
+        public readonly ?Capabilities $capability = null
     ) {
     }
 }
