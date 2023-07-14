@@ -9,6 +9,8 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use VAF\WP\Framework\AdminAjax\Attributes\AsAdminAjaxContainer;
 use VAF\WP\Framework\AdminAjax\Loader as AdminAjaxLoader;
 use VAF\WP\Framework\AdminAjax\LoaderCompilerPass as AdminAjaxLoaderCompilerPass;
+use VAF\WP\Framework\AdminPages\Attributes\IsTabbedPage;
+use VAF\WP\Framework\AdminPages\TabbedPage;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
@@ -101,6 +103,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerSettingsContainer($builder);
         $this->registerRestAPIContainer($builder);
         $this->registerMenuContainer($builder);
+        $this->registerAdminPages($builder);
 
         $this->registerAdminAjaxContainer($builder);
 
@@ -147,6 +150,9 @@ abstract class WordpressKernel extends Kernel
                 ]);
             }
         );
+
+        $builder->registerForAutoconfiguration(TabbedPage::class)
+            ->addTag('isTabbedPage');
 
         $builder->register(Notice::class, Notice::class)
             ->setAutoconfigured(true)
@@ -206,6 +212,18 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $defintion
             ): void {
                 $defintion->addTag('adminajax.container');
+            }
+        );
+    }
+
+    private function registerAdminPages(ContainerBuilder $builder): void
+    {
+        $builder->registerAttributeForAutoconfiguration(
+            IsTabbedPage::class,
+            static function (
+                ChildDefinition $defintion
+            ): void {
+                $defintion->addTag('adminpages.tabbed');
             }
         );
     }
