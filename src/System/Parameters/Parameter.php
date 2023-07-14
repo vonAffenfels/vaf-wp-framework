@@ -11,4 +11,14 @@ class Parameter
         private readonly mixed $default
     ) {
     }
+
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'type' => $this->type,
+            'isOptional' => $this->isOptional,
+            'default' => $this->default
+        ];
+    }
 }

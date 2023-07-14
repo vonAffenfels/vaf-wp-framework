@@ -16,4 +16,11 @@ class ParameterBag
         $this->params[] = $param;
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return array_map(function (Parameter $param) {
+            return $param->toArray();
+        }, $this->params);
+    }
 }

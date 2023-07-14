@@ -98,7 +98,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
                         name: $parameter->getName(),
                         type: $type->getName(),
                         isOptional: $parameter->isOptional(),
-                        default: $parameter->getDefaultValue()
+                        default: $parameter->isOptional() ? $parameter->getDefaultValue() : null
                     )
                 );
 
@@ -110,7 +110,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $data[] = [
                 'callback' => $methodName,
                 'action' => $instance->action,
-                'params' => $parameterBag
+                'params' => $parameterBag->toArray()
             ];
         }
 

@@ -188,7 +188,7 @@ abstract class WordpressKernel extends Kernel
         );
     }
 
-    private function registerAdminAjaxContiner(ContainerBuilder $builder): void
+    private function registerAdminAjaxContainer(ContainerBuilder $builder): void
     {
         $builder->register('adminajax.loader', AdminAjaxLoader::class)
             ->setPublic(true)
