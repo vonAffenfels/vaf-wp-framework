@@ -11,6 +11,8 @@ final class TabbedPage extends Template
     private string $pageTitle = '';
     private array $tabs = [];
 
+    private string $content = '';
+
     public function setPageTitle(string $title): self
     {
         $this->pageTitle = $title;
@@ -23,11 +25,18 @@ final class TabbedPage extends Template
         return $this;
     }
 
+    public function setContent(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
     protected function getContextData(): array
     {
         return [
             'pageTitle' => $this->pageTitle,
-            'tabs' => $this->tabs
+            'tabs' => $this->tabs,
+            'content' => $this->content
         ];
     }
 }

@@ -91,7 +91,8 @@ final class TabbedPageCompilerPass implements CompilerPassInterface
                 $handlerMethods[$slug] = [
                     'params' => $parameterBag->toArray(),
                     'slug' => $slug,
-                    'title' => $title
+                    'title' => $title,
+                    'method' => $method->getName()
                 ];
             }
 
