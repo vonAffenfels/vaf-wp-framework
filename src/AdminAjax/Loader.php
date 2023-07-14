@@ -32,7 +32,9 @@ final class Loader
                 /** @var Capabilities $capability */
                 $capability = $action['capability'];
 
-                $callback = function () use ($parameterBag, $capability, $method, $serviceId) {
+                $callback = function () use ($action, $parameterBag, $capability, $method, $serviceId) {
+                    check_ajax_referer($action['action']);
+
                     if (!is_null($capability) && !current_user_can($capability->value)) {
                         wp_send_json_error(
                             [
