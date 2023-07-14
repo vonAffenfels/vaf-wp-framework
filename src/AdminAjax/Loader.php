@@ -23,8 +23,6 @@ final class Loader
 
     public function registerAdminAjaxActions(): void
     {
-        $name = $this->base->getName();
-
         foreach ($this->adminAjaxContainer as $serviceId => $adminAjaxContainer) {
             foreach ($adminAjaxContainer as $action) {
                 $parameterBag = ParameterBag::fromArray($action['params']);
