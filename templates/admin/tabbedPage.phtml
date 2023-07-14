@@ -1,5 +1,10 @@
 <div class="wrap">
-    <h2><?php echo $this->title ?></h2>
+    <h2><?php echo $this->pageTitle ?></h2>
     <h2 class="nav-tab-wrapper">
+        <?php foreach ($this->tabs as $tab): ?>
+            <a href="<?php echo $tab['url'] ?>" class="nav-tab <?php echo $tab['active'] ? 'nav-tab-active' : '' ?>">
+                <?php echo $tab['title'] ?>
+            </a>
+        <?php endforeach; ?>
     </h2>
 </div>
