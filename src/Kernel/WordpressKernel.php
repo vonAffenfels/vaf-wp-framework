@@ -11,6 +11,7 @@ use VAF\WP\Framework\AdminAjax\Loader as AdminAjaxLoader;
 use VAF\WP\Framework\AdminAjax\LoaderCompilerPass as AdminAjaxLoaderCompilerPass;
 use VAF\WP\Framework\AdminPages\Attributes\IsTabbedPage;
 use VAF\WP\Framework\AdminPages\TabbedPage;
+use VAF\WP\Framework\AdminPages\TabbedPageCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
@@ -218,6 +219,8 @@ abstract class WordpressKernel extends Kernel
 
     private function registerAdminPages(ContainerBuilder $builder): void
     {
+        $builder->addCompilerPass(new TabbedPageCompilerPass());
+
         $builder->registerAttributeForAutoconfiguration(
             IsTabbedPage::class,
             static function (
