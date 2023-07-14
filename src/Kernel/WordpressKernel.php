@@ -31,7 +31,7 @@ use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
 use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
-use VAF\WP\Framework\Utils\Templates\Notice;
+use VAF\WP\Framework\Utils\Templates\Admin\Notice;
 
 abstract class WordpressKernel extends Kernel
 {

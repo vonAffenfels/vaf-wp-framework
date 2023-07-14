@@ -1,12 +1,12 @@
 <?php
 
-namespace VAF\WP\Framework\Utils\Templates;
+namespace VAF\WP\Framework\Utils\Templates\Admin;
 
 use VAF\WP\Framework\Template\Attribute\IsTemplate;
 use VAF\WP\Framework\Template\Template;
 use VAF\WP\Framework\Utils\NoticeType;
 
-#[IsTemplate(templateFile: '@vaf-wp-framework/utils/notice')]
+#[IsTemplate(templateFile: '@vaf-wp-framework/admin/notice')]
 final class Notice extends Template
 {
     private string $content = '';
