@@ -6,6 +6,9 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use VAF\WP\Framework\AdminAjax\Attributes\AsAdminAjaxContainer;
+use VAF\WP\Framework\AdminAjax\Loader as AdminAjaxLoader;
+use VAF\WP\Framework\AdminAjax\LoaderCompilerPass as AdminAjaxLoaderCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
@@ -23,20 +26,15 @@ use VAF\WP\Framework\Shortcode\Attribute\AsShortcodeContainer;
 use VAF\WP\Framework\Shortcode\Loader as ShortcodeLoader;
 use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass;
 use VAF\WP\Framework\Template\Attribute\IsTemplate;
-use VAF\WP\Framework\Template\Attribute\UseAdminAjax;
 use VAF\WP\Framework\Template\Attribute\UseScript;
 use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
 use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Notice;
-use WP;
 
 abstract class WordpressKernel extends Kernel
 {
-    private const QUERY_VAR_JS = '_vaf_js';
-    private const QUERY_VAR_CSS = '_vaf_css';
-
     public function __construct(string $projectDir, bool $debug, protected readonly BaseWordpress $base)
     {
         parent::__construct($projectDir, $debug);
@@ -99,6 +97,8 @@ abstract class WordpressKernel extends Kernel
         $this->registerSettingsContainer($builder);
         $this->registerRestAPIContainer($builder);
         $this->registerMenuContainer($builder);
+
+        $this->registerAdminAjaxContainer($builder);
 
         $this->base->configureContainer($builder);
     }
@@ -184,6 +184,24 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $defintion
             ): void {
                 $defintion->addTag('setting.container');
+            }
+        );
+    }
+
+    private function registerAdminAjaxContiner(ContainerBuilder $builder): void
+    {
+        $builder->register('adminajax.loader', AdminAjaxLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new AdminAjaxLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsAdminAjaxContainer::class,
+            static function (
+                ChildDefinition $defintion
+            ): void {
+                $defintion->addTag('adminajax.container');
             }
         );
     }

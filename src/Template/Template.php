@@ -31,11 +31,12 @@ abstract class Template
         wp_enqueue_script($handle, $src, $deps, false, true);
 
         foreach ($adminAjaxActions as $ajaxAction) {
-            wp_localize_script($handle, $this->base->getName() . '_' . $ajaxAction, [
+            $completeActionName = $this->base->getName() . '_' . $ajaxAction;
+            wp_localize_script($handle, $completeActionName, [
                 'ajaxurl' => admin_url('admin-ajax.php'),
                 'data' => [
                     '_ajax_nonce' => wp_create_nonce($ajaxAction),
-                    'action' => $ajaxAction
+                    'action' => $completeActionName
                 ]
             ]);
         }
