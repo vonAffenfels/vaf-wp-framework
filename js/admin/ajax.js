@@ -1,6 +1,6 @@
 import $ from 'jquery';
 
-export function ajaxRequest(action, params, success, error)
+export function ajaxRequest(action, params, successCb, errorCb)
 {
     if (!window[action]) {
         console.error('Action ' + action + ' not configured!');
@@ -19,15 +19,15 @@ export function ajaxRequest(action, params, success, error)
         success: function (response) {
             const data = response.data || {};
             if (response.success) {
-                success(data);
+                successCb(data);
             } else {
-                error(data.message);
+                errorCb(data.message);
             }
         },
         error: function (request, status, error) {
             const json = request.responseJSON || {};
             const data = json.data || {};
-            error(data.message || error);
+            errorCb(data.message || error);
         }
     })
 }
