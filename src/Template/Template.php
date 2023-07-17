@@ -31,15 +31,31 @@ abstract class Template
         wp_enqueue_script($handle, $src, $deps, false, true);
 
         foreach ($adminAjaxActions as $ajaxAction) {
-            $completeActionName = $this->base->getName() . '_' . $ajaxAction;
-            wp_localize_script($handle, str_replace('-', '_', $completeActionName), [
-                'ajaxurl' => admin_url('admin-ajax.php'),
-                'data' => [
-                    '_ajax_nonce' => wp_create_nonce($ajaxAction),
-                    'action' => $completeActionName
-                ]
-            ]);
+            $this->registerAdminAjaxAction($ajaxAction);
         }
+
+        return $this;
+    }
+
+    final public function registerAdminAjaxAction(string $action): self
+    {
+        $completeActionName = $this->base->getName() . '_' . $action;
+        $this->addScriptData(str_replace('-', '_', $completeActionName), [
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'data' => [
+                '_ajax_nonce' => wp_create_nonce($action),
+                'action' => $completeActionName
+            ]
+        ]);
+
+        return $this;
+    }
+
+    final public function addScriptData(string $var, array $data): self
+    {
+        // Make sure that we have the common JS included to hook onto that handle
+        wp_enqueue_script('common');
+        wp_localize_script('common', $var, $data);
 
         return $this;
     }
