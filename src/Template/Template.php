@@ -16,6 +16,11 @@ abstract class Template
 
     final public function render(): string
     {
+        $jsData = $this->getJavascriptData();
+        if ($jsData !== false) {
+            $templateFileParts = explode('/', $this->templateFile);
+            $this->addScriptData($this->base->getName() . '_' . end($templateFileParts), $jsData);
+        }
         return $this->renderer->render($this->templateFile, $this->getContextData());
     }
 
@@ -51,13 +56,16 @@ abstract class Template
         return $this;
     }
 
-    final public function addScriptData(string $var, array $data): self
+    private function addScriptData(string $var, array $data): void
     {
         // Make sure that we have the common JS included to hook onto that handle
         wp_enqueue_script('common');
         wp_localize_script('common', $var, $data);
+    }
 
-        return $this;
+    protected function getJavascriptData(): false|array
+    {
+        return false;
     }
 
     abstract protected function getContextData(): array;
