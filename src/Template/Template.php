@@ -19,7 +19,12 @@ abstract class Template
         $jsData = $this->getJavascriptData();
         if ($jsData !== false) {
             $templateFileParts = explode('/', $this->templateFile);
-            $this->addScriptData($this->base->getName() . '_' . end($templateFileParts), $jsData);
+            $name = str_replace(
+                '-',
+                '_',
+                $this->base->getName() . '_' . end($templateFileParts)
+            );
+            $this->addScriptData($name, $jsData);
         }
         return $this->renderer->render($this->templateFile, $this->getContextData());
     }
