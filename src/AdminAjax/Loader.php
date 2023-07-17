@@ -55,14 +55,22 @@ final class Loader
                             continue;
                         }
 
+                        $name = $parameter->getName();
+                        if (
+                            !$this->request->hasParam($name, Request::TYPE_POST)
+                            && $this->request->hasParam($parameter->getNameLower(), Request::TYPE_POST)
+                        ) {
+                            $name = $parameter->getNameLower();
+                        }
+
                         if (
                             !$parameter->isOptional()
-                            && !$this->request->hasParam($parameter->getNameLower(), Request::TYPE_POST)
+                            && !$this->request->hasParam($name, Request::TYPE_POST)
                         ) {
                             wp_send_json_error(
                                 [
                                     'code' => HttpResponseCodes::HTTP_BAD_REQUEST->value,
-                                    'message' => 'Missing parameter ' . $parameter->getNameLower() . '!'
+                                    'message' => 'Missing parameter ' . $name . '!'
                                 ],
                                 HttpResponseCodes::HTTP_BAD_REQUEST->value
                             );
@@ -70,7 +78,7 @@ final class Loader
                         }
 
                         $value = $this->request->getParam(
-                            $parameter->getNameLower(),
+                            $name,
                             Request::TYPE_POST,
                             $parameter->getDefault()
                         );
