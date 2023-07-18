@@ -2,12 +2,16 @@
 
 namespace VAF\WP\Framework\Menu;
 
+use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Kernel\WordpressKernel;
 
 final class Loader
 {
-    public function __construct(private readonly WordpressKernel $kernel, private readonly array $menuData)
-    {
+    public function __construct(
+        private readonly WordpressKernel $kernel,
+        private readonly BaseWordpress $base,
+        private readonly array $menuData
+    ) {
     }
 
     private function registerMenu(array $menuData): void
@@ -26,8 +30,8 @@ final class Loader
 
         if (empty($menuData['parent'])) {
             add_menu_page(
-                $menuData['menuTitle'],
-                $menuData['menuTitle'],
+                __($menuData['menuTitle'], $this->base->getName()),
+                __($menuData['menuTitle'], $this->base->getName()),
                 $menuData['capability'],
                 $menuData['slug'],
                 $callback,
@@ -40,7 +44,7 @@ final class Loader
                 // when having children
                 add_submenu_page(
                     $menuData['slug'],
-                    $menuData['menuTitle'],
+                    __($menuData['menuTitle'], $this->base->getName()),
                     $menuData['subMenuTitle'],
                     $menuData['capability'],
                     $menuData['slug'],
@@ -51,8 +55,8 @@ final class Loader
         } else {
             add_submenu_page(
                 $menuData['parent'],
-                $menuData['menuTitle'],
-                $menuData['menuTitle'],
+                __($menuData['menuTitle'], $this->base->getName()),
+                __($menuData['menuTitle'], $this->base->getName()),
                 $menuData['capability'],
                 $menuData['slug'],
                 $callback,

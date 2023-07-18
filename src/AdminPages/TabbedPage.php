@@ -2,6 +2,7 @@
 
 namespace VAF\WP\Framework\AdminPages;
 
+use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Kernel\WordpressKernel;
 use VAF\WP\Framework\Request;
 use VAF\WP\Framework\System\Parameters\Parameter;
@@ -17,7 +18,8 @@ abstract class TabbedPage
         private array $handler,
         private readonly Request $request,
         private readonly Template $template,
-        private readonly WordpressKernel $kernel
+        private readonly WordpressKernel $kernel,
+        private readonly BaseWordpress $base
     ) {
     }
 
@@ -61,7 +63,7 @@ abstract class TabbedPage
         foreach ($this->handler as $tab) {
             $tabs[] = [
                 'active' => $tab['slug'] === $page,
-                'title' => $tab['title'],
+                'title' => __($tab['title'], $this->base->getName()),
                 'url' => $this->buildUrl($tab['slug'])
             ];
         }
@@ -73,7 +75,7 @@ abstract class TabbedPage
         }
 
         $this->template->setTabs($tabs);
-        $this->template->setPageTitle($this->pageTitle);
+        $this->template->setPageTitle(__($this->pageTitle, $this->base->getName()));
         $this->template->output();
     }
 }
