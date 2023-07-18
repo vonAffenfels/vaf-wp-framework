@@ -63,7 +63,7 @@ abstract class TabbedPage
         foreach ($this->handler as $tab) {
             $tabs[] = [
                 'active' => $tab['slug'] === $page,
-                'title' => __($tab['title'], $this->base->getName()),
+                'title' => $tab['title'],
                 'url' => $this->buildUrl($tab['slug'])
             ];
         }

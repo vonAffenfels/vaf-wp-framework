@@ -30,8 +30,8 @@ final class Loader
 
         if (empty($menuData['parent'])) {
             add_menu_page(
-                __($menuData['menuTitle'], $this->base->getName()),
-                __($menuData['menuTitle'], $this->base->getName()),
+                $menuData['menuTitle'],
+                $menuData['menuTitle'],
                 $menuData['capability'],
                 $menuData['slug'],
                 $callback,
@@ -44,7 +44,7 @@ final class Loader
                 // when having children
                 add_submenu_page(
                     $menuData['slug'],
-                    __($menuData['menuTitle'], $this->base->getName()),
+                    $menuData['menuTitle'],
                     $menuData['subMenuTitle'],
                     $menuData['capability'],
                     $menuData['slug'],
@@ -55,8 +55,8 @@ final class Loader
         } else {
             add_submenu_page(
                 $menuData['parent'],
-                __($menuData['menuTitle'], $this->base->getName()),
-                __($menuData['menuTitle'], $this->base->getName()),
+                $menuData['menuTitle'],
+                $menuData['menuTitle'],
                 $menuData['capability'],
                 $menuData['slug'],
                 $callback,
