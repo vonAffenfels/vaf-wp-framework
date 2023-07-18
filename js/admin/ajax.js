@@ -18,9 +18,9 @@ export function ajaxRequest(action, params, successCb, errorCb)
     }
 
     $.ajax({
-        url: window[action]['vaf_admin_ajax']['ajaxurl'],
+        url: window['vaf_admin_ajax'][action]['ajaxurl'],
         type: 'post',
-        data: Object.assign(params, window[action].data),
+        data: Object.assign(params, window['vaf_admin_ajax'][action]['data']),
         success: function (response) {
             const data = response.data || {};
             if (response.success) {
