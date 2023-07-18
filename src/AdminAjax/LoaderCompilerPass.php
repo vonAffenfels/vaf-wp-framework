@@ -16,7 +16,7 @@ use VAF\WP\Framework\System\Parameters\ParameterBag;
 
 final class LoaderCompilerPass implements CompilerPassInterface
 {
-    private array $allowedTypes = ['int', 'string', 'bool'];
+    private array $allowedTypes = ['int', 'string', 'bool', 'array'];
 
     /**
      * @throws Exception
