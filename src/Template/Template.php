@@ -50,14 +50,20 @@ abstract class Template
     final public function registerAdminAjaxAction(string $action): self
     {
         $completeActionName = $this->base->getName() . '_' . $action;
-        $this->addScriptData(str_replace('-', '_', $completeActionName), [
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'data' => [
-                '_ajax_nonce' => wp_create_nonce($action),
-                'action' => $completeActionName
-            ]
-        ]);
 
+        $code = sprintf(
+            '(window.vaf_admin_ajax = window.vaf_admin_ajax || {})[\'%1$s\'] = %2$s;',
+            $completeActionName,
+            json_encode([
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'data' => [
+                    '_ajax_nonce' => wp_create_nonce($action),
+                    'action' => $completeActionName
+                ]
+            ])
+        );
+        wp_enqueue_script('common');
+        wp_add_inline_script('common', $code, 'before');
         return $this;
     }
 

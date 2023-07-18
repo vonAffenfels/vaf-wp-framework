@@ -2,18 +2,23 @@ import $ from 'jquery';
 
 export function ajaxRequest(action, params, successCb, errorCb)
 {
-    if (!window[action]) {
+    if (!window['vaf_admin_ajax']) {
+        console.error('No admin ajax actions configured!');
+        return;
+    }
+
+    if (!window['vaf_admin_ajax'][action]) {
         console.error('Action ' + action + ' not configured!');
         return;
     }
 
-    if (!window[action].ajaxurl) {
+    if (!window['vaf_admin_ajax'][action]['ajaxurl']) {
         console.error('AJAX URL for action ' + action + ' not configured!');
         return;
     }
 
     $.ajax({
-        url: window[action].ajaxurl,
+        url: window[action]['vaf_admin_ajax']['ajaxurl'],
         type: 'post',
         data: Object.assign(params, window[action].data),
         success: function (response) {
@@ -25,7 +30,7 @@ export function ajaxRequest(action, params, successCb, errorCb)
             }
         },
         error: function (request, status, error) {
-            const json = request.responseJSON || {};
+            const json = request['responseJSON'] || {};
             const data = json.data || {};
             errorCb(data.message || error);
         }
