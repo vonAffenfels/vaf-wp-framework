@@ -22,7 +22,7 @@ export function ajaxRequest(action, params, successCb, errorCb)
         type: 'post',
         data: Object.assign(params, window['vaf_admin_ajax'][action]['data']),
         success: function (response) {
-            const data = response.data || {};
+            const data = response.hasOwnProperty('data') ? response['data'] : null;
             if (response.success) {
                 successCb(data);
             } else {
