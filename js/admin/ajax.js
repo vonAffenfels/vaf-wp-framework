@@ -26,7 +26,11 @@ export function ajaxRequest(action, params, successCb, errorCb)
             if (response.success) {
                 successCb(data);
             } else {
-                errorCb(data.message || 'Operation failed');
+                let message = 'Operation failed';
+                if (data && data.message) {
+                    message = data.message;
+                }
+                errorCb(message || 'Operation failed');
             }
         },
         error: function (request, status, error) {
