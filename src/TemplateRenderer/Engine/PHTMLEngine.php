@@ -32,4 +32,9 @@ final class PHTMLEngine extends TemplateEngine
     {
         return $this->getData($name);
     }
+
+    public function __isset(string $name)
+    {
+        return isset($this->data[$name]);
+    }
 }
