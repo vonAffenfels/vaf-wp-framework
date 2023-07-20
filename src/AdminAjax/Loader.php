@@ -103,19 +103,12 @@ final class Loader
 
                     $container = $this->kernel->getContainer()->get($serviceId);
                     try {
+                        /** @var Response $retVal */
                         $retVal = $container->$method(...$params);
-
-                        if ($retVal !== false) {
-                            wp_send_json_success($retVal === true ? null : $retVal);
-                        } else {
-                            wp_send_json_error();
-                        }
+                        wp_send_json($retVal->toArray());
                     } catch (Exception $e) {
-                        wp_send_json_error(
-                            [
-                                'code' => $e->getCode(),
-                                'message' => $e->getMessage()
-                            ],
+                        wp_send_json(
+                            Response::error($e::class . ': ' . $e->getMessage()),
                             HttpResponseCodes::HTTP_INTERNAL_SERVER_ERROR->value
                         );
                     }

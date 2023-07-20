@@ -64,6 +64,12 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $instance = $attribute[0]->newInstance();
 
             $methodName = $method->getName();
+            $returnType = $method->getReturnType();
+            if (is_null($returnType) || $returnType->getName() !== Response::class) {
+                throw new Exception(
+                    sprintf('AdminAjaxAction "%s" must return object of type %s!', $instance->action, Response::class)
+                );
+            }
 
             $parameterBag = new ParameterBag();
 
