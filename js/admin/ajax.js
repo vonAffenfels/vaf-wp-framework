@@ -22,15 +22,10 @@ export function ajaxRequest(action, params, successCb, errorCb)
         type: 'post',
         data: Object.assign(params, window['vaf_admin_ajax'][action]['data']),
         success: function (response) {
-            const data = response.hasOwnProperty('data') ? response['data'] : null;
             if (response.success) {
-                successCb(data);
+                successCb(response.data);
             } else {
-                let message = 'Operation failed';
-                if (data && data.message) {
-                    message = data.message;
-                }
-                errorCb(message || 'Operation failed');
+                errorCb(response.message);
             }
         },
         error: function (request, status, error) {
