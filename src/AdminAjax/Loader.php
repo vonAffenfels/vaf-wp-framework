@@ -118,9 +118,9 @@ final class Loader
 
                 if (is_null($capability)) {
                     add_action('wp_ajax_nopriv_' . $actionName, $callback);
-                } else {
-                    add_action('wp_ajax_' . $actionName, $callback);
                 }
+
+                add_action('wp_ajax_' . $actionName, $callback);
             }
         }
     }
