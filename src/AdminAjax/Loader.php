@@ -107,8 +107,9 @@ final class Loader
                         $retVal = $container->$method(...$params);
                         wp_send_json($retVal->toArray());
                     } catch (Exception $e) {
+                        $retVal = Response::error($e::class . ': ' . $e->getMessage());
                         wp_send_json(
-                            Response::error($e::class . ': ' . $e->getMessage()),
+                            $retVal->toArray(),
                             HttpResponseCodes::HTTP_INTERNAL_SERVER_ERROR->value
                         );
                     }

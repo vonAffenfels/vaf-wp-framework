@@ -30,8 +30,7 @@ export function ajaxRequest(action, params, successCb, errorCb)
         },
         error: function (request, status, error) {
             const json = request['responseJSON'] || {};
-            const data = json.data || {};
-            errorCb(data.message || error);
+            errorCb(json.message || error);
         }
     })
 }
