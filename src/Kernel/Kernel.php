@@ -28,12 +28,9 @@ use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Filesystem\Filesystem;
-use Throwable;
 
 /**
  * The Kernel is the heart of the library system.
@@ -61,10 +58,6 @@ abstract class Kernel
             return;
         }
 
-        if (null === $this->container) {
-            $this->initializeContainer();
-        }
-
         $this->bootHandler();
 
         $this->booted = true;
@@ -85,15 +78,6 @@ abstract class Kernel
     public function getProjectDir(): string
     {
         return $this->projectDir;
-    }
-
-    public function getContainer(): ContainerInterface
-    {
-        if (!$this->container) {
-            throw new LogicException('Cannot retrieve the container from a non-booted kernel.');
-        }
-
-        return $this->container;
     }
 
     public function getBuildDir(): string
@@ -186,104 +170,36 @@ abstract class Kernel
             . ($this->debug ? 'Debug' : '') . 'Container';
     }
 
-    /**
-     * Gets the container's base class.
-     *
-     * All names except Container must be fully qualified.
-     */
-    private function getContainerBaseClass(): string
-    {
-        return 'Container';
-    }
-
-    /**
-     * Initializes the service container.
-     *
-     * The built version of the service container is used when fresh, otherwise the
-     * container is built.
-     * @throws Exception
-     */
-    private function initializeContainer(): void
+    public function getContainer(): ContainerInterface
     {
         $class = $this->getContainerClass();
         $buildDir = $this->getBuildDir();
         $cache = new ConfigCache($buildDir . '/' . $class . '.php', $this->debug);
         $cachePath = $cache->getPath();
 
-        // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
-        $errorLevel = error_reporting(E_ALL ^ E_WARNING);
+        if (!$cache->isFresh()) {
+            // Rebuild the whole container
+            $container = $this->buildContainer();
+            $container->compile();
 
-        try {
-            if (
-                is_file($cachePath)
-                && is_object($this->container = include $cachePath)
-                && (!$this->debug || $cache->isFresh())
-            ) {
-                $this->container->set('kernel', $this);
-                error_reporting($errorLevel);
+            // cache the container
+            $dumper = new PhpDumper($container);
 
-                return;
-            }
-        } catch (Throwable $e) {
+            $code = $dumper->dump([
+                'class' => $class
+            ]);
+
+            $cache->write($code, $container->getResources());
         }
 
-        $oldContainer = is_object($this->container) ? new ReflectionClass($this->container) : $this->container = null;
+        if (file_exists($cachePath)) {
+            require_once $cachePath;
 
-        try {
-            is_dir($buildDir) || mkdir($buildDir, 0777, true);
-
-            if ($lock = fopen($cachePath . '.lock', 'w')) {
-                if (
-                    !flock($lock, LOCK_EX | LOCK_NB, $wouldBlock)
-                    && !flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)
-                ) {
-                    fclose($lock);
-                    $lock = null;
-                } elseif (!is_file($cachePath) || !is_object($this->container = include $cachePath)) {
-                    $this->container = null;
-                } elseif (!$oldContainer || get_class($this->container) !== $oldContainer->name) {
-                    flock($lock, LOCK_UN);
-                    fclose($lock);
-                    $this->container->set('kernel', $this);
-
-                    return;
-                }
-            }
-        } catch (Throwable $e) {
-        } finally {
-            error_reporting($errorLevel);
+            $this->container = new $class();
+            $this->container->set('kernel', $this);
         }
 
-        $container = null;
-        $container = $this->buildContainer();
-        $container->compile();
-
-        $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-
-        if ($lock) {
-            flock($lock, LOCK_UN);
-            fclose($lock);
-        }
-
-        $this->container = require $cachePath;
-        $this->container->set('kernel', $this);
-
-        if ($oldContainer && get_class($this->container) !== $oldContainer->name) {
-            // Because concurrent requests might still be using them,
-            // old container files are not removed immediately,
-            // but on a next dump of the container.
-            static $legacyContainers = [];
-            $oldContainerDir = dirname($oldContainer->getFileName());
-            $legacyContainers[$oldContainerDir . '.legacy'] = true;
-            $glob = glob(dirname($oldContainerDir) . DIRECTORY_SEPARATOR . '*.legacy', GLOB_NOSORT);
-            foreach ($glob as $legacyContainer) {
-                if (!isset($legacyContainers[$legacyContainer]) && @unlink($legacyContainer)) {
-                    (new Filesystem())->remove(substr($legacyContainer, 0, -7));
-                }
-            }
-
-            touch($oldContainerDir . '.legacy');
-        }
+        return $this->container;
     }
 
     /**
@@ -340,49 +256,6 @@ abstract class Kernel
         }
 
         return $container;
-    }
-
-    /**
-     * Dumps the service container to PHP code in the cache.
-     *
-     * @param string $class     The name of the class to generate
-     * @param string $baseClass The name of the container's base class
-     */
-    private function dumpContainer(
-        ConfigCache $cache,
-        ContainerBuilder $container,
-        string $class,
-        string $baseClass
-    ): void {
-        // cache the container
-        $dumper = new PhpDumper($container);
-
-        $content = $dumper->dump([
-            'class' => $class,
-            'base_class' => $baseClass,
-            'file' => $cache->getPath(),
-            'as_files' => true,
-            'debug' => $this->debug,
-            'build_time' => $container->hasParameter('kernel.container_build_time')
-                ? $container->getParameter('kernel.container_build_time')
-                : time(),
-            'preload_classes' => [],
-        ]);
-
-        $rootCode = array_pop($content);
-        $dir = dirname($cache->getPath()) . '/';
-        $fs = new Filesystem();
-
-        foreach ($content as $file => $code) {
-            $fs->dumpFile($dir . $file, $code);
-            @chmod($dir . $file, 0666 & ~umask());
-        }
-        $legacyFile = dirname($dir . key($content)) . '.legacy';
-        if (is_file($legacyFile)) {
-            @unlink($legacyFile);
-        }
-
-        $cache->write($rootCode, $container->getResources());
     }
 
     /**

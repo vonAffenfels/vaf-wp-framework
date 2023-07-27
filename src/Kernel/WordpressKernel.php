@@ -10,7 +10,6 @@ use VAF\WP\Framework\AdminAjax\Attributes\AsAdminAjaxContainer;
 use VAF\WP\Framework\AdminAjax\Loader as AdminAjaxLoader;
 use VAF\WP\Framework\AdminAjax\LoaderCompilerPass as AdminAjaxLoaderCompilerPass;
 use VAF\WP\Framework\AdminPages\Attributes\IsTabbedPage;
-use VAF\WP\Framework\AdminPages\TabbedPage;
 use VAF\WP\Framework\AdminPages\TabbedPageCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;

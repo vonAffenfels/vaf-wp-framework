@@ -21,7 +21,15 @@ abstract class BaseWordpress
         private readonly bool $debug = false
     ) {
         $this->kernel = $this->createKernel();
-        $this->kernel->boot();
+    }
+
+    /**
+     * @throws Exception
+     */
+    final public static function buildContainer(string $path): void
+    {
+        $obj = new static('__BUILD__', $path, '__BUILD__', true);
+        $obj->getContainer();
     }
 
     public function configureContainer(ContainerBuilder $builder): void

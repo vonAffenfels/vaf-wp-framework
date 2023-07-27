@@ -22,7 +22,10 @@ abstract class Plugin extends BaseWordpress
         $pluginPath = plugin_dir_path($file);
         $pluginName = dirname(plugin_basename($file));
 
-        return new static($pluginName, $pluginPath, $pluginUrl, $debug);
+        $plugin = new static($pluginName, $pluginPath, $pluginUrl, $debug);
+        $plugin->kernel->boot();
+
+        return $plugin;
     }
 
     final protected function createKernel(): Kernel
