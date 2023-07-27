@@ -39,9 +39,13 @@ use VAF\WP\Framework\Utils\Templates\Admin\TabbedPage as TabbedPageTemplate;
 
 abstract class WordpressKernel extends Kernel
 {
-    public function __construct(string $projectDir, bool $debug, protected readonly BaseWordpress $base)
-    {
-        parent::__construct($projectDir, $debug);
+    public function __construct(
+        string $projectDir,
+        bool $debug,
+        string $namespace,
+        protected readonly BaseWordpress $base
+    ) {
+        parent::__construct($projectDir, $debug, $namespace);
     }
 
     protected function bootHandler(): void

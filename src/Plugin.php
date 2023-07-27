@@ -25,22 +25,15 @@ abstract class Plugin extends BaseWordpress
         $plugin = new static($pluginName, $pluginPath, $pluginUrl, $debug);
         $plugin->kernel->boot();
 
+        $plugin->registerPluginApi();
+
         return $plugin;
     }
 
     final protected function createKernel(): Kernel
     {
-        return new PluginKernel($this->getPath(), $this->getDebug(), $this);
-    }
-
-    /**
-     * @throws Exception
-     */
-    final protected function __construct(string $name, string $path, string $url, bool $debug = false)
-    {
-        parent::__construct($name, $path, $url, $debug);
-
-        $this->registerPluginApi();
+        $namespace = substr(static::class, 0, strrpos(static::class, '\\'));
+        return new PluginKernel($this->getPath(), $this->getDebug(), $namespace, $this);
     }
 
     private function registerPluginApi(): void

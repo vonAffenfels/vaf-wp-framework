@@ -4,9 +4,6 @@ namespace VAF\WP\Framework\Kernel;
 
 use Closure;
 use Exception;
-use InvalidArgumentException;
-use LogicException;
-use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
@@ -37,12 +34,17 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 abstract class Kernel
 {
+    private const CONTAINER_CLASS = 'CachedContainer';
+
     protected ?Container $container = null;
 
     protected bool $booted = false;
 
-    public function __construct(protected readonly string $projectDir, protected readonly bool $debug)
-    {
+    public function __construct(
+        protected readonly string $projectDir,
+        protected readonly bool $debug,
+        protected readonly string $namespace
+    ) {
     }
 
     private function __clone()
@@ -155,26 +157,14 @@ abstract class Kernel
         });
     }
 
-    /**
-     * Gets the container class.
-     *
-     * @throws InvalidArgumentException If the generated classname is invalid
-     */
-    private function getContainerClass(): string
-    {
-        $class = static::class;
-        $class = str_contains($class, "@anonymous\0")
-            ? get_parent_class($class) . str_replace('.', '_', ContainerBuilder::hash($class))
-            : $class;
-        return str_replace('\\', '_', $class)
-            . ($this->debug ? 'Debug' : '') . 'Container';
-    }
-
     public function getContainer(): ContainerInterface
     {
-        $class = $this->getContainerClass();
+        if (!is_null($this->container)) {
+            return $this->container;
+        }
+
         $buildDir = $this->getBuildDir();
-        $cache = new ConfigCache($buildDir . '/' . $class . '.php', $this->debug);
+        $cache = new ConfigCache($buildDir . '/' . self::CONTAINER_CLASS . '.php', $this->debug);
         $cachePath = $cache->getPath();
 
         if (!$cache->isFresh()) {
@@ -186,7 +176,8 @@ abstract class Kernel
             $dumper = new PhpDumper($container);
 
             $code = $dumper->dump([
-                'class' => $class
+                'class' => self::CONTAINER_CLASS,
+                'namespace' => $this->namespace
             ]);
 
             $cache->write($code, $container->getResources());
@@ -195,6 +186,7 @@ abstract class Kernel
         if (file_exists($cachePath)) {
             require_once $cachePath;
 
+            $class = $this->namespace . "\\" . self::CONTAINER_CLASS;
             $this->container = new $class();
             $this->container->set('kernel', $this);
         }
@@ -213,7 +205,7 @@ abstract class Kernel
             'kernel.debug' => $this->debug,
             'kernel.build_dir' => realpath($this->getBuildDir()) ?: $this->getBuildDir(),
             'kernel.charset' => $this->getCharset(),
-            'kernel.container_class' => $this->getContainerClass(),
+            'kernel.container_class' => self::CONTAINER_CLASS,
         ];
     }
 
