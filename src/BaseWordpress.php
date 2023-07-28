@@ -26,9 +26,9 @@ abstract class BaseWordpress
     /**
      * @throws Exception
      */
-    final public static function buildContainer(string $path): void
+    final public static function buildContainer(): void
     {
-        $obj = new static('__BUILD__', $path, '__BUILD__', true);
+        $obj = new static('__BUILD__', getcwd(), '__BUILD__', true);
         $obj->getContainer();
     }
 
