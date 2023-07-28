@@ -113,7 +113,7 @@ abstract class WordpressKernel extends Kernel
 
         $this->registerAdminAjaxContainer($builder);
 
-        $this->base->configureContainer($builder);
+        $this->base->configureContainer($builder, $container);
     }
 
     /**

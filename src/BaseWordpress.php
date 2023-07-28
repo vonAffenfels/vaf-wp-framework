@@ -5,6 +5,7 @@ namespace VAF\WP\Framework;
 use Exception;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use VAF\WP\Framework\Kernel\Kernel;
 
 abstract class BaseWordpress
@@ -32,7 +33,7 @@ abstract class BaseWordpress
         $obj->getContainer();
     }
 
-    public function configureContainer(ContainerBuilder $builder): void
+    public function configureContainer(ContainerBuilder $builder, ContainerConfigurator $configurator): void
     {
     }
 
