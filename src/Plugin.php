@@ -30,6 +30,15 @@ abstract class Plugin extends BaseWordpress
         return $plugin;
     }
 
+    /**
+     * @throws Exception
+     */
+    final public static function buildContainer(): void
+    {
+        $obj = new static('__BUILD__', getcwd(), '__BUILD__', true);
+        $obj->getContainer();
+    }
+
     final protected function createKernel(): Kernel
     {
         $namespace = substr(static::class, 0, strrpos(static::class, '\\'));

@@ -24,15 +24,6 @@ abstract class BaseWordpress
         $this->kernel = $this->createKernel();
     }
 
-    /**
-     * @throws Exception
-     */
-    final public static function buildContainer(): void
-    {
-        $obj = new static('__BUILD__', getcwd(), '__BUILD__', true);
-        $obj->getContainer();
-    }
-
     public function configureContainer(ContainerBuilder $builder, ContainerConfigurator $configurator): void
     {
     }

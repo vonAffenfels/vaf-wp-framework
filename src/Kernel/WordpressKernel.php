@@ -32,7 +32,10 @@ use VAF\WP\Framework\Template\Attribute\UseAdminAjax;
 use VAF\WP\Framework\Template\Attribute\UseScript;
 use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
+use VAF\WP\Framework\TemplateRenderer\Engine\Twig\FileLoader;
+use VAF\WP\Framework\TemplateRenderer\Engine\TwigEngine;
 use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
+use VAF\WP\Framework\TemplateRenderer\NamespaceHandler;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Admin\Notice;
 use VAF\WP\Framework\Utils\Templates\Admin\TabbedPage as TabbedPageTemplate;
@@ -96,8 +99,8 @@ abstract class WordpressKernel extends Kernel
 
         if (is_file($configDir . '/services.yaml')) {
             $container->import($configDir . '/services.yaml');
-        } else {
-            $container->import($configDir . '/{services}.php');
+        } elseif (is_file($configDir . '/services.php')) {
+            $container->import($configDir . '/services.php');
         }
 
         $this->registerRequestService($builder);
@@ -178,12 +181,25 @@ abstract class WordpressKernel extends Kernel
 
     private function registerTemplateRenderer(ContainerBuilder $builder): void
     {
+        $builder->register(NamespaceHandler::class, NamespaceHandler::class)
+            ->setAutowired(true);
         $builder->register(TemplateRenderer::class, TemplateRenderer::class)
             ->setPublic(true)
             ->setAutowired(true);
+        $builder->setAlias('template.renderer', TemplateRenderer::class)
+            ->setPublic(true);
 
+        // PHTML Engine
         $builder->register(PHTMLEngine::class, PHTMLEngine::class)
             ->setPublic(true)
+            ->setAutowired(true)
+            ->addTag('template.engine');
+
+        // Twig Engine
+        $builder->register(FileLoader::class, FileLoader::class)
+            ->setAutowired(true);
+        $builder->register(TwigEngine::class, TwigEngine::class)
+            ->setPublic('true')
             ->setAutowired(true)
             ->addTag('template.engine');
 

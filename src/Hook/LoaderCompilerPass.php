@@ -39,13 +39,10 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $methodName = $method->getName();
 
             // Check if the Hook attribute is present
-            $attribute = $method->getAttributes(Hook::class);
-            if (empty($attribute)) {
+            $attributes = $method->getAttributes(Hook::class);
+            if (empty($attributes)) {
                 continue;
             }
-
-            /** @var Hook $instance */
-            $instance = $attribute[0]->newInstance();
 
             # Check if we have to inject service containers into parameters
             $serviceParams = [];
@@ -63,12 +60,16 @@ final class LoaderCompilerPass implements CompilerPassInterface
                 }
             }
 
-            $data[$instance->hook] = [
-                'method' => $methodName,
-                'priority' => $instance->priority,
-                'numParams' => $numParameters,
-                'serviceParams' => $serviceParams
-            ];
+            foreach ($attributes as $attribute) {
+                $instance = $attribute->newInstance();
+
+                $data[$instance->hook] = [
+                    'method' => $methodName,
+                    'priority' => $instance->priority,
+                    'numParams' => $numParameters,
+                    'serviceParams' => $serviceParams
+                ];
+            }
         }
 
         return $data;
