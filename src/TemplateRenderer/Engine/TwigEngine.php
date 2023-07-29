@@ -7,6 +7,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
+use VAF\WP\Framework\TemplateRenderer\Engine\Twig\Extension;
 use VAF\WP\Framework\TemplateRenderer\Engine\Twig\FileLoader;
 
 #[AsTemplateEngine(extension: 'twig')]
@@ -15,9 +16,11 @@ final class TwigEngine extends TemplateEngine
     private Environment $twig;
 
     public function __construct(
-        private readonly FileLoader $loader
+        FileLoader $loader,
+        Extension $extension
     ) {
-        $this->twig = new Environment($this->loader);
+        $this->twig = new Environment($loader);
+        $this->twig->addExtension($extension);
     }
 
     /**

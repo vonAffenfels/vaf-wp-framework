@@ -30,11 +30,16 @@ use VAF\WP\Framework\Shortcode\LoaderCompilerPass as ShortcodeLoaderCompilerPass
 use VAF\WP\Framework\Template\Attribute\IsTemplate;
 use VAF\WP\Framework\Template\Attribute\UseAdminAjax;
 use VAF\WP\Framework\Template\Attribute\UseScript;
+use VAF\WP\Framework\TemplateRenderer\Attribute\AsFunctionContainer;
 use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
 use VAF\WP\Framework\TemplateRenderer\Engine\PHTMLEngine;
+use VAF\WP\Framework\TemplateRenderer\Engine\Twig\Extension;
 use VAF\WP\Framework\TemplateRenderer\Engine\Twig\FileLoader;
 use VAF\WP\Framework\TemplateRenderer\Engine\TwigEngine;
 use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
+use VAF\WP\Framework\TemplateRenderer\FunctionCompilerPass;
+use VAF\WP\Framework\TemplateRenderer\FunctionHandler;
+use VAF\WP\Framework\TemplateRenderer\Functions\BuiltIn\Wordpress;
 use VAF\WP\Framework\TemplateRenderer\NamespaceHandler;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Admin\Notice;
@@ -181,8 +186,17 @@ abstract class WordpressKernel extends Kernel
 
     private function registerTemplateRenderer(ContainerBuilder $builder): void
     {
+        // Register handler
         $builder->register(NamespaceHandler::class, NamespaceHandler::class)
             ->setAutowired(true);
+        $builder->register(FunctionHandler::class, FunctionHandler::class)
+            ->setAutowired(true);
+
+        // Register built in template functions
+        $builder->register(Wordpress::class, Wordpress::class)
+            ->setAutowired(true)
+            ->addTag('template.functions');
+
         $builder->register(TemplateRenderer::class, TemplateRenderer::class)
             ->setPublic(true)
             ->setAutowired(true);
@@ -198,12 +212,12 @@ abstract class WordpressKernel extends Kernel
         // Twig Engine
         $builder->register(FileLoader::class, FileLoader::class)
             ->setAutowired(true);
+        $builder->register(Extension::class, Extension::class)
+            ->setAutowired(true);
         $builder->register(TwigEngine::class, TwigEngine::class)
             ->setPublic('true')
             ->setAutowired(true)
             ->addTag('template.engine');
-
-        $builder->addCompilerPass(new EngineCompilerPass());
 
         $builder->registerAttributeForAutoconfiguration(
             AsTemplateEngine::class,
@@ -213,6 +227,18 @@ abstract class WordpressKernel extends Kernel
                 $definition->addTag('template.engine');
             }
         );
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsFunctionContainer::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('template.functions');
+            }
+        );
+
+        $builder->addCompilerPass(new EngineCompilerPass());
+        $builder->addCompilerPass(new FunctionCompilerPass());
     }
 
     private function registerSettingsContainer(ContainerBuilder $builder): void

@@ -50,22 +50,21 @@ final class TemplateRenderer
 
     public function render(string $template, array $context = []): string
     {
-        foreach ($this->engines as $extension => $engine) {
-            $templateFile = $this->handler->getTemplateFile($template . '.' . $extension);
-            if ($templateFile !== false) {
-                /** @var TemplateEngine $engineObj */
-                $engineObj = $this->base->getContainer()->get($engine);
-                return $engineObj->render($templateFile, $context);
-            }
+        $extension = '';
+        $templateFile = $this->handler->searchTemplateFile($template, array_keys($this->engines), $extension);
+        if ($templateFile === false) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Could not find the template "%s"! Searched in directories: [%s]',
+                    $template,
+                    implode(', ', $this->handler->getSearchDirectoriesForTemplate($template))
+                )
+            );
         }
 
-        throw new InvalidArgumentException(
-            sprintf(
-                'Could not find the template "%s"! Searched in directories: [%s]',
-                $template,
-                implode(', ', $this->handler->getSearchDirectoriesForTemplate($template))
-            )
-        );
+        /** @var TemplateEngine $engineObj */
+        $engineObj = $this->base->getContainer()->get($this->engines[$extension]);
+        return $engineObj->render($templateFile, $context);
     }
 
     public function output(string $template, array $context = []): void

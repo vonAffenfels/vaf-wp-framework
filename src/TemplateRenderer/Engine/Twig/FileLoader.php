@@ -19,7 +19,7 @@ class FileLoader implements LoaderInterface
             return $name;
         }
 
-        $file = $this->handler->getTemplateFile($name);
+        $file = $this->handler->searchTemplateFile($name, ['twig'], $foundExtension);
         return $file ?: false;
     }
 

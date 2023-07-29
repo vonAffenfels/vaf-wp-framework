@@ -51,8 +51,11 @@ class NamespaceHandler
         return implode('/', $templateParts);
     }
 
-    public function getTemplateFile(string $template): string|false
-    {
+    public function searchTemplateFile(
+        string $template,
+        array $availableExtensions,
+        string &$foundExtension
+    ): false|string {
         $namespace = $this->getNamespaceFromTemplate($template);
         if (!$namespace) {
             throw new InvalidArgumentException(
@@ -67,9 +70,12 @@ class NamespaceHandler
         $template = $this->getTemplateFileFromTemplate($template);
 
         foreach ($this->namespaces[$namespace] as $namespaceDirectory) {
-            $templateFile = trailingslashit($namespaceDirectory) . $template;
-            if (file_exists($templateFile) && is_readable($templateFile)) {
-                return $templateFile;
+            foreach ($availableExtensions as $extension) {
+                $templateFile = trailingslashit($namespaceDirectory) . $template . '.' . $extension;
+                if (file_exists($templateFile) && is_readable($templateFile)) {
+                    $foundExtension = $extension;
+                    return $templateFile;
+                }
             }
         }
 
