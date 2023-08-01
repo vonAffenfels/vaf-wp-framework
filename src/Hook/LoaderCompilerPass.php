@@ -48,6 +48,10 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $serviceParams = [];
             foreach ($method->getParameters() as $paramIdx => $parameter) {
                 $type = $parameter->getType();
+                if (is_null($type)) {
+                    continue;
+                }
+
                 if ($container->has($type->getName())) {
                     # We found a service parameter
                     # So reduce number of parameters of hook by one

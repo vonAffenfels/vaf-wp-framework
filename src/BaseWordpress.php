@@ -35,7 +35,7 @@ abstract class BaseWordpress
         return $this->debug;
     }
 
-    final public function getPath(): string
+    public function getPath(): string
     {
         return $this->path;
     }
