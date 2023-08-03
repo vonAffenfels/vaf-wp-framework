@@ -113,7 +113,7 @@ abstract class Theme extends BaseWordpress
         }
 
         if (isset($this->pathCache[$searchMode->value . '_' . $file])) {
-            return $this->pathCache[$file];
+            return $this->pathCache[$searchMode->value . '_' . $file];
         }
 
         if ($searchMode === ThemeSearchMode::ALL && $this->hasParent()) {
