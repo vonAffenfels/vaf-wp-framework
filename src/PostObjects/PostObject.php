@@ -1,33 +1,29 @@
 <?php
 
-namespace VAF\WP\Framework\Wordpress;
+namespace VAF\WP\Framework\PostObjects;
 
+use LogicException;
 use WP_Post;
 
 abstract class PostObject
 {
-    private static array $postTypeMap = [
-        'post' => Post::class,
-        'page' => Page::class
-    ];
-
     private array $metadata = [];
 
-    final public static function getByID(int $postId): static|false
+    private ?WP_Post $post = null;
+
+    public function setPost(WP_Post $post): static
     {
-        $post = WP_Post::get_instance($postId);
-        return (false === $post) ? false : static::createFromWPPost($post);
+        $this->post = $post;
+        return $this;
     }
 
-    final public static function createFromWPPost(WP_Post $post): static
+    private function getPost(): WP_Post
     {
-        $postType = $post->post_type;
-        $class = self::$postTypeMap[$postType] ?? Post::class;
-        return new $class($post);
-    }
+        if (is_null($this->post)) {
+            throw new LogicException('PostObject not initialized!');
+        }
 
-    protected function __construct(private readonly WP_Post $post)
-    {
+        return $this->post;
     }
 
     private function isJson(string $string): bool
@@ -36,10 +32,10 @@ abstract class PostObject
         return json_last_error() === JSON_ERROR_NONE;
     }
 
-    public function getMetadata(string $name): mixed
+    private function getMetadata(string $name): mixed
     {
         if (!isset($this->metadata[$name])) {
-            $meta = get_post_meta($this->post->ID, $name, true);
+            $meta = get_post_meta($this->getPost()->ID, $name, true);
 
             if (is_serialized($meta)) {
                 $meta = @unserialize(trim($meta));
@@ -54,8 +50,8 @@ abstract class PostObject
 
     public function get(string $name): mixed
     {
-        if (property_exists($this->post, $name)) {
-            return $this->post->$name;
+        if (property_exists($this->getPost(), $name)) {
+            return $this->getPost()->$name;
         }
 
         return $this->getMetadata($name);

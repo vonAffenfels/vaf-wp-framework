@@ -2,9 +2,11 @@
 
 namespace VAF\WP\Framework\Kernel;
 
+use ReflectionClass;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use VAF\WP\Framework\AdminAjax\Attributes\AsAdminAjaxContainer;
 use VAF\WP\Framework\AdminAjax\Loader as AdminAjaxLoader;
@@ -18,6 +20,11 @@ use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
 use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
 use VAF\WP\Framework\Menu\Loader as MenuLoader;
 use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
+use VAF\WP\Framework\PostObjects\Attributes\ForPostType;
+use VAF\WP\Framework\PostObjects\Hooks\GetPostObjectByPostType;
+use VAF\WP\Framework\PostObjects\Page;
+use VAF\WP\Framework\PostObjects\Post;
+use VAF\WP\Framework\PostObjects\PostObjectManager;
 use VAF\WP\Framework\Request;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
 use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
@@ -121,6 +128,8 @@ abstract class WordpressKernel extends Kernel
 
         $this->registerAdminAjaxContainer($builder);
 
+        $this->registerPostObjects($builder);
+
         $this->base->configureContainer($builder, $container);
     }
 
@@ -136,6 +145,39 @@ abstract class WordpressKernel extends Kernel
     {
         $builder->register(Request::class, Request::class)
             ->setPublic(true)
+            ->setAutowired(true);
+    }
+
+    private function registerPostObjects(ContainerBuilder $builder): void
+    {
+        $managerDefinition = $builder->register(PostObjectManager::class, PostObjectManager::class)
+            ->setArgument('$internalPostObjects', [])
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->registerAttributeForAutoconfiguration(
+            ForPostType::class,
+            static function (
+                ChildDefinition $definition,
+                ForPostType $attribute,
+                ReflectionClass $reflectionClass
+            ) use ($managerDefinition): void {
+                $internalPostObjects = $managerDefinition->getArgument('$internalPostObjects');
+                $internalPostObjects[$attribute->postType] = $reflectionClass->getName();
+                $managerDefinition->replaceArgument('$internalPostObjects', $internalPostObjects);
+
+                $definition->setPublic(true);
+                $definition->setShared(false);
+            }
+        );
+
+        $builder->register(Page::class, Page::class)
+            ->setAutoconfigured(true);
+        $builder->register(Post::class, Post::class)
+            ->setAutoconfigured(true);
+
+        $builder->register(GetPostObjectByPostType::class, GetPostObjectByPostType::class)
+            ->setAutoconfigured(true)
             ->setAutowired(true);
     }
 

@@ -1,22 +1,22 @@
 <?php
 
-namespace VAF\WP\Framework\Wordpress;
+namespace VAF\WP\Framework\PostObjects;
 
 use Iterator;
 use ReturnTypeWillChange;
 use WP_Post;
 
-class PostObjectList implements Iterator
+class PostObjectList extends PostObject implements Iterator
 {
     private array $posts;
 
-    public function __construct(array $posts)
+    public function __construct(PostObjectManager $manager, array $posts)
     {
-        $this->posts = array_map(function (WP_Post|int $post): PostObject {
+        $this->posts = array_map(function (WP_Post|int $post) use ($manager): PostObject {
             if ($post instanceof WP_Post) {
-                return PostObject::createFromWPPost($post);
+                return $manager->getByWPPost($post);
             } else {
-                return PostObject::getByID($post);
+                return $manager->getById($post);
             }
         }, array_filter($posts, function ($post): bool {
             return $post instanceof WP_Post || is_int($post);
@@ -48,5 +48,10 @@ class PostObjectList implements Iterator
     public function rewind(): void
     {
         reset($this->posts);
+    }
+
+    public function get(string $name): mixed
+    {
+        return $this->current()->get($name);
     }
 }
