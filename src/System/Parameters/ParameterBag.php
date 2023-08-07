@@ -11,6 +11,11 @@ class ParameterBag
         return $this->params;
     }
 
+    public function countParams(): int
+    {
+        return count($this->params);
+    }
+
     public function addParam(Parameter $param): self
     {
         $this->params[] = $param;

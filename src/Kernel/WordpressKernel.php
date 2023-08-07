@@ -6,7 +6,6 @@ use ReflectionClass;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use VAF\WP\Framework\AdminAjax\Attributes\AsAdminAjaxContainer;
 use VAF\WP\Framework\AdminAjax\Loader as AdminAjaxLoader;
@@ -20,8 +19,10 @@ use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
 use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
 use VAF\WP\Framework\Menu\Loader as MenuLoader;
 use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
-use VAF\WP\Framework\PostObjects\Attributes\ForPostType;
-use VAF\WP\Framework\PostObjects\Hooks\GetPostObjectByPostType;
+use VAF\WP\Framework\PostObjects\Attributes\PostType;
+use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
+use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
+use VAF\WP\Framework\PostObjects\ExtensionLoaderCompilerPass as PostObjectExtensionLoaderCompilerPass;
 use VAF\WP\Framework\PostObjects\Page;
 use VAF\WP\Framework\PostObjects\Post;
 use VAF\WP\Framework\PostObjects\PostObjectManager;
@@ -76,6 +77,10 @@ abstract class WordpressKernel extends Kernel
         /** @var AdminAjaxLoader $adminAjaxLoader */
         $adminAjaxLoader = $this->getContainer()->get('adminajax.loader');
         $adminAjaxLoader->registerAdminAjaxActions();
+
+        /** @var PostObjectExtensionLoader $extensionLoader */
+        $extensionLoader = $this->getContainer()->get('postobject.extensionLoader');
+        $extensionLoader->registerPostObjectExtensions();
 
         // Registering REST routes
         add_action('rest_api_init', function () {
@@ -150,21 +155,36 @@ abstract class WordpressKernel extends Kernel
 
     private function registerPostObjects(ContainerBuilder $builder): void
     {
+        $builder->register('postobject.extensionLoader', PostObjectExtensionLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new PostObjectExtensionLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            PostTypeExtension::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('postobject.extension');
+            }
+        );
+
         $managerDefinition = $builder->register(PostObjectManager::class, PostObjectManager::class)
-            ->setArgument('$internalPostObjects', [])
+            ->setArgument('$registeredPostObjects', [])
             ->setPublic(true)
             ->setAutowired(true);
 
         $builder->registerAttributeForAutoconfiguration(
-            ForPostType::class,
+            PostType::class,
             static function (
                 ChildDefinition $definition,
-                ForPostType $attribute,
+                PostType $attribute,
                 ReflectionClass $reflectionClass
             ) use ($managerDefinition): void {
-                $internalPostObjects = $managerDefinition->getArgument('$internalPostObjects');
-                $internalPostObjects[$attribute->postType] = $reflectionClass->getName();
-                $managerDefinition->replaceArgument('$internalPostObjects', $internalPostObjects);
+                $registeredPostObjects = $managerDefinition->getArgument('$registeredPostObjects');
+                $registeredPostObjects[$attribute->postType] = $reflectionClass->getName();
+                $managerDefinition->replaceArgument('$registeredPostObjects', $registeredPostObjects);
 
                 $definition->setPublic(true);
                 $definition->setShared(false);
@@ -175,10 +195,6 @@ abstract class WordpressKernel extends Kernel
             ->setAutoconfigured(true);
         $builder->register(Post::class, Post::class)
             ->setAutoconfigured(true);
-
-        $builder->register(GetPostObjectByPostType::class, GetPostObjectByPostType::class)
-            ->setAutoconfigured(true)
-            ->setAutowired(true);
     }
 
     private function registerTemplate(ContainerBuilder $builder): void

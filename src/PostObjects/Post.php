@@ -2,9 +2,9 @@
 
 namespace VAF\WP\Framework\PostObjects;
 
-use VAF\WP\Framework\PostObjects\Attributes\ForPostType;
+use VAF\WP\Framework\PostObjects\Attributes\PostType;
 
-#[ForPostType('post')]
+#[PostType('post')]
 final class Post extends PostObject
 {
 }

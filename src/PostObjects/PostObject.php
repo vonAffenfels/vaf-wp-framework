@@ -7,7 +7,7 @@ use WP_Post;
 
 abstract class PostObject
 {
-    private array $metadata = [];
+    private array $data = [];
 
     private ?WP_Post $post = null;
 
@@ -32,48 +32,67 @@ abstract class PostObject
         return json_last_error() === JSON_ERROR_NONE;
     }
 
-    private function getMetadata(string $name): mixed
+    public function getMetadata(string $name): mixed
     {
-        if (!isset($this->metadata[$name])) {
-            $meta = get_post_meta($this->getPost()->ID, $name, true);
+        $meta = get_post_meta($this->getPost()->ID, $name, true);
 
-            if (is_serialized($meta)) {
-                $meta = @unserialize(trim($meta));
-            } elseif ($this->isJson($meta)) {
-                $meta = json_decode($meta, true);
-            }
-
-            $this->metadata[$name] = $meta;
+        if (is_serialized($meta)) {
+            $meta = @unserialize(trim($meta));
+        } elseif ($this->isJson($meta)) {
+            $meta = json_decode($meta, true);
         }
-        return $this->metadata[$name];
+
+        return $meta;
     }
 
     public function get(string $name): mixed
     {
-        if (property_exists($this->getPost(), $name)) {
-            return $this->getPost()->$name;
+        if (isset($this->data[$name])) {
+            return $this->data[$name];
         }
 
-        return $this->getMetadata($name);
+        // $obj->get('post_title');
+        // 1. $this->getPostTitle();
+        $funcName = 'get' . str_replace('_', '', ucwords($name, '_'));
+        if (method_exists($this, $funcName)) {
+            $this->data[$name] = $this->$funcName();
+            return $this->data[$name];
+        }
+
+        // 2.1. apply_filters('vaf_wp_framework/post_type_ext/all/post_title')
+        // 2.2. apply_filters('vaf_wp_framework/post_type_ext/post/post_title')
+        $hookNameAll = 'vaf_wp_framework/post_type_ext/all/' . $name;
+        $hookNamePostType = 'vaf_wp_framework/post_type_ext/' . $this->post->post_type . '/' . $name;
+
+        if (has_filter($hookNamePostType)) {
+            $this->data[$name] = apply_filters($hookNamePostType, null, $this);
+            return $this->data[$name];
+        }
+
+        if (has_filter($hookNameAll)) {
+            $this->data[$name] = apply_filters($hookNameAll, null, $this);
+            return $this->data[$name];
+        }
+
+        // 3. $this->post->post_title
+        if (property_exists($this->post, $name)) {
+            $this->data[$name] = $this->post->$name;
+            return $this->data[$name];
+        }
+
+        // 4. $this->getMetaData('post_title')
+        $this->data[$name] = $this->getMetadata($name);
+        return $this->data[$name];
     }
 
-    public function getID(): int
+    public function __isset(string $name): bool
     {
-        return $this->get('ID');
+        $val = $this->get($name);
+        return !empty($val);
     }
 
-    public function getContent(): string
+    public function __get(string $name): mixed
     {
-        return $this->get('post_content');
-    }
-
-    public function getTitle(): string
-    {
-        return $this->get('post_title');
-    }
-
-    public function getSlug(): string
-    {
-        return $this->get('post_name');
+        return $this->get($name);
     }
 }

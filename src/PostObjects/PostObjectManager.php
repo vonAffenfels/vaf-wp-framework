@@ -8,17 +8,34 @@ use WP_Query;
 
 class PostObjectManager
 {
-    public const HOOK_GET_POST_OBJECT_BY_POST_TYPE = 'vaf-wp-framework/get-post-object-by-post-type';
+    private array $internalPostTypes = [
+        'post' => Post::class,
+        'page' => Page::class
+    ];
 
     public function __construct(
-        private readonly array $internalPostObjects,
+        array $registeredPostObjects,
         private readonly BaseWordpress $base
     ) {
+        foreach ($registeredPostObjects as $postType => $postObjectClass) {
+            add_filter(
+                $this->getHookName($postType),
+                function (?PostObject $obj) use ($postObjectClass): PostObject {
+                    /** @var PostObject $obj */
+                    $obj = $this->base->getContainer()->get($postObjectClass);
+                    return $obj;
+                }
+            );
+        }
+    }
+
+    private function getHookName(string $postType): string
+    {
+        return 'vaf_wp_framework/post_type/' . $postType . '/get_object';
     }
 
     private function getObjectForPostType(string $postType): PostObject
     {
-        // Handle container internal post types
         if (isset($this->internalPostObjects[$postType])) {
             /** @var PostObject $obj */
             $obj = $this->base->getContainer()->get($this->internalPostObjects[$postType]);
@@ -26,18 +43,18 @@ class PostObjectManager
         }
 
         /** @var ?PostObject $obj */
-        $obj = apply_filters(self::HOOK_GET_POST_OBJECT_BY_POST_TYPE, null, $postType);
+        $obj = null;
+
+        $hookName = $this->getHookName($postType);
+        if (has_filter($hookName)) {
+            $obj = apply_filters($hookName, null);
+        }
+
         if (is_null($obj)) {
-            // If no object was provided by any plugin simply return Post
             $obj = $this->base->getContainer()->get(Post::class);
         }
 
         return $obj;
-    }
-
-    public function getInternalClassForPostType(string $postType): ?string
-    {
-        return $this->internalPostObjects[$postType] ?? null;
     }
 
     public function getByWPPost(WP_Post $post): PostObject
