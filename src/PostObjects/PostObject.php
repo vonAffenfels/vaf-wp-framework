@@ -62,7 +62,7 @@ abstract class PostObject
         // 2.1. apply_filters('vaf_wp_framework/post_type_ext/all/post_title')
         // 2.2. apply_filters('vaf_wp_framework/post_type_ext/post/post_title')
         $hookNameAll = 'vaf_wp_framework/post_type_ext/all/' . $name;
-        $hookNamePostType = 'vaf_wp_framework/post_type_ext/' . $this->post->post_type . '/' . $name;
+        $hookNamePostType = 'vaf_wp_framework/post_type_ext/' . $this->getPost()->post_type . '/' . $name;
 
         if (has_filter($hookNamePostType)) {
             $this->data[$name] = apply_filters($hookNamePostType, null, $this);
@@ -75,8 +75,8 @@ abstract class PostObject
         }
 
         // 3. $this->post->post_title
-        if (property_exists($this->post, $name)) {
-            $this->data[$name] = $this->post->$name;
+        if (property_exists($this->getPost(), $name)) {
+            $this->data[$name] = $this->getPost()->$name;
             return $this->data[$name];
         }
 
@@ -94,5 +94,10 @@ abstract class PostObject
     public function __get(string $name): mixed
     {
         return $this->get($name);
+    }
+
+    public function getPostType(): string
+    {
+        return $this->getPost()->post_type;
     }
 }
