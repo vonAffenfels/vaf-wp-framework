@@ -169,20 +169,20 @@ abstract class Kernel
 
         if (!$cache->isFresh()) {
             // Rebuild the whole container
-            $container = $this->buildContainer();
-            $container->compile();
+            $this->container = $this->buildContainer();
+            $this->container->compile();
 
             try {
                 $this->checkBuildDirectories();
                 // cache the container
-                $dumper = new PhpDumper($container);
+                $dumper = new PhpDumper($this->container);
 
                 $code = $dumper->dump([
                     'class' => self::CONTAINER_CLASS,
                     'namespace' => $this->namespace
                 ]);
 
-                $cache->write($code, $container->getResources());
+                $cache->write($code, $this->container->getResources());
             } catch (RuntimeException $e) {
                 // Do nothing if directories can't be created
                 // We simply can't cache the container then

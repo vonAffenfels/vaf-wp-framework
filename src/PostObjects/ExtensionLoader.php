@@ -15,7 +15,7 @@ class ExtensionLoader
     public function registerPostObjectExtensions(): void
     {
         foreach ($this->extensions as $extension) {
-            foreach ($extension['postTypes'] as $postType) {
+            foreach ($extension['postTypes'] ?? [] as $postType) {
                 $hookName = 'vaf_wp_framework/post_type_ext/' . $postType . '/' . $extension['fieldName'];
                 $parameterBag = ParameterBag::fromArray($extension['params']);
 
