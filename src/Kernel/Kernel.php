@@ -172,26 +172,45 @@ abstract class Kernel
             $container = $this->buildContainer();
             $container->compile();
 
-            // cache the container
-            $dumper = new PhpDumper($container);
+            try {
+                $this->checkBuildDirectories();
+                // cache the container
+                $dumper = new PhpDumper($container);
 
-            $code = $dumper->dump([
-                'class' => self::CONTAINER_CLASS,
-                'namespace' => $this->namespace
-            ]);
+                $code = $dumper->dump([
+                    'class' => self::CONTAINER_CLASS,
+                    'namespace' => $this->namespace
+                ]);
 
-            $cache->write($code, $container->getResources());
-        }
-
-        if (file_exists($cachePath)) {
+                $cache->write($code, $container->getResources());
+            } catch (RuntimeException $e) {
+                // Do nothing if directories can't be created
+                // We simply can't cache the container then
+            }
+        } elseif (file_exists($cachePath)) {
             require_once $cachePath;
 
             $class = $this->namespace . "\\" . self::CONTAINER_CLASS;
             $this->container = new $class();
-            $this->container->set('kernel', $this);
         }
 
+        $this->container->set('kernel', $this);
+
         return $this->container;
+    }
+
+    private function checkBuildDirectories(): void
+    {
+        $dirs = ['build' => $this->getBuildDir()];
+        foreach ($dirs as $name => $dir) {
+            if (!is_dir($dir)) {
+                if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
+                    throw new RuntimeException(sprintf('Unable to create the "%s" directory (%s).', $name, $dir));
+                }
+            } elseif (!is_writable($dir)) {
+                throw new RuntimeException(sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
+            }
+        }
     }
 
     /**
@@ -211,23 +230,10 @@ abstract class Kernel
 
     /**
      * Builds the service container.
-     *
-     * @throws RuntimeException
      * @throws Exception
      */
     private function buildContainer(): ContainerBuilder
     {
-        $dirs = ['build' => $this->getBuildDir()];
-        foreach ($dirs as $name => $dir) {
-            if (!is_dir($dir)) {
-                if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new RuntimeException(sprintf('Unable to create the "%s" directory (%s).', $name, $dir));
-                }
-            } elseif (!is_writable($dir)) {
-                throw new RuntimeException(sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
-            }
-        }
-
         $container = $this->getContainerBuilder();
         $container->addObjectResource($this);
         $this->registerContainerConfiguration($this->getContainerLoader($container));
