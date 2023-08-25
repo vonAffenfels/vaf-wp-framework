@@ -2,6 +2,7 @@
 
 namespace VAF\WP\Framework;
 
+use Exception;
 use Isolated\Symfony\Component\Finder\Finder;
 
 final class PHPScoperConfigGenerator
@@ -17,11 +18,14 @@ final class PHPScoperConfigGenerator
 
     private array $packagesToProcess = [];
 
+    private array $patchers = [];
+
     public function __construct(
         private readonly string $baseDir,
         private readonly string $prefix,
         private readonly string $buildDir
     ) {
+        $this->addPackagePatcher('symfony/dependency-injection', [$this, 'getPatcherSymfonyDI']);
     }
 
     public function ignorePackage(string $package): void
@@ -29,6 +33,14 @@ final class PHPScoperConfigGenerator
         if (!in_array($package, $this->ignoredPackages)) {
             $this->ignoredPackages[] = $package;
         }
+    }
+
+    public function addPackagePatcher(string $package, callable $patcher): void
+    {
+        $this->patchers[$package] = $this->patchers[$package] ?? [];
+        $this->patchers[$package][] = function () use ($patcher) {
+            return call_user_func_array($patcher, func_get_args());
+        };
     }
 
     private function getRequiredPackages(string $pathToComposerJson, bool $useRequireDev = false): array
@@ -74,11 +86,14 @@ final class PHPScoperConfigGenerator
             ->in(['vendor/' . $package]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function buildConfig(): array
     {
         $rootComposerJson = realpath($this->baseDir . '/composer.json');
         if (false === $rootComposerJson) {
-            throw new \Exception(
+            throw new Exception(
                 sprintf(
                     'Could not find root composer.json in path %s!',
                     $this->baseDir . '/composer.json'
@@ -112,43 +127,48 @@ final class PHPScoperConfigGenerator
             }
         }
 
+        $patchers = [];
+        foreach ($this->packagesProcessed as $package) {
+            if (isset($this->patchers[$package])) {
+                $patchers = array_merge($patchers, $this->patchers[$package]);
+            }
+        }
+
         return [
             'prefix' => $this->prefix,
             'output-dir' => $this->buildDir,
             'finders' => $finders,
-            'patchers' => []
+            'patchers' => $patchers
         ];
     }
 
-    private static function getPatcherSymfonyDI(): callable
+    private function getPatcherSymfonyDI(string $filePath, string $prefix, string $content): string
     {
-        return static function (string $filePath, string $prefix, string $content): string {
-            if (!str_contains($filePath, 'Compiler/ResolveInstanceofConditionalsPass.php')) {
-                return $content;
-            }
+        if (!str_contains($filePath, 'Compiler/ResolveInstanceofConditionalsPass.php')) {
+            return $content;
+        }
 
-            $lenPrefix = strlen($prefix . '\\');
+        $lenPrefix = strlen($prefix . '\\');
 
-            $content = preg_replace_callback(
-                '/\$definition = \\\\substr_replace\(\$definition, \'(53)\', 2, 2\);/',
-                function (array $matches) use ($lenPrefix): string {
-                    $origLength = $matches[1];
-                    $newLength = $origLength + $lenPrefix;
-                    return str_replace("'{$origLength}'", "'{$newLength}'", $matches[0]);
-                },
-                $content
-            );
+        $content = preg_replace_callback(
+            '/\$definition = \\\\substr_replace\(\$definition, \'(53)\', 2, 2\);/',
+            function (array $matches) use ($lenPrefix): string {
+                $origLength = $matches[1];
+                $newLength = $origLength + $lenPrefix;
+                return str_replace("'{$origLength}'", "'{$newLength}'", $matches[0]);
+            },
+            $content
+        );
 
-            return preg_replace_callback(
-                '/\$definition = \\\\substr_replace\(\$definition, \'Child\', (44), 0\);/',
-                function (array $matches) use ($lenPrefix): string {
-                    $origOffset = $matches[1];
-                    $newOffset = $origOffset + $lenPrefix;
+        return preg_replace_callback(
+            '/\$definition = \\\\substr_replace\(\$definition, \'Child\', (44), 0\);/',
+            function (array $matches) use ($lenPrefix): string {
+                $origOffset = $matches[1];
+                $newOffset = $origOffset + $lenPrefix;
 
-                    return str_replace(", {$origOffset}, ", ", {$newOffset}, ", $matches[0]);
-                },
-                $content
-            );
-        };
+                return str_replace(", {$origOffset}, ", ", {$newOffset}, ", $matches[0]);
+            },
+            $content
+        );
     }
 }
