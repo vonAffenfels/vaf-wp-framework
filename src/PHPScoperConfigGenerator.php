@@ -6,36 +6,123 @@ use Isolated\Symfony\Component\Finder\Finder;
 
 final class PHPScoperConfigGenerator
 {
-    private static function getFinderPsr(): Finder
-    {
-        return Finder::create()
-            ->files()
-            ->ignoreVCS(true)
-            ->in(['vendor/psr/container']);
+    private array $ignoredPackages = [
+        'friendsofphp/php-cs-fixer',
+        'humbug/php-scoper',
+        'squizlabs/php_codesniffer',
+        'roave/security-advisories'
+    ];
+
+    private array $packagesProcessed = [];
+
+    private array $packagesToProcess = [];
+
+    public function __construct(
+        private readonly string $baseDir,
+        private readonly string $prefix,
+        private readonly string $buildDir
+    ) {
     }
 
-    private static function getFinderSymfony(): Finder
+    public function ignorePackage(string $package): void
     {
+        if (!in_array($package, $this->ignoredPackages)) {
+            $this->ignoredPackages[] = $package;
+        }
+    }
+
+    private function getRequiredPackages(string $pathToComposerJson, bool $useRequireDev = false): array
+    {
+        if (!file_exists($pathToComposerJson) && !is_readable($pathToComposerJson)) {
+            return [];
+        }
+
+        $composerData = json_decode(file_get_contents($pathToComposerJson), true);
+        $packages = [];
+
+        if ($useRequireDev && is_array($composerData['require-dev'] ?? null)) {
+            $packages = array_keys($composerData['require-dev']);
+        } elseif (is_array($composerData['require'] ?? null)) {
+            $packages = array_keys($composerData['require']);
+        }
+
+        return array_filter($packages, function (string $package): bool {
+            if (!str_contains($package, '/')) {
+                // Composer packages have to include at least one /
+                return false;
+            }
+
+            // Filter ignored packages
+            // and already processed packages
+            // and packages already marked for processing
+            return
+                !in_array($package, $this->ignoredPackages) &&
+                !in_array($package, $this->packagesProcessed) &&
+                !in_array($package, $this->packagesToProcess);
+        });
+    }
+
+    private function buildFinderForPackage(string $package): ?Finder
+    {
+        $path = $this->baseDir . '/vendor/' . $package;
+        if (false === realpath($path)) {
+            return null;
+        }
         return Finder::create()
             ->files()
             ->ignoreVCS(true)
-            ->in([
-                'vendor/symfony/config',
-                'vendor/symfony/dependency-injection',
-                'vendor/symfony/deprecation-contracts',
-                'vendor/symfony/filesystem',
-                'vendor/symfony/polyfill-ctype',
-                'vendor/symfony/polyfill-mbstring',
-                'vendor/symfony/service-contracts',
-                'vendor/symfony/var-exporter',
-                'vendor/symfony/yaml'
-            ]);
+            ->in(['vendor/' . $package]);
+    }
+
+    public function buildConfig(): array
+    {
+        $rootComposerJson = realpath($this->baseDir . '/composer.json');
+        if (false === $rootComposerJson) {
+            throw new \Exception(
+                sprintf(
+                    'Could not find root composer.json in path %s!',
+                    $this->baseDir . '/composer.json'
+                )
+            );
+        }
+
+        $this->packagesToProcess = $this->getRequiredPackages(
+            $rootComposerJson,
+            true
+        );
+
+        $finders = [];
+        while (!empty($this->packagesToProcess)) {
+            $package = array_shift($this->packagesToProcess);
+            $this->packagesProcessed[] = $package;
+
+            $finder = $this->buildFinderForPackage($package);
+            if (!is_null($finder)) {
+                $finders[] = $finder;
+            }
+
+            $packageComposerJson = realpath($this->baseDir . '/vendor/' . $package . '/composer.json');
+            if (false !== $packageComposerJson) {
+                $newPackages = $this->getRequiredPackages($packageComposerJson);
+
+                $this->packagesToProcess = array_merge(
+                    $this->packagesToProcess,
+                    $newPackages
+                );
+            }
+        }
+
+        return [
+            'prefix' => $this->prefix,
+            'output-dir' => $this->buildDir,
+            'finders' => $finders,
+            'patchers' => []
+        ];
     }
 
     private static function getPatcherSymfonyDI(): callable
     {
-        return static function (string $filePath, string $prefix, string $content): string
-        {
+        return static function (string $filePath, string $prefix, string $content): string {
             if (!str_contains($filePath, 'Compiler/ResolveInstanceofConditionalsPass.php')) {
                 return $content;
             }
@@ -63,39 +150,5 @@ final class PHPScoperConfigGenerator
                 $content
             );
         };
-    }
-
-    private static function getFinderTwig(): Finder
-    {
-        return Finder::create()
-            ->files()
-            ->ignoreVCS(true)
-            ->in([
-                'vendor/twig/twig'
-            ]);
-    }
-
-    public static function generateConfig(
-        string $prefix,
-        string $outputDir = './vendor_prefixed',
-        array $finders = [],
-        array $patchers = []
-    ): array {
-        $finders = array_merge([
-            self::getFinderPsr(),
-            self::getFinderSymfony(),
-            self::getFinderTwig()
-        ], $finders);
-
-        $patchers = array_merge([
-            self::getPatcherSymfonyDI()
-        ], $patchers);
-
-        return [
-            'prefix' => $prefix,
-            'output-dir' => $outputDir,
-            'finders' => $finders,
-            'patchers' => $patchers
-        ];
     }
 }
