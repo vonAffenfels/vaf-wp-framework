@@ -49,6 +49,7 @@
     "twig/twig": "^3"
   },
   "require-dev": {
+    "composer/composer": "^2.5",
     "friendsofphp/php-cs-fixer": "^3.22",
     "humbug/php-scoper": "^0.18.3",
     "squizlabs/php_codesniffer": "^3.6"
