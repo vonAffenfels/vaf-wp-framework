@@ -87,11 +87,6 @@ abstract class Kernel
         return $this->getProjectDir() . '/container/';
     }
 
-    public function getCharset(): string
-    {
-        return 'UTF-8';
-    }
-
     abstract protected function configureContainer(
         ContainerConfigurator $container,
         LoaderInterface $loader,
@@ -163,38 +158,42 @@ abstract class Kernel
             return $this->container;
         }
 
-        $buildDir = $this->getBuildDir();
-        $cache = new ConfigCache($buildDir . '/' . self::CONTAINER_CLASS . '.php', $this->debug);
-        $cachePath = $cache->getPath();
+        $cache = new ConfigCache($buildDir . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
+        if ($cache->isFresh() && is_readable($cache->getPath())) {
+            // Load cached container if cache is still good
+            // If not in debug mode and cache file exists cache will always be good
 
-        if (!$cache->isFresh()) {
-            // Rebuild the whole container
-            $this->container = $this->buildContainer();
-            $this->container->compile();
+            // Load cached container if exists
+            require_once $cache->getPath();
 
+            $class = $this->namespace . "\\" . self::CONTAINER_CLASS;
+            $container = new $class();
+        } else {
+            // Cache is not good so we compile the container
+            $container = $this->buildContainer();
+            $container->compile();
+
+            // Try to cache the container if possible
             try {
                 $this->checkBuildDirectories();
-                // cache the container
-                $dumper = new PhpDumper($this->container);
+                $dumper = new PhpDumper($container);
 
                 $code = $dumper->dump([
                     'class' => self::CONTAINER_CLASS,
                     'namespace' => $this->namespace
                 ]);
 
-                $cache->write($code, $this->container->getResources());
+                $cache->write($code, $container->getResources());
             } catch (RuntimeException $e) {
                 // Do nothing if directories can't be created
                 // We simply can't cache the container then
             }
-        } elseif (file_exists($cachePath)) {
-            require_once $cachePath;
-
-            $class = $this->namespace . "\\" . self::CONTAINER_CLASS;
-            $this->container = new $class();
         }
 
-        $this->container->set('kernel', $this);
+        if (!is_null($container)) {
+            $this->container = $container;
+            $this->container->set('kernel', $this);
+        }
 
         return $this->container;
     }
@@ -220,10 +219,8 @@ abstract class Kernel
     {
         return [
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
-            'kernel.runtime_environment' => '%env(default:kernel.environment:APP_RUNTIME_ENV)%',
             'kernel.debug' => $this->debug,
             'kernel.build_dir' => realpath($this->getBuildDir()) ?: $this->getBuildDir(),
-            'kernel.charset' => $this->getCharset(),
             'kernel.container_class' => self::CONTAINER_CLASS,
         ];
     }

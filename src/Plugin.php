@@ -35,6 +35,7 @@ abstract class Plugin extends BaseWordpress
      */
     final public static function buildContainer(): void
     {
+        // Set debug to true to always renew the container
         $obj = new static('__BUILD__', getcwd(), '__BUILD__', true);
         $obj->getContainer();
     }
