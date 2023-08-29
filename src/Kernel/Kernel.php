@@ -158,7 +158,7 @@ abstract class Kernel
             return $this->container;
         }
 
-        $cache = new ConfigCache($buildDir . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
+        $cache = new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
         if ($cache->isFresh() && is_readable($cache->getPath())) {
             // Load cached container if cache is still good
             // If not in debug mode and cache file exists cache will always be good
