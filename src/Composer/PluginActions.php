@@ -8,7 +8,10 @@ class PluginActions
 {
     public static function postCreateProject(Event $event): void
     {
+        $io = $event->getIO();
 
+        $pluginName = $io->ask('Plugin name: ');
+        var_dump($pluginName);
     }
 
     public static function prefixDependencies(Event $event): void
