@@ -190,6 +190,11 @@ class PluginSkeletonAction
             $namespace . '\Plugin::buildContainer'
         ];
 
+        // Add post-dump-autoload command
+        $composerData['scripts']['post-autoload-dump'] = [
+            'VAF\\WP\\Framework\\Composer\\PluginActions::prefixDependencies'
+        ];
+
         $authorData = [];
         if (!empty($authorName)) {
             $authorData['name'] = $authorName;
