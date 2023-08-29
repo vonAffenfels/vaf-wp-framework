@@ -2,11 +2,15 @@
 
 namespace VAF\WP\Framework\Composer;
 
-use Composer\Composer;
 use Composer\Script\Event;
 
 class PluginActions
 {
+    public static function postCreateProject(Event $event): void
+    {
+
+    }
+
     public static function prefixDependencies(Event $event): void
     {
         $io = $event->getIO();
@@ -16,7 +20,7 @@ class PluginActions
             return;
         }
 
-        if (!\file_exists(__DIR__ . '/../vendor/bin/php-scoper')) {
+        if (!file_exists(getcwd() . '/vendor/bin/php-scoper')) {
             $io->write('Not prefixing dependencies, due to PHP scoper not being installed');
         }
 
