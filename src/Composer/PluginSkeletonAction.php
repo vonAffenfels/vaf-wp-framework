@@ -176,7 +176,7 @@ END;
         string $authorEmail,
         string $website
     ): void {
-        $pluginName = " * Plugin Name:       $pluginName";
+        $pluginName = " * Plugin Name:       $pluginName\n";
         if (!empty($pluginDescription)) {
             $pluginDescription = " * Description:       $pluginDescription\n";
         }
