@@ -25,8 +25,19 @@ final class PHPScoperConfigGenerator
         private readonly string $prefix,
         private readonly string $buildDir
     ) {
-        $this->addPackagePatcher('symfony/dependency-injection', [$this, 'getPatcherSymfonyDI']);
-        $this->addPackagePatcher('vonaffenfels/vaf-framwork', [$this, 'getPatcherVAFFramework']);
+        $this->addPackagePatcher(
+            'symfony/dependency-injection',
+            function (string $filePath, string $prefix, string $content): string {
+                return $this->patchSymfonyDI($filePath, $prefix, $content);
+            }
+        );
+
+        $this->addPackagePatcher(
+            'vonaffenfels/vaf-wp-framework',
+            function (string $filePath, string $prefix, string $content): string {
+                return $this->patchVAFFramework($filePath, $prefix, $content);
+            }
+        );
     }
 
     public function ignorePackage(string $package): void
@@ -143,7 +154,7 @@ final class PHPScoperConfigGenerator
         ];
     }
 
-    private function getPatcherVAFFramework(string $filePath, string $prefix, string $content): string
+    private function patchVAFFramework(string $filePath, string $prefix, string $content): string
     {
         if (!str_contains($filePath, 'templates/admin/notice.phtml')) {
             return $content;
@@ -156,7 +167,7 @@ final class PHPScoperConfigGenerator
         );
     }
 
-    private function getPatcherSymfonyDI(string $filePath, string $prefix, string $content): string
+    private function patchSymfonyDI(string $filePath, string $prefix, string $content): string
     {
         if (!str_contains($filePath, 'Compiler/ResolveInstanceofConditionalsPass.php')) {
             return $content;
