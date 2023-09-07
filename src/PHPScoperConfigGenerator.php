@@ -26,6 +26,7 @@ final class PHPScoperConfigGenerator
         private readonly string $buildDir
     ) {
         $this->addPackagePatcher('symfony/dependency-injection', [$this, 'getPatcherSymfonyDI']);
+        $this->addPackagePatcher('vonaffenfels/vaf-framwork', [$this, 'getPatcherVAFFramework']);
     }
 
     public function ignorePackage(string $package): void
@@ -140,6 +141,19 @@ final class PHPScoperConfigGenerator
             'finders' => $finders,
             'patchers' => $patchers
         ];
+    }
+
+    private function getPatcherVAFFramework(string $filePath, string $prefix, string $content): string
+    {
+        if (!str_contains($filePath, 'templates/admin/notice.phtml')) {
+            return $content;
+        }
+
+        return str_replace(
+            'VAF\WP\Framework\Utils\NoticeType::INFO',
+            $prefix . '\VAF\WP\Framework\Utils\NoticeType::INFO',
+            $content
+        );
     }
 
     private function getPatcherSymfonyDI(string $filePath, string $prefix, string $content): string

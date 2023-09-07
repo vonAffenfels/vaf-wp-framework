@@ -1,10 +1,7 @@
-<?php
-    use VAF\WP\Framework\Utils\NoticeType;
-?>
 <div
     class="
         notice
-        <?php echo $this->getData('type', NoticeType::INFO)->value ?>
+        <?php echo $this->getData('type', VAF\WP\Framework\Utils\NoticeType::INFO)->value ?>
         <?php echo $this->getData('isDismissible', false) ? 'is-dismissible' : '' ?>
     "
 >
