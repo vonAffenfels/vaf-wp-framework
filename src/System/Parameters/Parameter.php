@@ -9,8 +9,14 @@ class Parameter
         private readonly string $type,
         private readonly bool $isOptional,
         private readonly mixed $default,
-        private readonly bool $isServiceParam
+        private readonly bool $isServiceParam,
+        private readonly bool $isNullable,
     ) {
+    }
+
+    public function isNullable(): bool
+    {
+        return $this->isNullable;
     }
 
     public function isServiceParam(): bool
@@ -50,7 +56,8 @@ class Parameter
             'type' => $this->getType(),
             'isOptional' => $this->isOptional(),
             'default' => $this->getDefault(),
-            'isServiceParam' => $this->isServiceParam()
+            'isServiceParam' => $this->isServiceParam(),
+            'isNullable' => $this->isNullable()
         ];
     }
 
@@ -61,7 +68,8 @@ class Parameter
             type: $data['type'],
             isOptional: $data['isOptional'],
             default: $data['default'],
-            isServiceParam: $data['isServiceParam']
+            isServiceParam: $data['isServiceParam'],
+            isNullable: $data['isNullable']
         );
     }
 }

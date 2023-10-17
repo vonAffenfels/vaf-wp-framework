@@ -83,21 +83,24 @@ final class Loader
                             $parameter->getDefault()
                         );
 
-                        # Handle type
-                        switch ($parameter->getType()) {
-                            case 'int':
-                                $value = (int)$value;
-                                break;
+                        if (!($parameter->isNullable() && is_null($value))) {
+                            # Handle type
+                            switch ($parameter->getType()) {
+                                case 'int':
+                                    $value = (int)$value;
+                                    break;
 
-                            case 'bool':
-                                $value = in_array(strtolower($value), ['1', 'on', 'true']);
-                                break;
+                                case 'bool':
+                                    $value = in_array(strtolower($value), ['1', 'on', 'true']);
+                                    break;
 
-                            case 'string':
-                            default:
-                                # Nothing to do as $value is already a string
-                                break;
+                                case 'string':
+                                default:
+                                    # Nothing to do as $value is already a string
+                                    break;
+                            }
                         }
+
                         $params[$parameter->getName()] = $value;
                     }
 

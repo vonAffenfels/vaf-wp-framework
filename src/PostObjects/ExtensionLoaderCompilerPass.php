@@ -111,7 +111,8 @@ class ExtensionLoaderCompilerPass implements CompilerPassInterface
                         type: $type->getName(),
                         isOptional: $parameter->isOptional(),
                         default: $parameter->isOptional() ? $parameter->getDefaultValue() : null,
-                        isServiceParam: $isServiceParam
+                        isServiceParam: $isServiceParam,
+                        isNullable: $parameter->allowsNull()
                     )
                 );
             }

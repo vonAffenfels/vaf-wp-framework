@@ -45,8 +45,6 @@ abstract class TabbedPage
             $params[$parameter->getName()] = $this->kernel->getContainer()->get($parameter->getType());
         }
 
-        $content = '';
-
         ob_start();
         $content = $this->$method(...$params);
         $contentEcho = ob_get_clean();
