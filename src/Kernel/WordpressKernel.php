@@ -16,6 +16,9 @@ use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
+use VAF\WP\Framework\GutenbergBlock\Attribute\GutenbergBlock;
+use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
+use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockLoaderCompilerPass;
 use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
 use VAF\WP\Framework\Menu\Loader as MenuLoader;
 use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
@@ -81,6 +84,10 @@ abstract class WordpressKernel extends Kernel
         /** @var PostObjectExtensionLoader $extensionLoader */
         $extensionLoader = $this->getContainer()->get('postobject.extensionLoader');
         $extensionLoader->registerPostObjectExtensions();
+
+        /** @var GutenbergBlockLoader $gutenbergblockLoader */
+        $gutenbergblockLoader = $this->getContainer()->get('gutenbergblock.extensionLoader');
+        $gutenbergblockLoader->registerBlocks();
 
         // Registering REST routes
         add_action('rest_api_init', function () {
