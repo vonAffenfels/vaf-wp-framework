@@ -27,6 +27,7 @@ final class CompilerPass implements CompilerPassInterface
 
             $definition->setArgument('$name', $attrInstance->name);
             $definition->setArgument('$default', $attrInstance->default);
+            $definition->setArgument('$hasPluginPrefix', $attrInstance->hasPluginPrefix);
         }
     }
 }

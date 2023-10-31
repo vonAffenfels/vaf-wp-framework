@@ -15,12 +15,17 @@ abstract class Setting
     public function __construct(
         private readonly string $name,
         private readonly BaseWordpress $base,
-        protected readonly mixed $default = null
+        protected readonly mixed $default = null,
+        protected readonly bool $hasPluginPrefix = true
     ) {
     }
 
     private function getOptionName(): string
     {
+        if (!$this->hasPluginPrefix) {
+            return $this->name;
+        }
+
         return $this->base->getName() . '_' . $this->name;
     }
 

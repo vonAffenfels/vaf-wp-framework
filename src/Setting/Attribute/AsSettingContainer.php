@@ -9,7 +9,8 @@ class AsSettingContainer
 {
     public function __construct(
         public readonly string $name,
-        public readonly mixed $default = null
+        public readonly mixed $default = null,
+        public readonly bool $hasPluginPrefix = true
     ) {
     }
 }
