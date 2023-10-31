@@ -8,9 +8,9 @@ abstract class EnvAwareSetting extends Setting
 {
     private mixed $envValue;
 
-    public function __construct(string $name, BaseWordpress $base, mixed $default = null, bool $hasPluginPrefix = true)
+    public function __construct(string $name, BaseWordpress $base, mixed $default = null)
     {
-        parent::__construct($name, $base, $default, $hasPluginPrefix);
+        parent::__construct($name, $base, $default);
         $this->envValue = $this->parseEnv();
     }
 
