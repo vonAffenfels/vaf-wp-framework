@@ -413,7 +413,7 @@ abstract class WordpressKernel extends Kernel
 
     private function registerGutenbergBlock(ContainerBuilder $builder): void
     {
-        $builder->register('gutenbergblock.loader', HookLoader::class)
+        $builder->register('gutenbergblock.loader', GutenbergBlockLoader::class)
             ->setPublic(true)
             ->setAutowired(true);
 
