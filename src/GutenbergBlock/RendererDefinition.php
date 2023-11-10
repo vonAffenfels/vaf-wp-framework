@@ -18,6 +18,7 @@ class RendererDefinition
         if(
             empty($renderReflection->getParameters())
             || !$renderReflection->getParameters()[0]->hasType()
+            || $renderReflection->getParameters()[0]->getType()->isBuiltin()
             || !($renderReflection->getParameters()[0]->getType() instanceof \ReflectionNamedType)
         ) {
 

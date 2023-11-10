@@ -2,7 +2,7 @@
 
 namespace VAF\WP\FrameworkTests\Unit\RendererDefinition;
 
-class TestBlock
+class TypehintedTestBlock
 {
 
     public ?TestAttributes $calledWith = null;
