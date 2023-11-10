@@ -17,7 +17,7 @@ final class Loader
 
             register_block_type( $dynamicBlock['type'], [
                 ...$dynamicBlock['options'],
-                'render' => RendererDefinition::fromRendererDefinition($dynamicBlock['renderer'])->renderer($instance),
+                'render_callback' => RendererDefinition::fromRendererDefinition($dynamicBlock['renderer'])->renderer($instance),
             ]);
         }
     }

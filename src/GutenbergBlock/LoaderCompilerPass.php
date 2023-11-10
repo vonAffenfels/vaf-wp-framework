@@ -49,7 +49,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
             'class' => $class,
             'renderer' => RendererDefinition::fromClassReflection($reflection)->definition(),
             'options' => [
-                'api_version' => 2,
+                'api_version' => $attribute->apiVersion,
                 'editor_script' => $attribute->editorScriptHandle,
             ]
         ];
