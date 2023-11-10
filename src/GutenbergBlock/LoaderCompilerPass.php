@@ -2,12 +2,11 @@
 
 namespace VAF\WP\Framework\GutenbergBlock;
 
+use LogicException;
 use ReflectionClass;
-use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use VAF\WP\Framework\GutenbergBlock\Attribute\GutenbergBlock;
-use VAF\WP\Framework\GutenbergBlock\Attribute\Hook;
+use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
 
 final class LoaderCompilerPass implements CompilerPassInterface
 {
@@ -19,29 +18,40 @@ final class LoaderCompilerPass implements CompilerPassInterface
 
         $loaderDefinition = $container->findDefinition('gutenbergblock.loader');
 
-        $gutenbergBlocks = $container->findTaggedServiceIds('gutenbergblock.block');
+        $dynamicBlockServicess = $container->findTaggedServiceIds('gutenbergblock.dynamicblock');
 
-        $gutenbergBlocks = [];
-        foreach ($gutenbergBlocks as $id => $tags) {
+        $dynamicBlockDefinitions = [];
+        foreach ($dynamicBlockServicess as $id => $tags) {
             $definition = $container->findDefinition($id);
             $definition->setPublic(true);
-            $gutenbergBlocks[$id] = $this->gutenbergBlockContainerData($definition->getClass(), $container);
+            try {
+                $dynamicBlockDefinitions[$id] = $this->getDynamicBlockDefinition($definition->getClass(), $container);
+            } catch(NoRenderMethodException) {
+            }
         }
-        $loaderDefinition->setArgument('$gutenbergBlockContainer', $gutenbergBlocks);
+        $loaderDefinition->setArgument('$dynamicBlocks', $dynamicBlockDefinitions);
     }
 
-    private function gutenbergBlockContainerData($class, ContainerBuilder $container)
+    private function getDynamicBlockDefinition(string $class, ContainerBuilder $container): array
     {
         $reflection = new ReflectionClass($class);
-        /**
-         * @var GutenbergBlock $attribute
-         */
-        $attribute = $reflection->getAttributes(GutenbergBlock::class)[0];
+        if(!$reflection->hasMethod('render')) {
+            throw new NoRenderMethodException();
+        }
 
+        if( empty($reflection->getAttributes(AsDynamicBlock::class)) ) {
+            throw new LogicException("DynamicBlock without AsDynamicBlock Attribute - should be impossible");
+        }
+
+        $attribute = $reflection->getAttributes(AsDynamicBlock::class)[0]->newInstance();
         return [
-            'block_type' => $attribute->type,
-            'api_version' => $attribute->apiVersion,
-            'editor_script' => $attribute->editorScript,
+            'type' => $attribute->blockType,
+            'class' => $class,
+            'renderer' => RendererDefinition::fromClassReflection($reflection)->definition(),
+            'options' => [
+                'api_version' => 2,
+                'editor_script' => $attribute->editorScriptHandle,
+            ]
         ];
     }
 

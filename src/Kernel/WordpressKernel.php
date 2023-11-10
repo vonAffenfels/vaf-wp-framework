@@ -13,12 +13,12 @@ use VAF\WP\Framework\AdminAjax\LoaderCompilerPass as AdminAjaxLoaderCompilerPass
 use VAF\WP\Framework\AdminPages\Attributes\IsTabbedPage;
 use VAF\WP\Framework\AdminPages\TabbedPageCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
+use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
-use VAF\WP\Framework\GutenbergBlock\Attribute\GutenbergBlock;
 use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
-use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockLoaderCompilerPass;
+use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
 use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
 use VAF\WP\Framework\Menu\Loader as MenuLoader;
 use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
@@ -73,6 +73,10 @@ abstract class WordpressKernel extends Kernel
         $hookLoader = $this->getContainer()->get('hook.loader');
         $hookLoader->registerHooks();
 
+        /** @var GutenbergBlockLoader $gutenbergBlockLoader */
+        $gutenbergBlockLoader = $this->getContainer()->get('gutenbergblock.loader');
+        $gutenbergBlockLoader->registerBlocks();
+
         /** @var ShortcodeLoader $shortcodeLoader */
         $shortcodeLoader = $this->getContainer()->get('shortcode.loader');
         $shortcodeLoader->registerShortcodes();
@@ -84,10 +88,6 @@ abstract class WordpressKernel extends Kernel
         /** @var PostObjectExtensionLoader $extensionLoader */
         $extensionLoader = $this->getContainer()->get('postobject.extensionLoader');
         $extensionLoader->registerPostObjectExtensions();
-
-        /** @var GutenbergBlockLoader $gutenbergblockLoader */
-        $gutenbergblockLoader = $this->getContainer()->get('gutenbergblock.extensionLoader');
-        $gutenbergblockLoader->registerBlocks();
 
         // Registering REST routes
         add_action('rest_api_init', function () {
@@ -132,6 +132,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerTemplate($builder);
 
         $this->registerHookContainer($builder);
+        $this->registerGutenbergBlock($builder);
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
         $this->registerRestAPIContainer($builder);
@@ -406,6 +407,24 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $defintion
             ): void {
                 $defintion->addTag('hook.container');
+            }
+        );
+    }
+
+    private function registerGutenbergBlock(ContainerBuilder $builder): void
+    {
+        $builder->register('gutenbergblock.loader', HookLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new GutenbergBlockCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsDynamicBlock::class,
+            static function (
+                ChildDefinition $defintion
+            ): void {
+                $defintion->addTag('gutenbergblock.dynamicblock');
             }
         );
     }

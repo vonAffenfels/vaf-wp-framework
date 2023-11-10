@@ -16,3 +16,4 @@ node_modules
 .DS_Store
 .phpdoc
 /.php-cs-fixer.cache
+/.phpunit.result.cache

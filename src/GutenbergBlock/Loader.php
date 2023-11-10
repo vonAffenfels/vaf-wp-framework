@@ -6,24 +6,20 @@ use VAF\WP\Framework\Kernel\WordpressKernel;
 
 final class Loader
 {
-    public function __construct(private readonly WordpressKernel $kernel, private readonly array $gutenbergBlocks)
+    public function __construct(private readonly WordpressKernel $kernel, private readonly array $dynamicBlocks)
     {
     }
 
     public function registerBlocks(): void
     {
-        foreach ($this->gutenbergBlocks as $serviceId => $hookContainer) {
-            foreach ($hookContainer as $gutenbergBlock => $data) {
+        foreach ($this->dynamicBlocks as $dynamicBlock) {
+            $instance = $this->kernel->getContainer()->get($dynamicBlock['class']);
 
-                register_block_type( $data['block_type'], array(
-                    'api_version' => 2,
-                    'editor_script' => $data['editor_script'],
-                    'render_callback' => function(...$args) use ($serviceId) {
-                        $this->kernel->getContainer()->get($serviceId)->render(...$args);
-                    }
-                ) );
-
-            }
+            register_block_type( $dynamicBlock['type'], [
+                ...$dynamicBlock['options'],
+                'render' => RendererDefinition::fromRendererDefinition($dynamicBlock['renderer'])->renderer($instance),
+            ]);
         }
     }
+
 }
