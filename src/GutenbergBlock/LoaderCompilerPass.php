@@ -24,10 +24,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
         foreach ($dynamicBlockServicess as $id => $tags) {
             $definition = $container->findDefinition($id);
             $definition->setPublic(true);
-            try {
-                $dynamicBlockDefinitions[$id] = $this->getDynamicBlockDefinition($definition->getClass(), $container);
-            } catch(NoRenderMethodException) {
-            }
+            $dynamicBlockDefinitions[$id] = $this->getDynamicBlockDefinition($definition->getClass(), $container);
         }
         $loaderDefinition->setArgument('$dynamicBlocks', $dynamicBlockDefinitions);
     }
@@ -36,7 +33,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
     {
         $reflection = new ReflectionClass($class);
         if(!$reflection->hasMethod('render')) {
-            throw new NoRenderMethodException();
+            throw new NoRenderMethodException($class);
         }
 
         if( empty($reflection->getAttributes(AsDynamicBlock::class)) ) {
@@ -49,7 +46,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
             'class' => $class,
             'renderer' => RendererDefinition::fromClassReflection($reflection)->definition(),
             'options' => [
-                'api_version' => $attribute->apiVersion,
+                'api_version' => $attribute->version,
                 'editor_script' => $attribute->editorScriptHandle,
             ]
         ];
