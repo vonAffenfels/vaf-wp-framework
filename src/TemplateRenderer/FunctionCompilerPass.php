@@ -59,7 +59,11 @@ class FunctionCompilerPass implements CompilerPassInterface
             $serviceParams = [];
             foreach ($method->getParameters() as $paramIdx => $parameter) {
                 $type = $parameter->getType();
-                if ($type instanceof ReflectionIntersectionType || $type instanceof ReflectionUnionType) {
+                if (
+                    $parameter->isVariadic()
+                    || $type instanceof ReflectionIntersectionType
+                    || $type instanceof ReflectionUnionType
+                ) {
                     continue;
                 }
 

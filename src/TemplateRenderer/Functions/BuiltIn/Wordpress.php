@@ -23,4 +23,11 @@ class Wordpress
     ): string {
         return wp_nonce_field($action, $name, $referer, $display);
     }
+
+    #[IsFunction('__')]
+    public function __(
+        ...$parameter,
+    ): string {
+        return __(...$parameter);
+    }
 }
