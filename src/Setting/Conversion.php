@@ -15,6 +15,15 @@ class Conversion
     {
     }
 
+    public static function identity(): self
+    {
+        return new self(
+            fromDb: fn($value) => $value,
+            toDb: fn($value) => $value,
+            fromInput: fn($value) => $value
+        );
+    }
+
     public static function boolean(): self
     {
         return new self(

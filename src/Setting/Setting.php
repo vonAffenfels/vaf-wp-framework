@@ -30,8 +30,7 @@ abstract class Setting
         $this->migrateIfNecessary();
 
         if (!$this->loaded) {
-            $this->value = ($this->conversion()?->fromDb)( get_option($this->getOptionName(), $this->default) )
-                ?? get_option($this->getOptionName(), $this->default);
+            $this->value = ($this->conversion()->fromDb)(get_option($this->getOptionName(), $this->default));
 
             $this->loaded = true;
         }
@@ -41,7 +40,9 @@ abstract class Setting
 
     protected function set($value, ?string $key = null, bool $doSave = true): self
     {
-        $convertedValue = fn() => ($this->conversion()?->fromInput)($value) ?? $value;
+        $convertedValue = fn() => $this->conversion()->fromInput !== null
+            ? ($this->conversion()->fromInput)($value)
+            : $value;
 
         if (is_null($key)) {
             $this->value = $convertedValue();
@@ -64,7 +65,7 @@ abstract class Setting
     final public function save(): void
     {
         if ($this->dirty) {
-            update_option($this->getOptionName(), ($this->conversion?->toDb)($this->value) ?? $this->value);
+            update_option($this->getOptionName(), ($this->conversion()->toDb)($this->value));
             $this->dirty = false;
         }
     }
@@ -100,8 +101,8 @@ abstract class Setting
         return null;
     }
 
-    protected function conversion(): ?Conversion
+    protected function conversion(): Conversion
     {
-        return null;
+        return Conversion::identity();
     }
 }
