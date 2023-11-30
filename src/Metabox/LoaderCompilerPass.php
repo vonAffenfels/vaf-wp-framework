@@ -35,7 +35,6 @@ final class LoaderCompilerPass implements CompilerPassInterface
 
         $reflection = new ReflectionClass($class);
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            $numParameters = $method->getNumberOfParameters();
             $methodName = $method->getName();
 
             // Check if the Metabox attribute is present
