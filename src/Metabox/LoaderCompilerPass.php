@@ -44,26 +44,6 @@ final class LoaderCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            # Check if we have to inject service containers into parameters
-            $serviceParams = [];
-            foreach ($method->getParameters() as $paramIdx => $parameter) {
-                $type = $parameter->getType();
-                if (is_null($type)) {
-                    continue;
-                }
-
-                if ($container->has($type->getName())) {
-                    # We found a service parameter
-                    # So reduce number of parameters of metabox by one
-                    # And register the service parameter
-
-                    $numParameters--;
-                    $serviceParams[$paramIdx] = $type->getName();
-
-                    $container->findDefinition($type->getName())->setPublic(true);
-                }
-            }
-
             foreach ($attributes as $attribute) {
                 /**
                  * @var Metabox $instance
@@ -72,9 +52,11 @@ final class LoaderCompilerPass implements CompilerPassInterface
 
                 $data[] = [
                     'method' => $methodName,
+                    'id' => $instance->id,
+                    'title' => $instance->title,
+                    'screen' => $instance->screen,
+                    'context' => $instance->context,
                     'priority' => $instance->priority,
-                    'numParams' => $numParameters,
-                    'serviceParams' => $serviceParams
                 ];
             }
         }
