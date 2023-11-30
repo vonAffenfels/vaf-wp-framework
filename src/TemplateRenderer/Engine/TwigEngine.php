@@ -22,7 +22,6 @@ final class TwigEngine extends TemplateEngine
     ) {
         $this->twig = new Environment($loader);
         $this->twig->addExtension($extension);
-        $this->twig->addFunction(new TwigFunction('__', fn (...$parameters) => __(...$parameters)));
     }
 
     /**

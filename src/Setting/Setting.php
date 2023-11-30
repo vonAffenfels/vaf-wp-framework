@@ -30,7 +30,8 @@ abstract class Setting
         $this->migrateIfNecessary();
 
         if (!$this->loaded) {
-            $this->value = get_option($this->getOptionName(), $this->default);
+            $this->value = ($this->conversion()->fromDb)(get_option($this->getOptionName(), $this->default));
+
             $this->loaded = true;
         }
 
@@ -39,13 +40,17 @@ abstract class Setting
 
     protected function set($value, ?string $key = null, bool $doSave = true): self
     {
+        $convertedValue = fn() => $this->conversion()->fromInput !== null
+            ? ($this->conversion()->fromInput)($value)
+            : $value;
+
         if (is_null($key)) {
-            $this->value = $value;
+            $this->value = $convertedValue();
         } else {
             if (!is_array($this->value)) {
-                $this->value = [$value];
+                $this->value = [$convertedValue()];
             }
-            $this->value[$key] = $value;
+            $this->value[$key] = $convertedValue();
         }
 
         $this->dirty = true;
@@ -60,7 +65,7 @@ abstract class Setting
     final public function save(): void
     {
         if ($this->dirty) {
-            update_option($this->getOptionName(), $this->value);
+            update_option($this->getOptionName(), ($this->conversion()->toDb)($this->value));
             $this->dirty = false;
         }
     }
@@ -94,5 +99,10 @@ abstract class Setting
     protected function migration(): ?Migration
     {
         return null;
+    }
+
+    protected function conversion(): Conversion
+    {
+        return Conversion::identity();
     }
 }
