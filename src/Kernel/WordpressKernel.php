@@ -17,6 +17,9 @@ use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
+use VAF\WP\Framework\Metabox\Attribute\AsMetaboxContainer;
+use VAF\WP\Framework\Metabox\Loader as MetaboxLoader;
+use VAF\WP\Framework\Metabox\LoaderCompilerPass as MetaboxLoaderCompilerPass;
 use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
 use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
 use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
@@ -72,6 +75,10 @@ abstract class WordpressKernel extends Kernel
         /** @var HookLoader $hookLoader */
         $hookLoader = $this->getContainer()->get('hook.loader');
         $hookLoader->registerHooks();
+
+        /** @var MetaboxLoader $metaboxLoader */
+        $metaboxLoader = $this->getContainer()->get('metabox.loader');
+        $metaboxLoader->registerMetaboxes();
 
         /** @var GutenbergBlockLoader $gutenbergBlockLoader */
         $gutenbergBlockLoader = $this->getContainer()->get('gutenbergblock.loader');
@@ -132,6 +139,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerTemplate($builder);
 
         $this->registerHookContainer($builder);
+        $this->registerMetaboxContainer($builder);
         $this->registerGutenbergBlock($builder);
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
@@ -404,9 +412,27 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsHookContainer::class,
             static function (
-                ChildDefinition $defintion
+                ChildDefinition $definition
             ): void {
-                $defintion->addTag('hook.container');
+                $definition->addTag('hook.container');
+            }
+        );
+    }
+
+    private function registerMetaboxContainer(ContainerBuilder $builder)
+    {
+        $builder->register('metabox.loader', MetaboxLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new MetaboxLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsMetaboxContainer::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('metabox.container');
             }
         );
     }
@@ -422,9 +448,9 @@ abstract class WordpressKernel extends Kernel
         $builder->registerAttributeForAutoconfiguration(
             AsDynamicBlock::class,
             static function (
-                ChildDefinition $defintion
+                ChildDefinition $definition
             ): void {
-                $defintion->addTag('gutenbergblock.dynamicblock');
+                $definition->addTag('gutenbergblock.dynamicblock');
             }
         );
     }
@@ -446,4 +472,5 @@ abstract class WordpressKernel extends Kernel
             }
         );
     }
+
 }
