@@ -51,7 +51,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
 
                 $data[] = [
                     'method' => $methodName,
-                    'id' => $instance->id ?? strtolower($reflection->name.'_'.$methodName),
+                    'id' => $instance->id ?? (string)MetaboxId::fromClassMethodName($reflection->name, $methodName),
                     'title' => $instance->title,
                     'screen' => $instance->screen,
                     'context' => $instance->context,

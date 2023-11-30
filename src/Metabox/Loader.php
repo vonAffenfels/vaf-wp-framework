@@ -15,13 +15,13 @@ final class Loader
         foreach ($this->metaboxContainer as $serviceId => $metaboxContainer) {
             foreach ($metaboxContainer as $data) {
 
-                add_action( 'add_meta_boxes', function() use ($data, $serviceId) {
+                add_action('add_meta_boxes', function () use ($data, $serviceId) {
                     $methodName = $data['method'];
-                    add_meta_box($data['id'], $data['title'], function() use ($serviceId, $methodName) {
+                    add_meta_box($data['id'], $data['title'], function () use ($serviceId, $methodName) {
                         $metaboxContainer = $this->kernel->getContainer()->get($serviceId);
                         return $metaboxContainer->$methodName();
                     }, $data['screen'], $data['context'], $data['priority']);
-                }, 5 );
+                }, 5);
             }
         }
     }
