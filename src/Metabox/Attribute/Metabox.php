@@ -17,8 +17,8 @@ final class Metabox
     const CONTEXT_ADVANCED = 'advanced';
 
     public function __construct(
-        public readonly string $id,
         public readonly string $title,
+        public readonly ?string $id = null,
         public readonly string|array|null $screen = null,
         public readonly string $context = self::CONTEXT_ADVANCED,
         public readonly string $priority = self::PRIORITY_DEFAULT
