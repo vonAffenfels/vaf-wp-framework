@@ -38,6 +38,30 @@ final class PHPScoperConfigGenerator
                 return $this->patchVAFFramework($filePath, $prefix, $content);
             }
         );
+
+        $this->addPackagePatcher(
+            'twig/twig',
+            function (string $filePath, string $prefix, string $content): string {
+                $replacements = [
+                    '"use Twig\\\\' => sprintf('"use %s\\\\Twig\\\\', $prefix),
+                ];
+
+                if(str_contains($filePath, 'EscaperExtension')) {
+                    $replacements = [
+                        ...$replacements,
+                        ...UnscopedFunction::fromName('twig_escape_filter')->scopedReplacement($prefix),
+                        ...UnscopedFunction::fromName('twig_escape_filter_is_safe')->scopedReplacement($prefix),
+                        ...UnscopedFunction::fromName('twig_raw_filter')->scopedReplacement($prefix),
+                    ];
+                }
+
+                return str_replace(
+                    array_keys($replacements),
+                    array_values($replacements),
+                    $content
+                );
+            }
+        );
     }
 
     public function ignorePackage(string $package): void
@@ -195,5 +219,9 @@ final class PHPScoperConfigGenerator
             },
             $content
         );
+    }
+
+    private function namespaceTwigFilterReplacement($twigFilterName, $replacements, $prefix) {
+        return $replacements;
     }
 }
