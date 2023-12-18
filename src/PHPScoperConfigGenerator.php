@@ -24,7 +24,8 @@ final class PHPScoperConfigGenerator
         private readonly string $baseDir,
         private readonly string $prefix,
         private readonly string $buildDir
-    ) {
+    )
+    {
         $this->addPackagePatcher(
             'symfony/dependency-injection',
             function (string $filePath, string $prefix, string $content): string {
@@ -46,7 +47,7 @@ final class PHPScoperConfigGenerator
                     '"use Twig\\\\' => sprintf('"use %s\\\\Twig\\\\', $prefix),
                 ];
 
-                if(str_contains($filePath, 'EscaperExtension')) {
+                if (str_contains($filePath, 'EscaperExtension')) {
                     $replacements = [
                         ...$replacements,
                         ...UnscopedFunction::fromName('twig_escape_filter')->scopedReplacement($prefix),
@@ -62,6 +63,18 @@ final class PHPScoperConfigGenerator
                 );
             }
         );
+
+        $this->addPackagePatcher(
+            'vonaffenfels/vaf-wp-framework',
+            function (string $filePath, string $prefix, string $content): string {
+                return str_replace(
+                    sprintf("%s\\WP_REST_Request", $prefix),
+                    "WP_REST_Request",
+                    $content
+                );
+            }
+        );
+
     }
 
     public function ignorePackage(string $package): void
@@ -221,7 +234,8 @@ final class PHPScoperConfigGenerator
         );
     }
 
-    private function namespaceTwigFilterReplacement($twigFilterName, $replacements, $prefix) {
+    private function namespaceTwigFilterReplacement($twigFilterName, $replacements, $prefix)
+    {
         return $replacements;
     }
 }
