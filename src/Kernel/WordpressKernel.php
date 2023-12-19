@@ -135,10 +135,6 @@ abstract class WordpressKernel extends Kernel
             $container->import($configDir . '/services.php');
         }
 
-        $builder->register(ReactTemplate::class, ReactTemplate::class)
-            ->setPublic(true)
-            ->setAutowired(true)
-        ;
         $this->registerRequestService($builder);
         $this->registerTemplateRenderer($builder);
         $this->registerTemplate($builder);
@@ -156,6 +152,10 @@ abstract class WordpressKernel extends Kernel
 
         $this->registerPostObjects($builder);
 
+        $builder->register(ReactTemplate::class, ReactTemplate::class)
+            ->setPublic(true)
+            ->setAutowired(true)
+        ;
         $this->base->configureContainer($builder, $container);
     }
 
