@@ -32,6 +32,10 @@ final class Loader
                             ),
                             ...get_post_types_by_support($data['supporting']),
                         ];
+
+                        if(empty($screen) && empty(get_post_types_by_support($data['supporting']))) {
+                            return;
+                        }
                     }
 
                     add_meta_box($data['id'], $data['title'], function () use ($serviceId, $methodName) {
