@@ -1,5 +1,5 @@
 import {createRoot} from '@wordpress/element';
-import {ready} from './ready';
+import {ready} from './ready.js';
 
 export function reactOnReady(id, fn) {
     ready(() => {
