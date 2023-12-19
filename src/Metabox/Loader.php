@@ -21,7 +21,15 @@ final class Loader
                     $screen = $data['screen'];
                     if ($data['supporting'] !== null) {
                         $screen = [
-                            ...(is_array($screen) ? $screen : [$screen]),
+                            ...(
+                            is_array($screen)
+                                ? $screen
+                                : (
+                                    screen === null
+                                    ? []
+                                    : [$screen]
+                                )
+                            ),
                             ...get_post_types_by_support($data['supporting']),
                         ];
                     }
