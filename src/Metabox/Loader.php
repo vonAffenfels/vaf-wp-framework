@@ -25,7 +25,7 @@ final class Loader
                             is_array($screen)
                                 ? $screen
                                 : (
-                                    screen === null
+                                    $screen === null
                                     ? []
                                     : [$screen]
                                 )
