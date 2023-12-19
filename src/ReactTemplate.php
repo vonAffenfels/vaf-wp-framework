@@ -1,6 +1,6 @@
 <?php
 
-namespace Wp\Plugin\Conversion;
+namespace VAF\WP\Framework;
 
 use VAF\WP\Framework\Template\Attribute\IsTemplate;
 use VAF\WP\Framework\Template\Template;
