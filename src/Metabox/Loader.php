@@ -17,10 +17,19 @@ final class Loader
 
                 add_action('add_meta_boxes', function () use ($data, $serviceId) {
                     $methodName = $data['method'];
+
+                    $screen = $data['screen'];
+                    if ($data['supporting'] !== null) {
+                        $screen = [
+                            ...(is_array($screen) ? $screen : [$screen]),
+                            ...get_post_types_by_support($data['supporting']),
+                        ];
+                    }
+
                     add_meta_box($data['id'], $data['title'], function () use ($serviceId, $methodName) {
                         $metaboxContainer = $this->kernel->getContainer()->get($serviceId);
                         return $metaboxContainer->$methodName();
-                    }, $data['screen'], $data['context'], $data['priority']);
+                    }, $screen, $data['context'], $data['priority']);
                 }, 5);
             }
         }

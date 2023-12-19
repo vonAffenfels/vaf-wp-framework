@@ -56,6 +56,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
                     'screen' => $instance->screen,
                     'context' => $instance->context,
                     'priority' => $instance->priority,
+                    'supporting' => $instance->supporting,
                 ];
             }
         }

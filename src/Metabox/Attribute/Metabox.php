@@ -21,7 +21,8 @@ final class Metabox
         public readonly ?string $id = null,
         public readonly string|array|null $screen = null,
         public readonly string $context = self::CONTEXT_ADVANCED,
-        public readonly string $priority = self::PRIORITY_DEFAULT
+        public readonly string $priority = self::PRIORITY_DEFAULT,
+        public readonly string|null $supporting = null,
     ) {
     }
 
