@@ -32,7 +32,6 @@ use VAF\WP\Framework\PostObjects\ExtensionLoaderCompilerPass as PostObjectExtens
 use VAF\WP\Framework\PostObjects\Page;
 use VAF\WP\Framework\PostObjects\Post;
 use VAF\WP\Framework\PostObjects\PostObjectManager;
-use VAF\WP\Framework\ReactTemplate;
 use VAF\WP\Framework\Request;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
 use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
@@ -58,6 +57,7 @@ use VAF\WP\Framework\TemplateRenderer\Functions\BuiltIn\Wordpress;
 use VAF\WP\Framework\TemplateRenderer\NamespaceHandler;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Admin\Notice;
+use VAF\WP\Framework\Utils\Templates\Admin\ReactTemplate;
 use VAF\WP\Framework\Utils\Templates\Admin\TabbedPage as TabbedPageTemplate;
 
 abstract class WordpressKernel extends Kernel
@@ -153,7 +153,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerPostObjects($builder);
 
         $builder->register(ReactTemplate::class, ReactTemplate::class)
-            ->setPublic(true)
+            ->setAutoconfigured(true)
             ->setAutowired(true)
         ;
         $this->base->configureContainer($builder, $container);

@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Framework;
+namespace VAF\WP\Framework\Utils\Templates\Admin;
 
 use VAF\WP\Framework\Template\Attribute\IsTemplate;
 use VAF\WP\Framework\Template\Template;
