@@ -32,6 +32,7 @@ use VAF\WP\Framework\PostObjects\ExtensionLoaderCompilerPass as PostObjectExtens
 use VAF\WP\Framework\PostObjects\Page;
 use VAF\WP\Framework\PostObjects\Post;
 use VAF\WP\Framework\PostObjects\PostObjectManager;
+use VAF\WP\Framework\ReactTemplate;
 use VAF\WP\Framework\Request;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
 use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
@@ -134,6 +135,7 @@ abstract class WordpressKernel extends Kernel
             $container->import($configDir . '/services.php');
         }
 
+        $builder->register(ReactTemplate::class);
         $this->registerRequestService($builder);
         $this->registerTemplateRenderer($builder);
         $this->registerTemplate($builder);
