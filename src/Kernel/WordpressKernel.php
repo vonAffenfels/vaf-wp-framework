@@ -135,7 +135,7 @@ abstract class WordpressKernel extends Kernel
             $container->import($configDir . '/services.php');
         }
 
-        $builder->register(ReactTemplate::class);
+        $builder->register(ReactTemplate::class, ReactTemplate::class);
         $this->registerRequestService($builder);
         $this->registerTemplateRenderer($builder);
         $this->registerTemplate($builder);
