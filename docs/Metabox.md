@@ -22,6 +22,7 @@ save the data inputted in the metabox.
     - Metabox::CONTEXT_ADVANCED - in advanced section of the sidebar
 - priority: The priority, determines where in the list of metaboxes this metabox will appear. Can be one of the following:
     - Metabox::PRIORITY_HIGH
+    - Metabox::PRIORITY_CORE
     - Metabox::PRIORITY_DEFAULT
     - Metabox::PRIORITY_LOW
 
