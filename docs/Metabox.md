@@ -30,10 +30,10 @@ save the data inputted in the metabox.
 ```php
 
 #[AsMetaboxContainer]
-class ArticleMetabox
+class ExampleMetabox
 {
     #[Metabox(title: 'Heading', screen: 'post', context: Metabox::CONTEXT_SIDE)]
-    public function banlistAdzonesMetabox()
+    public function anyFunctionName()
     {
         echo "Metabox Content!";
     }
@@ -56,7 +56,7 @@ class ExampleMetabox
     }
 
     #[Metabox(title: 'Example Metabox', screen: 'post', context: Metabox::CONTEXT_SIDE)]
-    public function banlistAdzonesMetabox()
+    public function myExampleMetabox()
     {
         $this->metaboxTemplate
             ->withId('example-metabox')
