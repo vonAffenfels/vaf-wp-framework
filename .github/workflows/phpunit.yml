@@ -12,7 +12,7 @@ jobs:
         uses: skitionek/notify-microsoft-teams@master
         if: failure()
         with:
-          webhook_url: {{ secret.phpteamTestingWebhook }}
+          webhook_url: ${{ secret.phpteamTestingWebhook }}
           needs: ${{ toJson(needs) }}
           job: ${{ toJson(job) }}
           steps: ${{ toJson(steps) }}
