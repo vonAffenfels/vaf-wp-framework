@@ -1,0 +1,30 @@
+name: vaf-wp-framework Unittests
+run-name: vaf-wp-framework Unittests
+on: [push]
+jobs:
+  Composer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6 # or alternative dependency management
+      - uses: php-actions/phpunit@v3
+      - name: Microsoft Teams Notification
+        uses: skitionek/notify-microsoft-teams@master
+        if: failure()
+        with:
+          webhook_url: {{ secret.phpteamTestingWebhook }}
+          needs: ${{ toJson(needs) }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
+
+
+
+
+
+
+
+
+
+
+
+
