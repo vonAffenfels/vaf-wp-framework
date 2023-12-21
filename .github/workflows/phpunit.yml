@@ -2,7 +2,7 @@ name: vaf-wp-framework Unittests
 run-name: vaf-wp-framework Unittests
 on: [push]
 jobs:
-  Composer:
+  PHPUnit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
