@@ -26,6 +26,9 @@ final class PHPScoperConfigGenerator
         private readonly string $buildDir
     )
     {
+        $this->ignorePackage('phpunit/phpunit');
+        $this->ignorePackage('mockery/mockery');
+
         $this->addPackagePatcher(
             'symfony/dependency-injection',
             function (string $filePath, string $prefix, string $content): string {
