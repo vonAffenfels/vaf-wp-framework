@@ -51,8 +51,9 @@ abstract class Plugin extends BaseWordpress
         /**
          * Do NOT typehint return with this. Plugin can be of a scoped plugin type because of php-scoper
          * @var ?Plugin $return
+         * @returns ?Plugin
          */
-        add_action('vaf-get-plugin', function ($return, string $plugin): ?Plugin {
+        add_action('vaf-get-plugin', function ($return, string $plugin) {
             if ($plugin === $this->getName()) {
                 $return = $this;
             }
