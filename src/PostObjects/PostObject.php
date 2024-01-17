@@ -17,7 +17,7 @@ abstract class PostObject
         return $this;
     }
 
-    private function getPost(): WP_Post
+    protected function getPost(): WP_Post
     {
         if (is_null($this->post)) {
             throw new LogicException('PostObject not initialized!');

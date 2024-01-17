@@ -5,6 +5,10 @@ namespace VAF\WP\Framework\PostObjects;
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
 
 #[PostType('post')]
-final class Post extends PostObject
+class Post extends PostObject
 {
+    public function getId(): int
+    {
+        return $this->getPost()->ID;
+    }
 }
