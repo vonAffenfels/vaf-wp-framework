@@ -83,6 +83,7 @@ class FunctionCompilerPass implements CompilerPassInterface
             $this->functionList[$functionName] = [
                 'container' => $class,
                 'method' => $methodName,
+                'isSafeHTML' => $instance->safeHTML,
                 'serviceParams' => $serviceParams
             ];
         }

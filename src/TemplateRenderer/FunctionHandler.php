@@ -34,6 +34,12 @@ class FunctionHandler
 
         $functionContainer = $this->kernel->getContainer()->get($functionData['container']);
         $methodName = $functionData['method'];
-        return $functionContainer->$methodName(...$params);
+        $ret = $functionContainer->$methodName(...$params);
+
+        if (!$functionData['isSafeHTML']) {
+            $ret = htmlentities($ret);
+        }
+
+        return $ret;
     }
 }
