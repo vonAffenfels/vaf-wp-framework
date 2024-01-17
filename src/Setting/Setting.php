@@ -13,11 +13,10 @@ abstract class Setting
     private bool $dirty = false;
 
     public function __construct(
-        private readonly string        $name,
+        private readonly string $name,
         private readonly BaseWordpress $base,
-        protected readonly mixed       $default = null
-    )
-    {
+        protected readonly mixed $default = null
+    ) {
     }
 
     private function getOptionName(): string
@@ -83,7 +82,8 @@ abstract class Setting
 
     private function migrateIfNecessary(?string $key = null): void
     {
-        if ($this->loaded
+        if (
+            $this->loaded
             || $this->migration() === null
             || ($this->migration()->migrated)($key)
         ) {

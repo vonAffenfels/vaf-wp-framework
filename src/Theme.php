@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use VAF\WP\Framework\Kernel\Kernel;
 use VAF\WP\Framework\Kernel\ThemeKernel;
+use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\ThemeSearchMode;
 
 abstract class Theme extends BaseWordpress
