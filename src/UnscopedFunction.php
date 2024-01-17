@@ -4,16 +4,15 @@ namespace VAF\WP\Framework;
 
 class UnscopedFunction
 {
-
     private string $name;
 
     public static function fromName(string $name): self
     {
-    	$unscopedFunction = new static();
+        $unscopedFunction = new static();
 
         $unscopedFunction->name = $name;
 
-    	return $unscopedFunction;
+        return $unscopedFunction;
     }
 
     public function scopedReplacement($scope): array
@@ -23,5 +22,4 @@ class UnscopedFunction
             "'{$this->name}'" => sprintf("'%s\\\\{$this->name}'", $scope)
         ];
     }
-
 }

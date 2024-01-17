@@ -79,4 +79,16 @@ class PostObjectManager
     {
         return new PostObjectList($this, $query->posts);
     }
+
+    public function getQueriedObject(): ?PostObject
+    {
+        $obj = get_queried_object();
+        $ret = null;
+
+        if ($obj instanceof WP_Post) {
+            $ret = $this->getByWPPost($obj);
+        }
+
+        return $ret;
+    }
 }
