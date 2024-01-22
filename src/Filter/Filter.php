@@ -32,8 +32,8 @@ class Filter
     {
         return $this->filters()->resultFrom(
             $this->name,
-            array_reduce($this->legacyNames, function ($previousResult, $legacyName) use ($args) {
-                return $this->filters()->resultFrom($legacyName, $previousResult, ...$args);
+            array_reduce($this->legacyNames, function ($previousResult, Filter $legacyFilter) use ($args) {
+                return $legacyFilter->result($previousResult, ...$args);
             }, $result),
             ...$args
         );
@@ -52,7 +52,7 @@ class Filter
     {
         $clone = clone $this;
 
-        $clone->legacyNames = [...$this->legacyNames, $legacyName];
+        $clone->legacyNames = [...$this->legacyNames, Filter::fromName($legacyName)];
 
         return $clone;
     }
