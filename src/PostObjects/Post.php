@@ -11,4 +11,14 @@ class Post extends PostObject
     {
         return $this->getPost()->ID;
     }
+
+    public function getPostType(): string
+    {
+        return $this->getPost()->post_type;
+    }
+
+    public function getPermalink(): string
+    {
+        return get_permalink($this->getPost());
+    }
 }
