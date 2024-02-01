@@ -34,7 +34,7 @@ abstract class Theme extends BaseWordpress
         $theme = wp_get_theme();
 
         parent::__construct(
-            $theme->get('Name'),
+            $theme->get_stylesheet(),
             $theme->get_stylesheet_directory(),
             $theme->get_stylesheet_directory_uri(),
             $debug
