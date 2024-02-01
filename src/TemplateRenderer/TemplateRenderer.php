@@ -11,8 +11,6 @@ final class TemplateRenderer
 {
     private const NAMESPACE = '@vaf-wp-framework';
 
-    private array $namespaces = [];
-
     public function __construct(
         private readonly BaseWordpress $base,
         private readonly NamespaceHandler $handler,
@@ -43,9 +41,9 @@ final class TemplateRenderer
         ]);
     }
 
-    public function registerNamespace(string $namespace, array $directories): void
+    public function registerNamespace(string $namespace, array $directories, bool $overwrite = false): void
     {
-        $this->handler->registerNamespace($namespace, $directories);
+        $this->handler->registerNamespace($namespace, $directories, $overwrite);
     }
 
     public function render(string $template, array $context = []): string
