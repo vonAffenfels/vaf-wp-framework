@@ -5,7 +5,6 @@ namespace VAF\WP\Framework\RestAPI;
 use Exception;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Kernel\WordpressKernel;
-use WP_HTTP_Response;
 use WP_REST_Request;
 
 final class Loader
@@ -91,10 +90,6 @@ final class Loader
                         try {
                             $container = $this->kernel->getContainer()->get($serviceId);
                             $retVal = $container->$methodName(...$params);
-
-                            if ($retVal instanceof WP_HTTP_Response) {
-                                return $retVal;
-                            }
 
                             if ($retVal !== false) {
                                 $return['success'] = true;
