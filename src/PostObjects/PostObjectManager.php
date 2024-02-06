@@ -8,9 +8,10 @@ use WP_Query;
 
 class PostObjectManager
 {
-    private array $internalPostTypes = [
+    private array $internalPostObjects = [
         'post' => Post::class,
-        'page' => Page::class
+        'page' => Page::class,
+        'nav_menu_item' => NavMenuItem::class
     ];
 
     public function __construct(
@@ -78,6 +79,11 @@ class PostObjectManager
     public function getByWPQuery(WP_Query $query): PostObjectList
     {
         return new PostObjectList($this, $query->posts);
+    }
+
+    public function getByPostArray(array $posts): PostObjectList
+    {
+        return new PostObjectList($this, $posts);
     }
 
     public function getQueriedObject(): ?PostObject

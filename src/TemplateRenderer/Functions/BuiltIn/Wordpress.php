@@ -8,26 +8,33 @@ use VAF\WP\Framework\TemplateRenderer\Attribute\IsFunction;
 #[AsFunctionContainer]
 class Wordpress
 {
-    #[IsFunction('wp_editor')]
-    public function wpEditor(string $content, string $editorId, array $settings = []): void
+    #[IsFunction('wp_head')]
+    public function wpHead(): void
     {
-        wp_editor($content, $editorId, $settings);
+        wp_head();
+    }
+
+    #[IsFunction('get_bloginfo', safeHTML: true)]
+    public function getBlogInfo(...$parameter): string
+    {
+        return get_bloginfo(...$parameter);
+    }
+
+    #[IsFunction('wp_editor')]
+    public function wpEditor(...$parameter): void
+    {
+        wp_editor(...$parameter);
     }
 
     #[IsFunction('wp_nonce_field')]
-    public function wpNonceField(
-        int|string $action = -1,
-        string $name = '_wpnonce',
-        bool $referer = true,
-        bool $display = true
-    ): string {
-        return wp_nonce_field($action, $name, $referer, $display);
+    public function wpNonceField(...$parameter): string
+    {
+        return wp_nonce_field(...$parameter);
     }
 
     #[IsFunction('__')]
-    public function __(
-        ...$parameter,
-    ): string {
+    public function __(...$parameter): string
+    {
         return __(...$parameter);
     }
 }

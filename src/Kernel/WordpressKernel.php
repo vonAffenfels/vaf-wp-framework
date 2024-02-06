@@ -29,6 +29,7 @@ use VAF\WP\Framework\PostObjects\Attributes\PostType;
 use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
 use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
 use VAF\WP\Framework\PostObjects\ExtensionLoaderCompilerPass as PostObjectExtensionLoaderCompilerPass;
+use VAF\WP\Framework\PostObjects\NavMenuItem;
 use VAF\WP\Framework\PostObjects\Page;
 use VAF\WP\Framework\PostObjects\Post;
 use VAF\WP\Framework\PostObjects\PostObjectManager;
@@ -54,6 +55,7 @@ use VAF\WP\Framework\TemplateRenderer\EngineCompilerPass;
 use VAF\WP\Framework\TemplateRenderer\FunctionCompilerPass;
 use VAF\WP\Framework\TemplateRenderer\FunctionHandler;
 use VAF\WP\Framework\TemplateRenderer\Functions\BuiltIn\Wordpress;
+use VAF\WP\Framework\TemplateRenderer\GlobalContext;
 use VAF\WP\Framework\TemplateRenderer\NamespaceHandler;
 use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 use VAF\WP\Framework\Utils\Templates\Admin\Notice;
@@ -209,13 +211,20 @@ abstract class WordpressKernel extends Kernel
 
                 $definition->setPublic(true);
                 $definition->setShared(false);
+                $definition->setAutoconfigured(true);
+                $definition->setAutowired(true);
             }
         );
 
         $builder->register(Page::class, Page::class)
-            ->setAutoconfigured(true);
+            ->setAutoconfigured(true)
+            ->setAutowired(true);
         $builder->register(Post::class, Post::class)
-            ->setAutoconfigured(true);
+            ->setAutoconfigured(true)
+            ->setAutowired(true);
+        $builder->register(NavMenuItem::class, NavMenuItem::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true);
     }
 
     private function registerTemplate(ContainerBuilder $builder): void
@@ -261,6 +270,7 @@ abstract class WordpressKernel extends Kernel
             ->setAutowired(true);
         $builder->setAlias('template.notice', Notice::class)
             ->setPublic(true);
+        $builder->register(GlobalContext::class, GlobalContext::class);
     }
 
     private function registerTemplateRenderer(ContainerBuilder $builder): void

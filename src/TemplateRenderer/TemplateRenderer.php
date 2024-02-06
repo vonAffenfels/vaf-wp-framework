@@ -3,9 +3,9 @@
 namespace VAF\WP\Framework\TemplateRenderer;
 
 use InvalidArgumentException;
-use VAF\WP\Framework\TemplateRenderer\Engine\TemplateEngine;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Plugin;
+use VAF\WP\Framework\TemplateRenderer\Engine\TemplateEngine;
 
 final class TemplateRenderer
 {
@@ -14,6 +14,7 @@ final class TemplateRenderer
     public function __construct(
         private readonly BaseWordpress $base,
         private readonly NamespaceHandler $handler,
+        private readonly GlobalContext $globalContext,
         private readonly array $engines
     ) {
         $namespacePaths = [];
@@ -59,6 +60,9 @@ final class TemplateRenderer
                 )
             );
         }
+
+        // Add global context
+        $context['global'] = $this->globalContext;
 
         /** @var TemplateEngine $engineObj */
         $engineObj = $this->base->getContainer()->get($this->engines[$extension]);

@@ -3,6 +3,7 @@
 namespace VAF\WP\Framework\PostObjects;
 
 use LogicException;
+use VAF\WP\Framework\BaseWordpress;
 use WP_Post;
 
 abstract class PostObject
@@ -59,8 +60,8 @@ abstract class PostObject
             return $this->data[$name];
         }
 
-        // 2.1. apply_filters('vaf_wp_framework/post_type_ext/all/post_title')
-        // 2.2. apply_filters('vaf_wp_framework/post_type_ext/post/post_title')
+        // 2.1. apply_filters('vaf_wp_framework/post_type_ext/post/post_title')
+        // 2.2. apply_filters('vaf_wp_framework/post_type_ext/all/post_title')
         $hookNameAll = 'vaf_wp_framework/post_type_ext/all/' . $name;
         $hookNamePostType = 'vaf_wp_framework/post_type_ext/' . $this->getPost()->post_type . '/' . $name;
 
@@ -99,5 +100,15 @@ abstract class PostObject
     public function getPostType(): string
     {
         return $this->getPost()->post_type;
+    }
+
+    public function getId(): int
+    {
+        return $this->getPost()->ID;
+    }
+
+    public function getPermalink(): string
+    {
+        return get_permalink($this->getPost());
     }
 }

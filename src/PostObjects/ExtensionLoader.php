@@ -5,6 +5,7 @@ namespace VAF\WP\Framework\PostObjects;
 use VAF\WP\Framework\Kernel\WordpressKernel;
 use VAF\WP\Framework\System\Parameters\Parameter;
 use VAF\WP\Framework\System\Parameters\ParameterBag;
+use VAF\WP\Framework\Utils\ClassSystem;
 
 class ExtensionLoader
 {
@@ -26,12 +27,12 @@ class ExtensionLoader
 
                         /** @var Parameter $parameter */
                         foreach ($parameterBag->getParams() as $parameter) {
-                            if ($parameter->isServiceParam()) {
+                            if (ClassSystem::isExtendsOrImplements(PostObject::class, $parameter->getType())) {
+                                $params[$parameter->getName()] = $post;
+                            } elseif ($parameter->isServiceParam()) {
                                 $params[$parameter->getName()] = $this->kernel->getContainer()->get(
                                     $parameter->getType()
                                 );
-                            } elseif ($parameter->getType() === PostObject::class) {
-                                $params[$parameter->getName()] = $post;
                             }
                         }
 
