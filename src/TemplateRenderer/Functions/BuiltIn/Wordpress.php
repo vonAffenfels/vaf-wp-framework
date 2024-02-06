@@ -37,4 +37,10 @@ class Wordpress
     {
         return __(...$parameter);
     }
+
+    #[IsFunction('do_shortcode')]
+    public function doShortcode(...$parameter): void
+    {
+        do_shortcode(...$parameter);
+    }
 }

@@ -40,6 +40,12 @@ class NavMenuItem extends PostObject
         return $this->getPost()->target;
     }
 
+    public function getAttrTitle(): string
+    {
+        /** @noinspection PhpUndefinedFieldInspection */
+        return $this->getPost()->attr_title;
+    }
+
     private function initializeClasses(): void
     {
         if (is_null($this->classes)) {
