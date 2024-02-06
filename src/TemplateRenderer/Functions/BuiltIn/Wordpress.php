@@ -43,4 +43,10 @@ class Wordpress
     {
         do_shortcode(...$parameter);
     }
+
+    #[IsFunction('wp_footer')]
+    public function wpFooter(): void
+    {
+        wp_footer();
+    }
 }
