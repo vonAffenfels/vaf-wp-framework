@@ -270,7 +270,8 @@ abstract class WordpressKernel extends Kernel
             ->setAutowired(true);
         $builder->setAlias('template.notice', Notice::class)
             ->setPublic(true);
-        $builder->register(GlobalContext::class, GlobalContext::class);
+        $builder->register(GlobalContext::class, GlobalContext::class)
+            ->setPublic(true);
     }
 
     private function registerTemplateRenderer(ContainerBuilder $builder): void
