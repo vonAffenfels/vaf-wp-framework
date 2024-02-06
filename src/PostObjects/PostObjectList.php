@@ -43,7 +43,6 @@ class PostObjectList implements Iterator
         return $this;
     }
 
-    #[ReturnTypeWillChange]
     public function current(): PostObject
     {
         return current($this->posts);
@@ -54,7 +53,6 @@ class PostObjectList implements Iterator
         next($this->posts);
     }
 
-    #[ReturnTypeWillChange]
     public function key(): ?int
     {
         return key($this->posts);
@@ -73,5 +71,10 @@ class PostObjectList implements Iterator
     public function get(string $name): mixed
     {
         return $this->current()->get($name);
+    }
+
+    public function first(): ?PostObject
+    {
+        return $this->posts[0] ?? null;
     }
 }
