@@ -5,6 +5,7 @@ namespace VAF\WP\Framework\RestAPI;
 use Exception;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Kernel\WordpressKernel;
+use WP_HTTP_Response;
 use WP_REST_Request;
 
 final class Loader
@@ -35,14 +36,16 @@ final class Loader
                 $methodName = $restRoute['callback'];
 
                 $options = [
-                    'permission_callback' => function() { return true; },
+                    'permission_callback' => function () {
+                        return true;
+                    },
                     'methods' => $restRoute['method']->value,
                     'callback' => function (WP_REST_Request $request) use (
                         $serviceId,
                         $methodName,
                         $params,
                         $restRoute
-                    ): array {
+                    ): array|WP_HTTP_Response {
                         $return = [
                             'success' => false
                         ];
@@ -88,6 +91,10 @@ final class Loader
                         try {
                             $container = $this->kernel->getContainer()->get($serviceId);
                             $retVal = $container->$methodName(...$params);
+
+                            if ($retVal instanceof WP_HTTP_Response) {
+                                return $retVal;
+                            }
 
                             if ($retVal !== false) {
                                 $return['success'] = true;
