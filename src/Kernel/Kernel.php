@@ -218,9 +218,7 @@ abstract class Kernel
     private function getKernelParameters(): array
     {
         return [
-            'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.debug' => $this->debug,
-            'kernel.build_dir' => realpath($this->getBuildDir()) ?: $this->getBuildDir(),
             'kernel.container_class' => self::CONTAINER_CLASS,
         ];
     }
