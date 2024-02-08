@@ -4,6 +4,7 @@ namespace VAF\WP\Framework\Hook;
 
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use VAF\WP\Framework\Hook\Attribute\Hook;
@@ -48,14 +49,11 @@ final class LoaderCompilerPass implements CompilerPassInterface
             $serviceParams = [];
             foreach ($method->getParameters() as $paramIdx => $parameter) {
                 $type = $parameter->getType();
-                if (is_null($type)) {
-                    continue;
-                }
 
-                if ($type instanceof \ReflectionParameter && $container->has($type->getName())) {
+                if ($type instanceof ReflectionNamedType && $container->has($type->getName())) {
                     # We found a service parameter
                     # So reduce number of parameters of hook by one
-                    # And register the service parameter
+                    # and register the service parameter
 
                     $numParameters--;
                     $serviceParams[$paramIdx] = $type->getName();
