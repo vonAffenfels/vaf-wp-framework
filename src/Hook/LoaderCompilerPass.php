@@ -52,7 +52,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
                     continue;
                 }
 
-                if ($container->has($type->getName())) {
+                if ($type instanceof \ReflectionParameter && $container->has($type->getName())) {
                     # We found a service parameter
                     # So reduce number of parameters of hook by one
                     # And register the service parameter
