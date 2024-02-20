@@ -6,24 +6,43 @@ use Iterator;
 use ReturnTypeWillChange;
 use WP_Post;
 
-class PostObjectList extends PostObject implements Iterator
+class PostObjectList implements Iterator
 {
     private array $posts;
 
-    public function __construct(PostObjectManager $manager, array $posts)
+    public function __construct(private readonly PostObjectManager $manager, array $posts)
     {
-        $this->posts = array_map(function (WP_Post|int $post) use ($manager): PostObject {
+        $this->setPosts($posts);
+    }
+
+    public function setPosts(array $posts): self
+    {
+        $this->posts = array_map(function (WP_Post|int $post): PostObject {
             if ($post instanceof WP_Post) {
-                return $manager->getByWPPost($post);
+                return $this->manager->getByWPPost($post);
             } else {
-                return $manager->getById($post);
+                return $this->manager->getById($post);
             }
         }, array_filter($posts, function ($post): bool {
             return $post instanceof WP_Post || is_int($post);
         }));
+
+        return $this;
     }
 
-    #[ReturnTypeWillChange]
+    public function addPost(PostObject|WP_Post|int $post): self
+    {
+        if ($post instanceof WP_Post) {
+            $post = $this->manager->getByWPPost($post);
+        } elseif (is_int($post)) {
+            $post = $this->manager->getById($post);
+        }
+
+        $this->posts[] = $post;
+
+        return $this;
+    }
+
     public function current(): PostObject
     {
         return current($this->posts);
@@ -34,7 +53,6 @@ class PostObjectList extends PostObject implements Iterator
         next($this->posts);
     }
 
-    #[ReturnTypeWillChange]
     public function key(): ?int
     {
         return key($this->posts);
@@ -53,5 +71,10 @@ class PostObjectList extends PostObject implements Iterator
     public function get(string $name): mixed
     {
         return $this->current()->get($name);
+    }
+
+    public function first(): ?PostObject
+    {
+        return $this->posts[0] ?? null;
     }
 }

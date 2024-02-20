@@ -35,14 +35,16 @@ final class Loader
                 $methodName = $restRoute['callback'];
 
                 $options = [
-                    'permission_callback' => function() { return true; },
+                    'permission_callback' => function () {
+                        return true;
+                    },
                     'methods' => $restRoute['method']->value,
                     'callback' => function (WP_REST_Request $request) use (
                         $serviceId,
                         $methodName,
                         $params,
                         $restRoute
-                    ): array {
+                    ): array|WP_HTTP_Response {
                         $return = [
                             'success' => false
                         ];

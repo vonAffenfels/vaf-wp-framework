@@ -11,11 +11,11 @@ class Filter
 
     public static function fromName(string $name): self
     {
-    	$filter = new static();
+        $filter = new static();
 
         $filter->name = $name;
 
-    	return $filter;
+        return $filter;
     }
 
     public static function resetFake(): void

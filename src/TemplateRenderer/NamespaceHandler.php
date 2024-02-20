@@ -82,13 +82,13 @@ class NamespaceHandler
         return false;
     }
 
-    public function registerNamespace(string $namespace, array $paths): void
+    public function registerNamespace(string $namespace, array $paths, bool $overwrite = false): void
     {
         if (!str_starts_with($namespace, '@')) {
             $namespace = '@' . $namespace;
         }
 
-        if (isset($this->namespaces[$namespace])) {
+        if (isset($this->namespaces[$namespace]) && !$overwrite) {
             throw new InvalidArgumentException(
                 sprintf('Namespace %s is already registered!', $namespace)
             );

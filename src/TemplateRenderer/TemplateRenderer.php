@@ -3,19 +3,18 @@
 namespace VAF\WP\Framework\TemplateRenderer;
 
 use InvalidArgumentException;
-use VAF\WP\Framework\TemplateRenderer\Engine\TemplateEngine;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Plugin;
+use VAF\WP\Framework\TemplateRenderer\Engine\TemplateEngine;
 
 final class TemplateRenderer
 {
     private const NAMESPACE = '@vaf-wp-framework';
 
-    private array $namespaces = [];
-
     public function __construct(
         private readonly BaseWordpress $base,
         private readonly NamespaceHandler $handler,
+        private readonly GlobalContext $globalContext,
         private readonly array $engines
     ) {
         $namespacePaths = [];
@@ -43,9 +42,9 @@ final class TemplateRenderer
         ]);
     }
 
-    public function registerNamespace(string $namespace, array $directories): void
+    public function registerNamespace(string $namespace, array $directories, bool $overwrite = false): void
     {
-        $this->handler->registerNamespace($namespace, $directories);
+        $this->handler->registerNamespace($namespace, $directories, $overwrite);
     }
 
     public function render(string $template, array $context = []): string
@@ -61,6 +60,9 @@ final class TemplateRenderer
                 )
             );
         }
+
+        // Add global context
+        $context['global'] = $this->globalContext;
 
         /** @var TemplateEngine $engineObj */
         $engineObj = $this->base->getContainer()->get($this->engines[$extension]);

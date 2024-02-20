@@ -24,8 +24,7 @@ final class PHPScoperConfigGenerator
         private readonly string $baseDir,
         private readonly string $prefix,
         private readonly string $buildDir
-    )
-    {
+    ) {
         $this->ignorePackage('phpunit/phpunit');
         $this->ignorePackage('mockery/mockery');
 
