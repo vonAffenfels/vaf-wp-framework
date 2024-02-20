@@ -59,6 +59,13 @@ final class PHPScoperConfigGenerator
                     ];
                 }
 
+                if (str_contains($filePath, 'GetAttrExpression')) {
+                    $replacements = [
+                        ...$replacements,
+                        ...UnscopedFunction::fromName('twig_get_attribute')->scopedReplacement($prefix),
+                    ];
+                }
+
                 return str_replace(
                     array_keys($replacements),
                     array_values($replacements),
