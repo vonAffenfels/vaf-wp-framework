@@ -49,4 +49,10 @@ class Wordpress
     {
         wp_footer();
     }
+
+    #[IsFunction('wp_title')]
+    public function wpTitle(): void
+    {
+        wp_title();
+    }
 }
