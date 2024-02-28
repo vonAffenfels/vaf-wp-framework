@@ -41,7 +41,7 @@ class FunctionHandler
             return "";
         }
 
-        if (!$functionData['isSafeHTML']) {
+        if (!$functionData['isSafeHTML'] && is_string($ret)) {
             $ret = htmlentities($ret);
         }
 

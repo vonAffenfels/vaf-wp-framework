@@ -55,4 +55,10 @@ class Wordpress
     {
         wp_title();
     }
+
+    #[IsFunction('is_admin_bar_showing')]
+    public function isAdminBarShowing(): bool
+    {
+        return is_admin_bar_showing();
+    }
 }
