@@ -36,7 +36,12 @@ class FunctionHandler
         $methodName = $functionData['method'];
         $ret = $functionContainer->$methodName(...$params);
 
-        if (!$functionData['isSafeHTML']) {
+        if (is_null($ret)) {
+            # If we get no return value we return an empty string
+            return "";
+        }
+
+        if (!$functionData['isSafeHTML'] && is_string($ret)) {
             $ret = htmlentities($ret);
         }
 

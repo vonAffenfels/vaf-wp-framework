@@ -49,4 +49,16 @@ class Wordpress
     {
         wp_footer();
     }
+
+    #[IsFunction('wp_title')]
+    public function wpTitle(): void
+    {
+        wp_title();
+    }
+
+    #[IsFunction('is_admin_bar_showing')]
+    public function isAdminBarShowing(): bool
+    {
+        return is_admin_bar_showing();
+    }
 }
