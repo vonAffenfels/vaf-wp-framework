@@ -24,4 +24,13 @@ class EnvironmentVariable
             default => null,
         };
     }
+
+    public function intOrNull(): ?int
+    {
+        if(!getenv($this->name) && getenv($this->name) !== '0') {
+            return null;
+        }
+
+        return (int) getenv($this->name);
+    }
 }
