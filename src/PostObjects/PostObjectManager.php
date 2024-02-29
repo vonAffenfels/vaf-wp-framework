@@ -97,4 +97,10 @@ class PostObjectManager
 
         return $ret;
     }
+
+    public function getCurrentPost(): PostObject|false
+    {
+        $id = get_the_ID();
+        return $this->getById($id);
+    }
 }
