@@ -21,7 +21,12 @@ class Extension extends AbstractExtension
             $registeredFunctions[] = new TwigFunction(
                 $registeredFunction,
                 function (...$args) use ($registeredFunction) {
-                    return new Markup($this->functionHandler->call($registeredFunction, $args), 'UTF-8');
+                    $ret = $this->functionHandler->call($registeredFunction, $args);
+                    if (is_string($ret)) {
+                        return new Markup($ret, 'UTF-8');
+                    } else {
+                        return $ret;
+                    }
                 }
             );
         }
