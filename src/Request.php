@@ -124,4 +124,14 @@ final class Request
     {
         return str_contains($this->getParam('HTTP_ACCEPT', self::TYPE_SERVER, ''), 'image/webp');
     }
+
+    /**
+     * Returns true if the browser is a mobile browser
+     *
+     * @return bool
+     */
+    final public function isMobile(): bool
+    {
+        return ((int) $this->getParam('device', self::TYPE_SERVER)) != 0;
+    }
 }
