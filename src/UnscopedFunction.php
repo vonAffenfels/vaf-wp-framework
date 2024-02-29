@@ -19,7 +19,8 @@ class UnscopedFunction
     {
 
         return [
-            "'{$this->name}'" => sprintf("'%s\\\\{$this->name}'", $scope)
+            "'{$this->name}'" => sprintf("'%s\\\\{$this->name}'", $scope),
+            "'{$this->name}(" => sprintf("'%s\\\\{$this->name}(", $scope),
         ];
     }
 }
