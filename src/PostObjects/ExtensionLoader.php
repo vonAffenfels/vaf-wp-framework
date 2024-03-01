@@ -35,7 +35,9 @@ class ExtensionLoader
                         /** @var Parameter $parameter */
                         foreach ($parameterBag->getParams() as $parameter) {
                             if ($parameter->getType() === 'string') {
-                                $params[$parameter->getName()] = array_shift($parameters);
+                                if (!empty($parameters)) {
+                                    $params[$parameter->getName()] = array_shift($parameters);
+                                }
                             } elseif (ClassSystem::isExtendsOrImplements(PostObject::class, $parameter->getType())) {
                                 $params[$parameter->getName()] = $post;
                             } elseif ($parameter->isServiceParam()) {

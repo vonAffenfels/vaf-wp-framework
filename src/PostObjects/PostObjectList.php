@@ -2,11 +2,12 @@
 
 namespace VAF\WP\Framework\PostObjects;
 
+use Countable;
 use Iterator;
 use ReturnTypeWillChange;
 use WP_Post;
 
-class PostObjectList implements Iterator
+class PostObjectList implements Iterator, Countable
 {
     private array $posts;
 
@@ -88,5 +89,10 @@ class PostObjectList implements Iterator
     {
         $this->posts = array_filter($this->posts, $filterFunction);
         return $this;
+    }
+
+    public function count(): int
+    {
+        return count($this->posts);
     }
 }

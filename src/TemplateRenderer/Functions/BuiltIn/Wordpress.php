@@ -67,4 +67,10 @@ class Wordpress
     {
         return get_home_url(...$parameter);
     }
+
+    #[IsFunction('sanitize_title')]
+    public function sanitizeTitle(...$parameter): string
+    {
+        return sanitize_title(...$parameter);
+    }
 }
