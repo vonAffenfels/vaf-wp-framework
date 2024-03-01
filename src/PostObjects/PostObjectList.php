@@ -77,4 +77,16 @@ class PostObjectList implements Iterator
     {
         return $this->posts[0] ?? null;
     }
+
+    public function sort(callable $sortFunction): self
+    {
+        usort($this->posts, $sortFunction);
+        return $this;
+    }
+
+    public function filter(callable $filterFunction): self
+    {
+        $this->posts = array_filter($this->posts, $filterFunction);
+        return $this;
+    }
 }
