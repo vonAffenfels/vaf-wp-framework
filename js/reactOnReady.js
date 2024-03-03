@@ -16,3 +16,22 @@ export function reactOnReady(id, fn) {
         ).render(fn({initialData}));
     });
 }
+
+export function reactBySelectorOnReady(selector, fn) {
+    ready(() => {
+        const elements = [...document.querySelectorAll(selector)];
+        if (elements.length === 0) {
+            return;
+        }
+
+        elements.forEach(element => {
+            const initialData = JSON.parse(
+                element.dataset['initialData']
+            );
+
+            createRoot(
+                element
+            ).render(fn({initialData}));
+        });
+    });
+}
