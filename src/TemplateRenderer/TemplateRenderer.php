@@ -11,6 +11,8 @@ final class TemplateRenderer
 {
     private const NAMESPACE = '@vaf-wp-framework';
 
+    private bool $debug = false;
+
     public function __construct(
         private readonly BaseWordpress $base,
         private readonly NamespaceHandler $handler,
@@ -42,6 +44,11 @@ final class TemplateRenderer
         ]);
     }
 
+    public function enableDebug(): void
+    {
+        $this->debug = true;
+    }
+
     public function registerNamespace(string $namespace, array $directories, bool $overwrite = false): void
     {
         $this->handler->registerNamespace($namespace, $directories, $overwrite);
@@ -66,6 +73,10 @@ final class TemplateRenderer
 
         /** @var TemplateEngine $engineObj */
         $engineObj = $this->base->getContainer()->get($this->engines[$extension]);
+        if ($this->debug) {
+            $engineObj->enableDebug();
+        }
+
         return $engineObj->render($templateFile, $context);
     }
 

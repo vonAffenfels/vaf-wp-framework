@@ -21,6 +21,7 @@ final class TwigEngine extends TemplateEngine
         Extension $extension
     ) {
         $this->twig = new Environment($loader);
+        $this->twig->enableDebug();
         $this->twig->addExtension($extension);
     }
 
@@ -31,6 +32,10 @@ final class TwigEngine extends TemplateEngine
      */
     public function render(string $file, array $context): string
     {
+        if ($this->isDebug()) {
+            $this->twig->enableDebug();
+        }
+
         return $this->twig->render($file, $context);
     }
 }
