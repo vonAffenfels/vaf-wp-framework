@@ -17,7 +17,7 @@ export function reactOnReady(id, fn) {
     });
 }
 
-export function reactBySelectorOnReady(selector, fn) {
+function reactBySelectorOnReady(selector, fn) {
     ready(() => {
         const elements = [...document.querySelectorAll(selector)];
         if (elements.length === 0) {
@@ -31,7 +31,7 @@ export function reactBySelectorOnReady(selector, fn) {
 
             createRoot(
                 element
-            ).render(fn({initialData}));
+            ).render(fn(initialData));
         });
     });
 }
