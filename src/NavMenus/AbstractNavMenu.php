@@ -3,9 +3,9 @@
 namespace VAF\WP\Framework\NavMenus;
 
 use VAF\WP\Framework\Filter\Filter;
-use VAF\WP\Framework\PostObjects\NavMenuItem;
 use VAF\WP\Framework\PostObjects\PostObjectList;
 use VAF\WP\Framework\PostObjects\PostObjectManager;
+use VAF\WP\Framework\PostObjects\PostTypes\NavMenuItem;
 
 abstract class AbstractNavMenu
 {

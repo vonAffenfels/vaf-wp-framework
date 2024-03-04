@@ -4,26 +4,41 @@ namespace VAF\WP\Framework\PostObjects;
 
 use Countable;
 use Iterator;
-use ReturnTypeWillChange;
 use WP_Post;
+use WP_Query;
+use VAF\WP\Framework\PostObjects\PostTypes\Post;
 
 class PostObjectList implements Iterator, Countable
 {
-    private array $posts;
-
-    public function __construct(private readonly PostObjectManager $manager, array $posts)
+    public static function getByWPQuery(WP_Query $query): self
     {
-        $this->setPosts($posts);
+        return self::getByPostArray($query->posts);
+    }
+
+    public static function getByPostArray(array $posts): PostObjectList
+    {
+        $obj = new self();
+        $obj->setPosts($posts);
+        return $obj;
+    }
+
+    private array $posts = [];
+
+    private function getPostObject(WP_Post|int|PostObject $post): PostObject
+    {
+        if ($post instanceof WP_Post) {
+            return Post::getByWPPost($post);
+        } elseif (is_int($post)) {
+            return Post::getById($post);
+        } else {
+            return $post;
+        }
     }
 
     public function setPosts(array $posts): self
     {
         $this->posts = array_map(function (WP_Post|int $post): PostObject {
-            if ($post instanceof WP_Post) {
-                return $this->manager->getByWPPost($post);
-            } else {
-                return $this->manager->getById($post);
-            }
+            return $this->getPostObject($post);
         }, array_filter($posts, function ($post): bool {
             return $post instanceof WP_Post || is_int($post);
         }));
@@ -33,13 +48,7 @@ class PostObjectList implements Iterator, Countable
 
     public function addPost(PostObject|WP_Post|int $post): self
     {
-        if ($post instanceof WP_Post) {
-            $post = $this->manager->getByWPPost($post);
-        } elseif (is_int($post)) {
-            $post = $this->manager->getById($post);
-        }
-
-        $this->posts[] = $post;
+        $this->posts[] = $this->getPostObject($post);
 
         return $this;
     }

@@ -14,25 +14,26 @@ use VAF\WP\Framework\AdminPages\Attributes\IsTabbedPage;
 use VAF\WP\Framework\AdminPages\TabbedPageCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
+use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
+use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
 use VAF\WP\Framework\Hook\Attribute\AsHookContainer;
 use VAF\WP\Framework\Hook\Loader as HookLoader;
 use VAF\WP\Framework\Hook\LoaderCompilerPass as HookLoaderCompilerPass;
-use VAF\WP\Framework\Metabox\Attribute\AsMetaboxContainer;
-use VAF\WP\Framework\Metabox\Loader as MetaboxLoader;
-use VAF\WP\Framework\Metabox\LoaderCompilerPass as MetaboxLoaderCompilerPass;
-use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
-use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
 use VAF\WP\Framework\Menu\Attribute\AsMenuContainer;
 use VAF\WP\Framework\Menu\Loader as MenuLoader;
 use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
+use VAF\WP\Framework\Metabox\Attribute\AsMetaboxContainer;
+use VAF\WP\Framework\Metabox\Loader as MetaboxLoader;
+use VAF\WP\Framework\Metabox\LoaderCompilerPass as MetaboxLoaderCompilerPass;
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
 use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
 use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
 use VAF\WP\Framework\PostObjects\ExtensionLoaderCompilerPass as PostObjectExtensionLoaderCompilerPass;
-use VAF\WP\Framework\PostObjects\NavMenuItem;
-use VAF\WP\Framework\PostObjects\Page;
-use VAF\WP\Framework\PostObjects\Post;
 use VAF\WP\Framework\PostObjects\PostObjectManager;
+use VAF\WP\Framework\PostObjects\PostTypeLoader;
+use VAF\WP\Framework\PostObjects\PostTypes\NavMenuItem;
+use VAF\WP\Framework\PostObjects\PostTypes\Page;
+use VAF\WP\Framework\PostObjects\PostTypes\Post;
 use VAF\WP\Framework\Request;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
 use VAF\WP\Framework\RestAPI\Loader as RestAPILoader;
@@ -98,6 +99,10 @@ abstract class WordpressKernel extends Kernel
         /** @var PostObjectExtensionLoader $extensionLoader */
         $extensionLoader = $this->getContainer()->get('postobject.extensionLoader');
         $extensionLoader->registerPostObjectExtensions();
+
+        /** @var PostTypeLoader $postTypeLoader */
+        $postTypeLoader = $this->getContainer()->get(PostTypeLoader::class);
+        $postTypeLoader->registerPostTypes();
 
         // Registering REST routes
         add_action('rest_api_init', function () {
@@ -193,8 +198,8 @@ abstract class WordpressKernel extends Kernel
             }
         );
 
-        $managerDefinition = $builder->register(PostObjectManager::class, PostObjectManager::class)
-            ->setArgument('$registeredPostObjects', [])
+        $loaderDefinition = $builder->register(PostTypeLoader::class, PostTypeLoader::class)
+            ->setArgument('$postTypes', [])
             ->setPublic(true)
             ->setAutowired(true);
 
@@ -204,10 +209,10 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $definition,
                 PostType $attribute,
                 ReflectionClass $reflectionClass
-            ) use ($managerDefinition): void {
-                $registeredPostObjects = $managerDefinition->getArgument('$registeredPostObjects');
-                $registeredPostObjects[$attribute->postType] = $reflectionClass->getName();
-                $managerDefinition->replaceArgument('$registeredPostObjects', $registeredPostObjects);
+            ) use ($loaderDefinition): void {
+                $postTypes = $loaderDefinition->getArgument('$postTypes');
+                $postTypes[$attribute->postType] = $reflectionClass->getName();
+                $loaderDefinition->replaceArgument('$postTypes', $postTypes);
 
                 $definition->setPublic(true);
                 $definition->setShared(false);

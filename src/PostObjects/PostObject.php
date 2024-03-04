@@ -3,7 +3,7 @@
 namespace VAF\WP\Framework\PostObjects;
 
 use LogicException;
-use VAF\WP\Framework\BaseWordpress;
+use VAF\WP\Framework\Utils\ClassSystem;
 use WP_Post;
 
 abstract class PostObject
@@ -12,10 +12,50 @@ abstract class PostObject
 
     private ?WP_Post $post = null;
 
-    public function setPost(WP_Post $post): static
+    /******************
+     * STATIC METHODS *
+     ******************/
+
+    public static function getByWPPost(WP_Post $post): ?static
+    {
+        $obj = PostTypeLoader::getObjectForPostType($post->post_type);
+        $obj->setPost($post);
+
+        if (!ClassSystem::isExtendsOrImplements(static::class, get_class($obj))) {
+            // Make sure that we return a requested type
+            return null;
+        }
+
+        return $obj;
+    }
+
+    public static function getById(int $postId): ?static
+    {
+        $post = WP_Post::get_instance($postId);
+        if (false === $post) {
+            return null;
+        }
+
+        return static::getByWPPost($post);
+    }
+
+    public static function currentPost(): ?static
+    {
+        $post = get_post();
+        if (false === $post) {
+            return null;
+        }
+
+        return static::getByWPPost($post);
+    }
+
+    /********************
+     * INSTANCE METHODS *
+     ********************/
+
+    private function setPost(WP_Post $post): void
     {
         $this->post = $post;
-        return $this;
     }
 
     protected function getPost(): WP_Post
@@ -111,10 +151,5 @@ abstract class PostObject
     public function getId(): int
     {
         return $this->getPost()->ID;
-    }
-
-    public function getPermalink(): string
-    {
-        return get_permalink($this->getPost());
     }
 }

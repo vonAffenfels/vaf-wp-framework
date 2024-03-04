@@ -1,19 +1,24 @@
 <?php
 
-namespace VAF\WP\Framework\PostObjects;
+namespace VAF\WP\Framework\PostObjects\PostTypes;
 
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
+use VAF\WP\Framework\PostObjects\PostObject;
+use VAF\WP\Framework\PostObjects\PostObjectList;
+use VAF\WP\Framework\PostObjects\PostObjectManager;
 
-#[PostType('nav_menu_item')]
+#[PostType(self::TYPE_NAME)]
 class NavMenuItem extends PostObject
 {
+    public const TYPE_NAME = 'nav_menu_item';
+
     private PostObjectList $children;
 
     private ?array $classes = null;
 
-    public function __construct(PostObjectManager $postObjectManager)
+    public function __construct()
     {
-        $this->children = new PostObjectList($postObjectManager, []);
+        $this->children = new PostObjectList();
     }
 
     public function getMenuItemParent(): int
