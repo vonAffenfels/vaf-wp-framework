@@ -61,4 +61,16 @@ class Wordpress
     {
         return is_admin_bar_showing();
     }
+
+    #[IsFunction('get_home_url')]
+    public function getHomeUrl(...$parameter): string
+    {
+        return get_home_url(...$parameter);
+    }
+
+    #[IsFunction('sanitize_title')]
+    public function sanitizeTitle(...$parameter): string
+    {
+        return sanitize_title(...$parameter);
+    }
 }

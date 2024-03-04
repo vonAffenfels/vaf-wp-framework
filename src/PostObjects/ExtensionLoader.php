@@ -22,12 +22,23 @@ class ExtensionLoader
 
                 add_filter(
                     $hookName,
-                    function (mixed $return, PostObject $post) use ($parameterBag, $extension): mixed {
+                    function (
+                        mixed $return,
+                        PostObject $post,
+                        array $parameters = []
+                    ) use (
+                        $parameterBag,
+                        $extension
+                    ): mixed {
                         $params = [];
 
                         /** @var Parameter $parameter */
                         foreach ($parameterBag->getParams() as $parameter) {
-                            if (ClassSystem::isExtendsOrImplements(PostObject::class, $parameter->getType())) {
+                            if ($parameter->getType() === 'string') {
+                                if (!empty($parameters)) {
+                                    $params[$parameter->getName()] = array_shift($parameters);
+                                }
+                            } elseif (ClassSystem::isExtendsOrImplements(PostObject::class, $parameter->getType())) {
                                 $params[$parameter->getName()] = $post;
                             } elseif ($parameter->isServiceParam()) {
                                 $params[$parameter->getName()] = $this->kernel->getContainer()->get(
@@ -41,7 +52,7 @@ class ExtensionLoader
                         return $container->$method(...$params);
                     },
                     10,
-                    2
+                    3
                 );
             }
         }

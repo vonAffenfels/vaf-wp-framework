@@ -62,16 +62,22 @@ abstract class PostObject
 
         // 2.1. apply_filters('vaf_wp_framework/post_type_ext/post/post_title')
         // 2.2. apply_filters('vaf_wp_framework/post_type_ext/all/post_title')
-        $hookNameAll = 'vaf_wp_framework/post_type_ext/all/' . $name;
-        $hookNamePostType = 'vaf_wp_framework/post_type_ext/' . $this->getPost()->post_type . '/' . $name;
+        $fieldName = $name;
+        $params = [];
+        if (str_contains($fieldName, '__')) {
+            $params = explode('__', $fieldName);
+            $fieldName = array_shift($params);
+        }
+        $hookNameAll = 'vaf_wp_framework/post_type_ext/all/' . $fieldName;
+        $hookNamePostType = 'vaf_wp_framework/post_type_ext/' . $this->getPost()->post_type . '/' . $fieldName;
 
         if (has_filter($hookNamePostType)) {
-            $this->data[$name] = apply_filters($hookNamePostType, null, $this);
+            $this->data[$name] = apply_filters($hookNamePostType, null, $this, $params);
             return $this->data[$name];
         }
 
         if (has_filter($hookNameAll)) {
-            $this->data[$name] = apply_filters($hookNameAll, null, $this);
+            $this->data[$name] = apply_filters($hookNameAll, null, $this, $params);
             return $this->data[$name];
         }
 

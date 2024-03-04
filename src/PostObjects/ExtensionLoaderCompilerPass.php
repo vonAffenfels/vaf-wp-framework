@@ -16,6 +16,7 @@ use VAF\WP\Framework\System\Parameters\ParameterBag;
 
 class ExtensionLoaderCompilerPass implements CompilerPassInterface
 {
+    private array $allowedTypes = ['string', PostObject::class];
     /**
      * @throws Exception
      */
@@ -86,7 +87,7 @@ class ExtensionLoaderCompilerPass implements CompilerPassInterface
                     );
                 }
 
-                if ($type->getName() !== PostObject::class && !$container->has($type->getName())) {
+                if (!in_array($type->getName(), $this->allowedTypes) && !$container->has($type->getName())) {
                     throw new Exception(
                         sprintf(
                             'Parameter type "%s" for PostObjectExtension "%s" (field "%s") is not allowed. ' .
