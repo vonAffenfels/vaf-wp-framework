@@ -45,6 +45,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
             'type' => $attribute->blockType,
             'class' => $class,
             'renderer' => RendererDefinition::fromClassReflection($reflection)->definition(),
+            'attributes' => $attribute->attributes,
             'options' => [
                 'api_version' => $attribute->version,
                 'editor_script' => $attribute->editorScriptHandle,

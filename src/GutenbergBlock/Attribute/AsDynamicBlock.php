@@ -11,6 +11,7 @@ class AsDynamicBlock
         public readonly string $blockType,
         public readonly string $editorScriptHandle,
         public readonly int $version = 2,
+        public readonly array $attributes = [],
     )
     {
     }
