@@ -40,7 +40,7 @@ class Builder
 
     private ?array $order = null;
 
-    public function orderBy(string|OrderFields $field, OrderDirection $direction = OrderDirection::DESC): static
+    public function addOrderField(string|OrderFields $field, OrderDirection $direction = OrderDirection::DESC): static
     {
         if ($field instanceof OrderFields) {
             $field = $field->value;
@@ -53,7 +53,7 @@ class Builder
 
     public function orderByPostFilter(OrderDirection $direction = OrderDirection::DESC): static
     {
-        return $this->orderBy(OrderFields::POST_FILTER, $direction);
+        return $this->addOrderField(OrderFields::POST_FILTER, $direction);
     }
 
     /*************************

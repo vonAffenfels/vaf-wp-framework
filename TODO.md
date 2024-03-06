@@ -3,3 +3,4 @@
 * [ ] Finalize Metabox System with automatic ReactJS stuff
 * [ ] Finish QueryBuilder
 * [ ] Finish Query Repositories
+* [ ] Meta PHP File for IDE Code Completion
