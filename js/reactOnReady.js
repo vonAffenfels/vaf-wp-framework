@@ -1,4 +1,4 @@
-import {createRoot} from '@wordpress/element';
+import {createRoot} from 'react-dom';
 import {ready} from './ready.js';
 
 export function reactOnReady(id, fn) {
