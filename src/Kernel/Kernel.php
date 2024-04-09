@@ -158,10 +158,7 @@ abstract class Kernel
         $container = $this->buildContainer();
         $container->compile();
 
-        $this->updateContainerCache(
-            new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug()),
-            $container,
-        );
+        $this->updateContainerCache($container);
     }
 
     public function getContainer(): ContainerInterface
@@ -187,7 +184,7 @@ abstract class Kernel
 
             // Try to cache the container if possible
             try {
-                $this->updateContainerCache($cache, $container);
+                $this->updateContainerCache($container, $cache);
             } catch (RuntimeException $e) {
                 // Do nothing if directories can't be created
                 // We simply can't cache the container then
@@ -202,7 +199,7 @@ abstract class Kernel
         return $this->container;
     }
 
-    public function updateContainerCache(?ConfigCache $cache, ContainerBuilder $container): void
+    public function updateContainerCache(ContainerBuilder $container, ?ConfigCache $cache = null): void
     {
         $cache ??= new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
 
