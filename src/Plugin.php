@@ -37,7 +37,7 @@ abstract class Plugin extends BaseWordpress
     {
         // Set debug to true to always renew the container
         $obj = new static('__BUILD__', getcwd(), '__BUILD__', true);
-        $obj->getContainer();
+        $obj->kernel->forceContainerCacheUpdate();
     }
 
     final protected function createKernel(): Kernel

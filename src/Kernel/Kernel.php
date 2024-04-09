@@ -42,9 +42,10 @@ abstract class Kernel
 
     public function __construct(
         protected readonly string $projectDir,
-        protected readonly bool $debug,
+        protected readonly bool   $debug,
         protected readonly string $namespace
-    ) {
+    )
+    {
     }
 
     private function __clone()
@@ -89,8 +90,8 @@ abstract class Kernel
 
     abstract protected function configureContainer(
         ContainerConfigurator $container,
-        LoaderInterface $loader,
-        ContainerBuilder $builder
+        LoaderInterface       $loader,
+        ContainerBuilder      $builder
     ): void;
 
     /**
@@ -152,6 +153,14 @@ abstract class Kernel
         });
     }
 
+    public function forceContainerCacheUpdate(): void
+    {
+        $container = $this->buildContainer();
+        $container->compile();
+
+        $this->updateContainerCache($container);
+    }
+
     public function getContainer(): ContainerInterface
     {
         if (!is_null($this->container)) {
@@ -175,15 +184,7 @@ abstract class Kernel
 
             // Try to cache the container if possible
             try {
-                $this->checkBuildDirectories();
-                $dumper = new PhpDumper($container);
-
-                $code = $dumper->dump([
-                    'class' => self::CONTAINER_CLASS,
-                    'namespace' => $this->namespace
-                ]);
-
-                $cache->write($code, $container->getResources());
+                $this->updateContainerCache($container, $cache);
             } catch (RuntimeException $e) {
                 // Do nothing if directories can't be created
                 // We simply can't cache the container then
@@ -197,6 +198,23 @@ abstract class Kernel
 
         return $this->container;
     }
+
+    public function updateContainerCache(ContainerBuilder $container, ?ConfigCache $cache = null): void
+    {
+        $cache ??= new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
+
+
+        $this->checkBuildDirectories();
+        $dumper = new PhpDumper($container);
+
+        $code = $dumper->dump([
+            'class' => self::CONTAINER_CLASS,
+            'namespace' => $this->namespace
+        ]);
+
+        $cache->write($code, $container->getResources());
+    }
+
 
     private function checkBuildDirectories(): void
     {
