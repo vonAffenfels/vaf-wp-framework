@@ -49,6 +49,13 @@ final class PHPScoperConfigGenerator
                     '"use Twig\\\\' => sprintf('"use %s\\\\Twig\\\\', $prefix),
                 ];
 
+                if (str_contains($filePath, 'ForNode')) {
+                    $replacements = [
+                        ...$replacements,
+                        ...UnscopedFunction::fromName('twig_ensure_traversable')->scopedReplacement($prefix),
+                    ];
+                }
+
                 if (str_contains($filePath, 'EscaperExtension')) {
                     $replacements = [
                         ...$replacements,
