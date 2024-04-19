@@ -27,6 +27,7 @@ final class PHPScoperConfigGenerator
     ) {
         $this->ignorePackage('phpunit/phpunit');
         $this->ignorePackage('mockery/mockery');
+        $this->ignorePackage('twig/twig');
 
         $this->addPackagePatcher(
             'symfony/dependency-injection',
@@ -39,37 +40,6 @@ final class PHPScoperConfigGenerator
             'vonaffenfels/vaf-wp-framework',
             function (string $filePath, string $prefix, string $content): string {
                 return $this->patchVAFFramework($filePath, $prefix, $content);
-            }
-        );
-
-        $this->addPackagePatcher(
-            'twig/twig',
-            function (string $filePath, string $prefix, string $content): string {
-                $replacements = [
-                    '"use Twig\\\\' => sprintf('"use %s\\\\Twig\\\\', $prefix),
-                ];
-
-                if (str_contains($filePath, 'EscaperExtension')) {
-                    $replacements = [
-                        ...$replacements,
-                        ...UnscopedFunction::fromName('twig_escape_filter')->scopedReplacement($prefix),
-                        ...UnscopedFunction::fromName('twig_escape_filter_is_safe')->scopedReplacement($prefix),
-                        ...UnscopedFunction::fromName('twig_raw_filter')->scopedReplacement($prefix),
-                    ];
-                }
-
-                if (str_contains($filePath, 'GetAttrExpression')) {
-                    $replacements = [
-                        ...$replacements,
-                        ...UnscopedFunction::fromName('twig_get_attribute')->scopedReplacement($prefix),
-                    ];
-                }
-
-                return str_replace(
-                    array_keys($replacements),
-                    array_values($replacements),
-                    $content
-                );
             }
         );
 
@@ -241,10 +211,5 @@ final class PHPScoperConfigGenerator
             },
             $content
         );
-    }
-
-    private function namespaceTwigFilterReplacement($twigFilterName, $replacements, $prefix)
-    {
-        return $replacements;
     }
 }
