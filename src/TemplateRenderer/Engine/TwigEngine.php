@@ -8,8 +8,8 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\TwigFunction;
 use VAF\WP\Framework\TemplateRenderer\Attribute\AsTemplateEngine;
-use VAF\WP\Framework\TemplateRenderer\Engine\Twig\Extension;
-use VAF\WP\Framework\TemplateRenderer\Engine\Twig\FileLoader;
+use VAF\WP\Framework\TemplateRenderer\Engine\TwigRenderer\Extension;
+use VAF\WP\Framework\TemplateRenderer\Engine\TwigRenderer\FileLoader;
 
 #[AsTemplateEngine(extension: 'twig')]
 final class TwigEngine extends TemplateEngine

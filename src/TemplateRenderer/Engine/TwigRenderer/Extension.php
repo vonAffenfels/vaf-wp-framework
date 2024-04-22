@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Framework\TemplateRenderer\Engine\Twig;
+namespace VAF\WP\Framework\TemplateRenderer\Engine\TwigRenderer;
 
 use Twig\Extension\AbstractExtension;
 use Twig\Markup;
