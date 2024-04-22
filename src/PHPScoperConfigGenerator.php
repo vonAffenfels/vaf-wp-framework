@@ -14,8 +14,6 @@ final class PHPScoperConfigGenerator
         'roave/security-advisories'
     ];
 
-    private array $ignoredNamespaces = [];
-
     private array $packagesProcessed = [];
 
     private array $packagesToProcess = [];
@@ -30,7 +28,6 @@ final class PHPScoperConfigGenerator
         $this->ignorePackage('phpunit/phpunit');
         $this->ignorePackage('mockery/mockery');
         $this->ignorePackage('twig/twig');
-        $this->ignoreNamespace('Twig');
 
         $this->addPackagePatcher(
             'symfony/dependency-injection',
@@ -63,13 +60,6 @@ final class PHPScoperConfigGenerator
     {
         if (!in_array($package, $this->ignoredPackages)) {
             $this->ignoredPackages[] = $package;
-        }
-    }
-
-    private function ignoreNamespace(string $namespace): void
-    {
-        if (!in_array($namespace, $this->ignoredNamespaces)) {
-            $this->ignoredNamespaces[] = $namespace;
         }
     }
 
@@ -176,7 +166,6 @@ final class PHPScoperConfigGenerator
             'prefix' => $this->prefix,
             'output-dir' => $this->buildDir,
             'finders' => $finders,
-            'exclude-namespaces' => $this->ignoredNamespaces,
             'patchers' => $patchers
         ];
     }
@@ -223,5 +212,4 @@ final class PHPScoperConfigGenerator
             $content
         );
     }
-
 }
