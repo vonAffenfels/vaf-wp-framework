@@ -203,7 +203,7 @@ final class PHPScoperConfigGenerator
         $lenPrefix = strlen($prefix . '\\');
 
         $content = preg_replace_callback(
-            '/\$definition = \\\\substr_replace\(\$definition, \'(53)\', 2, 2\);/',
+            '/\$definition = \\\\?substr_replace\(\$definition, \'([0-9]+)\', 2, 2\);/',
             function (array $matches) use ($lenPrefix): string {
                 $origLength = $matches[1];
                 $newLength = $origLength + $lenPrefix;
@@ -213,7 +213,7 @@ final class PHPScoperConfigGenerator
         );
 
         return preg_replace_callback(
-            '/\$definition = \\\\substr_replace\(\$definition, \'Child\', (44), 0\);/',
+            '/\$definition = \\\\?substr_replace\(\$definition, \'Child\', ([0-9]+), 0\);/',
             function (array $matches) use ($lenPrefix): string {
                 $origOffset = $matches[1];
                 $newOffset = $origOffset + $lenPrefix;
