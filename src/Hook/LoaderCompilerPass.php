@@ -65,7 +65,8 @@ final class LoaderCompilerPass implements CompilerPassInterface
             foreach ($attributes as $attribute) {
                 $instance = $attribute->newInstance();
 
-                $data[$instance->hook] = [
+                $data[] = [
+                    'hook' => $instance->hook,
                     'method' => $methodName,
                     'priority' => $instance->priority,
                     'numParams' => $numParameters,

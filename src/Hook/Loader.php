@@ -13,7 +13,8 @@ final class Loader
     public function registerHooks(): void
     {
         foreach ($this->hookContainer as $serviceId => $hookContainer) {
-            foreach ($hookContainer as $hook => $data) {
+            foreach ($hookContainer as $data) {
+                $hook = $data['hook'];
                 add_filter($hook, function (...$args) use ($serviceId, $data) {
                     $params = [];
 
