@@ -10,7 +10,8 @@ class RestRoute
 {
     public function __construct(
         public readonly string $uri,
-        public readonly RestRouteMethod $method
+        public readonly RestRouteMethod $method,
+        public readonly ?string $requiredPermission = null
     ) {
     }
 }

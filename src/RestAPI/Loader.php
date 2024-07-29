@@ -11,9 +11,10 @@ final class Loader
 {
     public function __construct(
         private readonly WordpressKernel $kernel,
-        private readonly BaseWordpress $base,
-        private readonly array $restContainer
-    ) {
+        private readonly BaseWordpress   $base,
+        private readonly array           $restContainer
+    )
+    {
     }
 
     public function registerRestRoutes(): void
@@ -35,8 +36,9 @@ final class Loader
                 $methodName = $restRoute['callback'];
 
                 $options = [
-                    'permission_callback' => function () {
-                        return true;
+                    'permission_callback' => match ($restRoute['permission']['type']) {
+                        'none' => fn() => true,
+                        'wordpress_permission' => fn() => current_user_can($restRoute['permission']['wordpress_permission_name']),
                     },
                     'methods' => $restRoute['method']->value,
                     'callback' => function (WP_REST_Request $request) use (
