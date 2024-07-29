@@ -2,12 +2,15 @@
 
 namespace VAF\WP\Framework\Hook;
 
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use VAF\WP\Framework\Hook\Attribute\Hook;
+use VAF\WP\Framework\Hook\Attribute\PreventAutowiring;
+use VAF\WP\Framework\Utils\Collection;
 
 final class LoaderCompilerPass implements CompilerPassInterface
 {
@@ -50,7 +53,11 @@ final class LoaderCompilerPass implements CompilerPassInterface
             foreach ($method->getParameters() as $paramIdx => $parameter) {
                 $type = $parameter->getType();
 
-                if ($type instanceof ReflectionNamedType && $container->has($type->getName())) {
+                if (
+                    Collection::make($parameter->getAttributes())
+                        ->doesNotContain(fn(ReflectionAttribute $attribute) => $attribute->newInstance() instanceof PreventAutowiring)
+                    && $type instanceof ReflectionNamedType && $container->has($type->getName())
+                ) {
                     # We found a service parameter
                     # So reduce number of parameters of hook by one
                     # and register the service parameter
