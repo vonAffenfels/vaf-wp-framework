@@ -35,6 +35,11 @@ abstract class Plugin extends BaseWordpress
      */
     final public static function buildContainer(): void
     {
+        if (!self::pluginVendorExists())
+        {
+            die('Please run "composer install" to ensure all dependencies are installed.');
+        }
+
         // Set debug to true to always renew the container
         $obj = new static('__BUILD__', getcwd(), '__BUILD__', true);
         $obj->kernel->forceContainerCacheUpdate();
@@ -51,5 +56,11 @@ abstract class Plugin extends BaseWordpress
         add_action('get-plugin/' . $this->getName(), function () {
             return $this;
         }, 10, 0);
+    }
+
+    private static function pluginVendorExists(): bool
+    {
+        $relVendorLocation = __DIR__ . '/../../../../vendor';
+        return file_exists($relVendorLocation) && is_dir($relVendorLocation);
     }
 }
