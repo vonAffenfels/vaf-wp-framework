@@ -37,7 +37,7 @@ abstract class Plugin extends BaseWordpress
     {
         if (!self::pluginVendorExists())
         {
-            die('Please run "composer install" to ensure all dependencies are installed.');
+            die('Please run "composer install" to ensure all dependencies are installed.' . PHP_EOL);
         }
 
         // Set debug to true to always renew the container
@@ -58,9 +58,9 @@ abstract class Plugin extends BaseWordpress
         }, 10, 0);
     }
 
-    private static function pluginVendorExists(): bool
+    private static function pluginVendorExists()
     {
-        $relVendorLocation = __DIR__ . '/../../../../vendor';
+        $relVendorLocation = getcwd() . '/vendor';
         return file_exists($relVendorLocation) && is_dir($relVendorLocation);
     }
 }
