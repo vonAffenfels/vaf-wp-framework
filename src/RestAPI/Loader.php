@@ -93,6 +93,10 @@ final class Loader
                             $container = $this->kernel->getContainer()->get($serviceId);
                             $retVal = $container->$methodName(...$params);
 
+                            if($retVal instanceof \WP_HTTP_Response) {
+                                return $retVal;
+                            }
+
                             if ($retVal !== false) {
                                 $return['success'] = true;
 
