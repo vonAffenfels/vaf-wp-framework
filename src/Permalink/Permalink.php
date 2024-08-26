@@ -13,6 +13,11 @@ class Permalink
         self::$permalinkResolver = $permalinkResolver;
     }
 
+    public static function fakePassthrough()
+    {
+        self::$permalinkResolver = new PermalinkPassthroughResolver();
+    }
+
     public static function fromPostId(int $postId): self
     {
     	$permalink = new static();
