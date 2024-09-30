@@ -13,6 +13,7 @@ use VAF\WP\Framework\AdminAjax\LoaderCompilerPass as AdminAjaxLoaderCompilerPass
 use VAF\WP\Framework\AdminPages\Attributes\IsTabbedPage;
 use VAF\WP\Framework\AdminPages\TabbedPageCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
+use VAF\WP\Framework\BulkEdit\Attribute\AsBulkEditContainer;
 use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
 use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
 use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
@@ -25,6 +26,8 @@ use VAF\WP\Framework\Menu\LoaderCompilerPass as MenuLoaderCompilerPass;
 use VAF\WP\Framework\Metabox\Attribute\AsMetaboxContainer;
 use VAF\WP\Framework\Metabox\Loader as MetaboxLoader;
 use VAF\WP\Framework\Metabox\LoaderCompilerPass as MetaboxLoaderCompilerPass;
+use VAF\WP\Framework\BulkEdit\Loader as BulkeditLoader;
+use VAF\WP\Framework\BulkEdit\LoaderCompilerPass as BulkeditLoaderCompilerPass;
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
 use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
 use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
@@ -83,6 +86,10 @@ abstract class WordpressKernel extends Kernel
         /** @var MetaboxLoader $metaboxLoader */
         $metaboxLoader = $this->getContainer()->get('metabox.loader');
         $metaboxLoader->registerMetaboxes();
+
+        /** @var BulkEditLoader $bulkeditLoader */
+        $bulkeditLoader = $this->getContainer()->get('bulkedit.loader');
+        $bulkeditLoader->registerBulkEditFields();
 
         /** @var GutenbergBlockLoader $gutenbergBlockLoader */
         $gutenbergBlockLoader = $this->getContainer()->get('gutenbergblock.loader');
@@ -148,6 +155,7 @@ abstract class WordpressKernel extends Kernel
 
         $this->registerHookContainer($builder);
         $this->registerMetaboxContainer($builder);
+        $this->registerBulkeditContainer($builder);
         $this->registerGutenbergBlock($builder);
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
@@ -454,6 +462,24 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $definition
             ): void {
                 $definition->addTag('metabox.container');
+            }
+        );
+    }
+
+    private function registerBulkeditContainer(ContainerBuilder $builder)
+    {
+        $builder->register('bulkedit.loader', BulkeditLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new BulkeditLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsBulkEditContainer::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('bulkedit.container');
             }
         );
     }

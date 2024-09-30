@@ -10,27 +10,20 @@ final class Loader
     {
     }
 
-    public function registerMetaboxes(): void
+    public function registerBulkEditFields(): void
     {
         foreach ($this->bulkeditContainer as $serviceId => $bulkeditContainer) {
             foreach ($bulkeditContainer as $data) {
 
                 add_action('add_meta_boxes', function () use ($data, $serviceId) {
                     $this->registerBulkEditField($serviceId, $data);
-
-
-                    try {
-                    } catch (EmptySupportingPostTypesException) {
-                        // should only show up on supporting post types but none are registered and registering with
-                        //empty array would result in showing up on all post types
-                    }
                 }, 5);
             }
 
         }
     }
 
-    public function registerBulkEditField($serviceId, $data)
+    private function registerBulkEditField($serviceId, $data)
     {
         add_action('admin_init', function () use ($data) {
             $post_types = PostTypeList::fromPostTypes($data['postTypes'])->withSupporting($data['supporting'], fn($feature) => get_post_types_by_support($feature))
@@ -53,7 +46,7 @@ final class Loader
             }
         });
 
-        add_action('bulk_edit_custom_box', function ($columnName, $serviceId, $data) {
+        add_action('bulk_edit_custom_box', function ($columnName, $data) use ($serviceId) {
             if ($columnName !== $data['name']) {
                 return;
             }
