@@ -6,7 +6,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use VAF\WP\Framework\Metabox\Attribute\Metabox;
+use VAF\WP\Framework\BulkEdit\Attribute\BulkEdit;
 use VAF\WP\Framework\Slug;
 
 final class LoaderCompilerPass implements CompilerPassInterface
@@ -38,8 +38,8 @@ final class LoaderCompilerPass implements CompilerPassInterface
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $methodName = $method->getName();
 
-            // Check if the Metabox attribute is present
-            $attributes = $method->getAttributes(Metabox::class);
+            // Check if the BulkEdit attribute is present
+            $attributes = $method->getAttributes(BulkEdit::class);
             if (empty($attributes)) {
                 continue;
             }
