@@ -14,10 +14,7 @@ final class Loader
     {
         foreach ($this->bulkeditContainer as $serviceId => $bulkeditContainer) {
             foreach ($bulkeditContainer as $data) {
-
-                add_action('add_meta_boxes', function () use ($data, $serviceId) {
-                    $this->registerBulkEditField($serviceId, $data);
-                }, 5);
+                $this->registerBulkEditField($serviceId, $data);
             }
 
         }
