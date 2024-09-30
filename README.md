@@ -7,4 +7,6 @@ directory for a good start.
 
 ## Table of Contents
 
+- [Bulk Edit](./docs/BulkEdit.md)
 - [Dynamic Blocks](./docs/DynamicBlocks.md)
+- [Metabox](./docs/Metabox.md)
