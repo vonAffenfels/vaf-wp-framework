@@ -32,8 +32,6 @@ final class Loader
 
     public function registerBulkEditField($serviceId, $data)
     {
-        $methodName = $data['method'];
-
         add_action('admin_init', function () use ($data) {
             $post_types = PostTypeList::fromPostTypes($data['postTypes'])->withSupporting($data['supporting'], fn($feature) => get_post_types_by_support($feature))
                 ->postTypes();
