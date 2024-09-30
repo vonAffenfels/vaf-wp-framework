@@ -23,18 +23,18 @@ final class Loader
     private function registerBulkEditField($serviceId, $data)
     {
         add_action('admin_init', function () use ($data) {
-            $post_types = PostTypeList::fromPostTypes($data['postTypes'])->withSupporting($data['supporting'], fn($feature) => get_post_types_by_support($feature))
+            $postTypes = PostTypeList::fromPostTypes($data['postTypes'])->withSupporting($data['supporting'], fn($feature) => get_post_types_by_support($feature))
                 ->postTypes();
 
-            foreach ($post_types as $post_type => $label) {
-                add_action("manage_{$post_type}_posts_columns", function ($columns) use ($data) {
+            foreach ($postTypes as $postType) {
+                add_action("manage_{$postType}_posts_columns", function ($columns) use ($data) {
                     return [
                         ...$columns,
                         $data['name'] => $data['title'],
                     ];
                 });
 
-                add_filter("manage_edit-{$post_type}_columns", function ($columns) use ($data) {
+                add_filter("manage_edit-{$postType}_columns", function ($columns) use ($data) {
                     return [
                         ...$columns,
                         $data['name'] => $data['title'],
