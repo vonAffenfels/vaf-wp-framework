@@ -43,7 +43,7 @@ final class Loader
             }
         });
 
-        add_action('bulk_edit_custom_box', function ($columnName, $data) use ($serviceId) {
+        add_action('bulk_edit_custom_box', function ($columnName) use ($serviceId, $data) {
             if ($columnName !== $data['name']) {
                 return;
             }
@@ -52,7 +52,7 @@ final class Loader
             echo $this->kernel->getContainer()->get($serviceId)->$methodName();
         });
 
-        add_action('hidden_columns', function ($columns, $data) {
+        add_action('hidden_columns', function ($columns) use ($data) {
             return [
                 ...$columns,
                 $data['name'],
