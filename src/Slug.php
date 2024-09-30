@@ -19,7 +19,7 @@ class Slug
     public function __toString(): string
     {
         return preg_replace(
-            '~[^a-zA-Z]~',
+            '~[^a-zA-Z]+~',
             '-',
             strtolower(
                 $this->name,
