@@ -28,6 +28,7 @@ final class PHPScoperConfigGenerator
         private readonly string $buildDir
     ) {
         $this->ignorePackage('phpunit/phpunit');
+        $this->ignorePackage('pestphp/pest');
         $this->ignorePackage('mockery/mockery');
         $this->ignorePackage('twig/twig');
         $this->ignoreNamespace('/^Twig/');
