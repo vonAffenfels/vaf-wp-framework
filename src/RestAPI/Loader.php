@@ -6,7 +6,9 @@ use Exception;
 use Throwable;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Kernel\WordpressKernel;
+use WP_HTTP_Response;
 use WP_REST_Request;
+use WP_REST_Response;
 
 final class Loader
 {
@@ -47,7 +49,7 @@ final class Loader
                         $methodName,
                         $params,
                         $restRoute
-                    ): array|\WP_HTTP_Response {
+                    ): array|WP_HTTP_Response {
                         $return = [
                             'success' => false
                         ];
@@ -94,12 +96,12 @@ final class Loader
                             $container = $this->kernel->getContainer()->get($serviceId);
                             $retVal = $container->$methodName(...$params);
 
-                            if ($retVal instanceof \WP_HTTP_Response) {
+                            if ($retVal instanceof WP_HTTP_Response) {
                                 return $retVal;
                             }
 
                             if (!($restRoute['wrapResponse'] ?? true)) {
-                                return new \WP_REST_Response($retVal);
+                                return new WP_REST_Response($retVal);
                             }
 
                             if ($retVal !== false) {
@@ -111,7 +113,7 @@ final class Loader
                             }
                         } catch (Throwable $e) {
                             if (!($restRoute['wrapResponse'] ?? true)) {
-                                return new \WP_REST_Response(
+                                return new WP_REST_Response(
                                     [
                                         'message' => $e->getMessage(),
                                         'trace' => $e->getTraceAsString(),

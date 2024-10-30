@@ -58,6 +58,28 @@ final class PHPScoperConfigGenerator
             }
         );
 
+        $this->addPackagePatcher(
+            'vonaffenfels/vaf-wp-framework',
+            function (string $filePath, string $prefix, string $content): string {
+                return str_replace(
+                    sprintf("%s\\WP_REST_Response", $prefix),
+                    "WP_REST_Response",
+                    $content
+                );
+            }
+        );
+
+        $this->addPackagePatcher(
+            'vonaffenfels/vaf-wp-framework',
+            function (string $filePath, string $prefix, string $content): string {
+                return str_replace(
+                    sprintf("%s\\WP_HTTP_Response", $prefix),
+                    "WP_HTTP_Response",
+                    $content
+                );
+            }
+        );
+
     }
 
     public function ignorePackage(string $package): void
