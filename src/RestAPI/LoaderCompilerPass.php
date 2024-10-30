@@ -132,6 +132,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
                     'type' => $instance->requiredPermission !== null ? 'wordpress_permission' : 'none',
                     ...($instance->requiredPermission !== null ? ['wordpress_permission_name' => $instance->requiredPermission] : [])
                 ],
+                'wrapResponse' => $instance->wrapResponse,
                 'namespace' => $containerAttribute->namespace,
                 'params' => $params,
                 'paramsLower' => $paramsLower,

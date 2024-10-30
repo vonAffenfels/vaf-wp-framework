@@ -3,6 +3,7 @@
 namespace VAF\WP\Framework\RestAPI;
 
 use Exception;
+use Throwable;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Kernel\WordpressKernel;
 use WP_REST_Request;
@@ -46,7 +47,7 @@ final class Loader
                         $methodName,
                         $params,
                         $restRoute
-                    ): array|WP_HTTP_Response {
+                    ): array|\WP_HTTP_Response {
                         $return = [
                             'success' => false
                         ];
@@ -93,8 +94,12 @@ final class Loader
                             $container = $this->kernel->getContainer()->get($serviceId);
                             $retVal = $container->$methodName(...$params);
 
-                            if($retVal instanceof \WP_HTTP_Response) {
+                            if ($retVal instanceof \WP_HTTP_Response) {
                                 return $retVal;
+                            }
+
+                            if (!($restRoute['wrapResponse'] ?? true)) {
+                                return new \WP_REST_Response($retVal);
                             }
 
                             if ($retVal !== false) {
@@ -104,7 +109,17 @@ final class Loader
                                     $return['data'] = $retVal;
                                 }
                             }
-                        } catch (Exception $e) {
+                        } catch (Throwable $e) {
+                            if (!($restRoute['wrapResponse'] ?? true)) {
+                                return new \WP_REST_Response(
+                                    [
+                                        'message' => $e->getMessage(),
+                                        'trace' => $e->getTraceAsString(),
+                                    ],
+                                    500
+                                );
+                            }
+
                             $return['success'] = false;
                             $return['message'] = $e->getMessage();
                         }
