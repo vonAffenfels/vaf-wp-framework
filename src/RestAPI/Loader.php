@@ -50,6 +50,9 @@ final class Loader
                         $params,
                         $restRoute
                     ): array|WP_HTTP_Response {
+                        $suppressOutput = SuppressOutput::enabled($restRoute['suppressEchoOutput'] ?? true);
+                        $suppressOutput->start();
+
                         $return = [
                             'success' => false
                         ];
@@ -113,6 +116,7 @@ final class Loader
                             }
                         } catch (Throwable $e) {
                             if (!($restRoute['wrapResponse'] ?? true)) {
+                                $suppressOutput->finish();
                                 return new WP_REST_Response(
                                     [
                                         'message' => $e->getMessage(),
@@ -126,6 +130,7 @@ final class Loader
                             $return['message'] = $e->getMessage();
                         }
 
+                        $suppressOutput->finish();
                         return $return;
                     }
                 ];

@@ -13,6 +13,7 @@ class RestRoute
         public readonly RestRouteMethod $method = RestRouteMethod::GET,
         public readonly ?string $requiredPermission = null,
         public readonly bool $wrapResponse = true,
+        public readonly bool $suppressEchoOutput = true,
     ) {
     }
 }
