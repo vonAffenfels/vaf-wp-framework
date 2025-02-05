@@ -128,6 +128,12 @@ final class LoaderCompilerPass implements CompilerPassInterface
                 'callback' => $methodName,
                 'method' => $instance->method,
                 'uri' => $instance->uri,
+                'permission' => [
+                    'type' => $instance->requiredPermission !== null ? 'wordpress_permission' : 'none',
+                    ...($instance->requiredPermission !== null ? ['wordpress_permission_name' => $instance->requiredPermission] : [])
+                ],
+                'wrapResponse' => $instance->wrapResponse,
+                'suppressEchoOutput' => $instance->suppressEchoOutput,
                 'namespace' => $containerAttribute->namespace,
                 'params' => $params,
                 'paramsLower' => $paramsLower,

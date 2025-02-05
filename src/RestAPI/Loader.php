@@ -3,17 +3,21 @@
 namespace VAF\WP\Framework\RestAPI;
 
 use Exception;
+use Throwable;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\Kernel\WordpressKernel;
+use WP_HTTP_Response;
 use WP_REST_Request;
+use WP_REST_Response;
 
 final class Loader
 {
     public function __construct(
         private readonly WordpressKernel $kernel,
-        private readonly BaseWordpress $base,
-        private readonly array $restContainer
-    ) {
+        private readonly BaseWordpress   $base,
+        private readonly array           $restContainer
+    )
+    {
     }
 
     public function registerRestRoutes(): void
@@ -35,8 +39,9 @@ final class Loader
                 $methodName = $restRoute['callback'];
 
                 $options = [
-                    'permission_callback' => function () {
-                        return true;
+                    'permission_callback' => match ($restRoute['permission']['type']) {
+                        'none' => fn() => true,
+                        'wordpress_permission' => fn() => current_user_can($restRoute['permission']['wordpress_permission_name']),
                     },
                     'methods' => $restRoute['method']->value,
                     'callback' => function (WP_REST_Request $request) use (
@@ -45,6 +50,9 @@ final class Loader
                         $params,
                         $restRoute
                     ): array|WP_HTTP_Response {
+                        $suppressOutput = SuppressOutput::enabled($restRoute['suppressEchoOutput'] ?? true);
+                        $suppressOutput->start();
+
                         $return = [
                             'success' => false
                         ];
@@ -91,8 +99,12 @@ final class Loader
                             $container = $this->kernel->getContainer()->get($serviceId);
                             $retVal = $container->$methodName(...$params);
 
-                            if($retVal instanceof \WP_HTTP_Response) {
+                            if ($retVal instanceof WP_HTTP_Response) {
                                 return $retVal;
+                            }
+
+                            if (!($restRoute['wrapResponse'] ?? true)) {
+                                return new WP_REST_Response($retVal);
                             }
 
                             if ($retVal !== false) {
@@ -102,11 +114,23 @@ final class Loader
                                     $return['data'] = $retVal;
                                 }
                             }
-                        } catch (Exception $e) {
+                        } catch (Throwable $e) {
+                            if (!($restRoute['wrapResponse'] ?? true)) {
+                                $suppressOutput->finish();
+                                return new WP_REST_Response(
+                                    [
+                                        'message' => $e->getMessage(),
+                                        'trace' => $e->getTraceAsString(),
+                                    ],
+                                    500
+                                );
+                            }
+
                             $return['success'] = false;
                             $return['message'] = $e->getMessage();
                         }
 
+                        $suppressOutput->finish();
                         return $return;
                     }
                 ];

@@ -14,6 +14,8 @@ final class PHPScoperConfigGenerator
         'roave/security-advisories'
     ];
 
+    private array $ignoredNamespaces = [];
+
     private array $packagesProcessed = [];
 
     private array $packagesToProcess = [];
@@ -26,7 +28,10 @@ final class PHPScoperConfigGenerator
         private readonly string $buildDir
     ) {
         $this->ignorePackage('phpunit/phpunit');
+        $this->ignorePackage('pestphp/pest');
         $this->ignorePackage('mockery/mockery');
+        $this->ignorePackage('twig/twig');
+        $this->ignoreNamespace('/^Twig/');
 
         $this->addPackagePatcher(
             'symfony/dependency-injection',
@@ -43,31 +48,11 @@ final class PHPScoperConfigGenerator
         );
 
         $this->addPackagePatcher(
-            'twig/twig',
+            'vonaffenfels/vaf-wp-framework',
             function (string $filePath, string $prefix, string $content): string {
-                $replacements = [
-                    '"use Twig\\\\' => sprintf('"use %s\\\\Twig\\\\', $prefix),
-                ];
-
-                if (str_contains($filePath, 'EscaperExtension')) {
-                    $replacements = [
-                        ...$replacements,
-                        ...UnscopedFunction::fromName('twig_escape_filter')->scopedReplacement($prefix),
-                        ...UnscopedFunction::fromName('twig_escape_filter_is_safe')->scopedReplacement($prefix),
-                        ...UnscopedFunction::fromName('twig_raw_filter')->scopedReplacement($prefix),
-                    ];
-                }
-
-                if (str_contains($filePath, 'GetAttrExpression')) {
-                    $replacements = [
-                        ...$replacements,
-                        ...UnscopedFunction::fromName('twig_get_attribute')->scopedReplacement($prefix),
-                    ];
-                }
-
                 return str_replace(
-                    array_keys($replacements),
-                    array_values($replacements),
+                    sprintf("%s\\WP_REST_Request", $prefix),
+                    "WP_REST_Request",
                     $content
                 );
             }
@@ -77,8 +62,19 @@ final class PHPScoperConfigGenerator
             'vonaffenfels/vaf-wp-framework',
             function (string $filePath, string $prefix, string $content): string {
                 return str_replace(
-                    sprintf("%s\\WP_REST_Request", $prefix),
-                    "WP_REST_Request",
+                    sprintf("%s\\WP_REST_Response", $prefix),
+                    "WP_REST_Response",
+                    $content
+                );
+            }
+        );
+
+        $this->addPackagePatcher(
+            'vonaffenfels/vaf-wp-framework',
+            function (string $filePath, string $prefix, string $content): string {
+                return str_replace(
+                    sprintf("%s\\WP_HTTP_Response", $prefix),
+                    "WP_HTTP_Response",
                     $content
                 );
             }
@@ -90,6 +86,13 @@ final class PHPScoperConfigGenerator
     {
         if (!in_array($package, $this->ignoredPackages)) {
             $this->ignoredPackages[] = $package;
+        }
+    }
+
+    private function ignoreNamespace(string $namespace): void
+    {
+        if (!in_array($namespace, $this->ignoredNamespaces)) {
+            $this->ignoredNamespaces[] = $namespace;
         }
     }
 
@@ -196,6 +199,7 @@ final class PHPScoperConfigGenerator
             'prefix' => $this->prefix,
             'output-dir' => $this->buildDir,
             'finders' => $finders,
+            'exclude-namespaces' => $this->ignoredNamespaces,
             'patchers' => $patchers
         ];
     }
@@ -243,8 +247,4 @@ final class PHPScoperConfigGenerator
         );
     }
 
-    private function namespaceTwigFilterReplacement($twigFilterName, $replacements, $prefix)
-    {
-        return $replacements;
-    }
 }
