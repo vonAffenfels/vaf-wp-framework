@@ -5,6 +5,9 @@ A QuickEdit field is shown when selecting pressing 'quick edit' on a post in the
 Note that the quick edit field uses the same save_posts Hook a Metabox does and usually you first have a metabox then
 add a quick edit field later.
 
+Also note that the quick edit form field is rendered only once for the whole table and is moved around when you click on
+
+
 ## Parameters
 
 - title: A name given to the quick edit field, will also decide its id by transforming it into a slug suffixed with '-quick'
@@ -33,12 +36,22 @@ class ExampleQuickEdit
     #[QuickEdit('Kampagne', postTypes: 'post', supporting: Plugin::CONVERSIONS_POST_TYPE_FEATURE)]
     public function quickEdit()
     {
-        return "Quick Edit Field Content!";
+        return QuickEditField::fromFormFieldData(
+            formField: fn(RenderQuickEditFormFieldEvent $e) => $this->template
+                ->withId('my-quick-edit-field')
+                ->withInitialData([
+                    'name' => $e->columnName,
+                ])
+                ->render(),
+            data: fn(QuickEditPostDataEvent $e) => [
+                'post_data' => get_post($e->postId),
+            ]
+        );
     }
 }
 ```
 
-## Metabox with save hook and React
+## QuickEdit with save hook and React
 
 ExampleQuickEdit.php
 ```php
@@ -56,13 +69,17 @@ class ExampleMetabox
     #[QuickEdit('Kampagne', postTypes: 'post', supporting: Plugin::CONVERSIONS_POST_TYPE_FEATURE)]
     public function quickEdit()
     {
-        return $this->template
-            ->withId('article-campaigns-quick-edit')
-            ->withInitialData([
-                'campaigns' => Campaign::all()
-                    ->map(fn(Campaign $campaign) => $campaign->dta()),
-            ])
-            ->render();
+        return QuickEditField::fromFormFieldData(
+            formField: fn(RenderQuickEditFormFieldEvent $e) => $this->template
+                ->withId('my-quick-edit-field')
+                ->withInitialData([
+                    'name' => $e->columnName,
+                ])
+                ->render(),
+            data: fn(QuickEditPostDataEvent $e) => [
+                'post_data' => get_post($e->postId),
+            ]
+        );
     }
 
     #[Hook('save_post')]
@@ -80,12 +97,23 @@ class ExampleMetabox
 
 example_quick_edit.js
 ```javascript
-import {useState} from '@wordpress/element';
+import {useState, useEffect} from '@wordpress/element';
 import {TextControl} from '@wordpress/components';
-import {reactOnReady} from 'vaf-wp-framework/reactOnReady';
+import {reactOnQuickEdit} from 'vaf-wp-framework/reactOnReady';
+import {QuickEdit} from 'vaf-wp-framework/QuickEdit';
 
-function ExampleQuickEdit({exampleValue: initialExampleValue}) {
-    const [exampleValue, setExampleValue] = useState(initialExampleValue);
+function ExampleQuickEdit({postId, name}) {
+    const [exampleValue, setExampleValue] = useState(null);
+    
+    useEffect(() => {
+      setExampleValue(
+              QuickEdit.fromPostIdFieldName(postId, name).initialValue
+      );
+    }, [])
+  
+    if(exampleValue === null) {
+      return null;
+    }
 
     return (
         <div>
@@ -99,10 +127,11 @@ function ExampleQuickEdit({exampleValue: initialExampleValue}) {
     );
 }
 
-reactOnReady('article-campaigns-quick-edit', ({initialData}) => <ExampleQuickEdit {...(initialData ?? {})} />);
+reactOnQuickEdit('my-quick-edit-field', ({postId, initialData}) => <ExampleQuickEdit
+        {...(initialData ?? {})}
+        postId={postId}
+/>);
 ```
 
 Note that the javascript file must be compiled and the result loaded for this example to work. See the example
 `webpack.config.js` in the plugin skeleton for help generating wordpress react javascript files.
-
-TODO: handle loading the current value for the selected post
