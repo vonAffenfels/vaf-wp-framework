@@ -27,12 +27,12 @@ final class Loader
                 ->postTypes();
 
             foreach ($postTypes as $postType) {
-                add_action("manage_{$postType}_posts_columns", function ($columns) use ($data) {
+                add_action("manage_edit-{$postType}_columns", function ($columns) use ($data) {
                     return [
                         ...$columns,
                         $data['name'] => $data['title'],
                     ];
-                });
+                }, 9999);
             }
         });
 
