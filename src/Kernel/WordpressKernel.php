@@ -14,6 +14,7 @@ use VAF\WP\Framework\AdminPages\Attributes\IsTabbedPage;
 use VAF\WP\Framework\AdminPages\TabbedPageCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\BulkEdit\Attribute\AsBulkEditContainer;
+use VAF\WP\Framework\QuickEdit\Attribute\AsQuickEditContainer;
 use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
 use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
 use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
@@ -28,6 +29,8 @@ use VAF\WP\Framework\Metabox\Loader as MetaboxLoader;
 use VAF\WP\Framework\Metabox\LoaderCompilerPass as MetaboxLoaderCompilerPass;
 use VAF\WP\Framework\BulkEdit\Loader as BulkeditLoader;
 use VAF\WP\Framework\BulkEdit\LoaderCompilerPass as BulkeditLoaderCompilerPass;
+use VAF\WP\Framework\QuickEdit\Loader as QuickeditLoader;
+use VAF\WP\Framework\QuickEdit\LoaderCompilerPass as QuickeditLoaderCompilerPass;
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
 use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
 use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
@@ -90,6 +93,10 @@ abstract class WordpressKernel extends Kernel
         /** @var BulkEditLoader $bulkeditLoader */
         $bulkeditLoader = $this->getContainer()->get('bulkedit.loader');
         $bulkeditLoader->registerBulkEditFields();
+
+        /** @var QuickEditLoader $quickeditLoader */
+        $quickeditLoader = $this->getContainer()->get('quickedit.loader');
+        $quickeditLoader->registerQuickEditFields();
 
         /** @var GutenbergBlockLoader $gutenbergBlockLoader */
         $gutenbergBlockLoader = $this->getContainer()->get('gutenbergblock.loader');
@@ -156,6 +163,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerHookContainer($builder);
         $this->registerMetaboxContainer($builder);
         $this->registerBulkeditContainer($builder);
+        $this->registerQuickeditContainer($builder);
         $this->registerGutenbergBlock($builder);
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
@@ -480,6 +488,24 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $definition
             ): void {
                 $definition->addTag('bulkedit.container');
+            }
+        );
+    }
+
+    private function registerQuickeditContainer(ContainerBuilder $builder)
+    {
+        $builder->register('quickedit.loader', QuickeditLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new QuickeditLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsQuickEditContainer::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('quickedit.container');
             }
         );
     }
