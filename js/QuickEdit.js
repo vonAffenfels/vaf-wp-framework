@@ -10,7 +10,7 @@ export class QuickEdit {
 
     get initialValue() {
         JSON.parse(
-            document.querySelector(`#post-${postId} .{fieldName}`).innerText()
+            document.querySelector(`#post-${this.postId} .${this.fieldName}`).innerText()
         );
     }
 }
