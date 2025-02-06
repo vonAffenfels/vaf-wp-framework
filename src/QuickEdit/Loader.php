@@ -35,7 +35,7 @@ final class Loader
                     ];
                 }, 9999);
 
-                add_action("manage_{$postType}_posts_custom_column", function ($columnName) use ($data, $serviceId) {
+                add_action("manage_{$postType}_posts_custom_column", function ($columnName, $postId) use ($data, $serviceId) {
                     if ($columnName !== $data['name']) {
                         return;
                     }
@@ -43,7 +43,10 @@ final class Loader
                     $methodName = $data['method'];
                     echo json_encode(
                         ($this->kernel->getContainer()->get($serviceId)->{$methodName}()->data)(
-                            new QuickEditPostDataEvent(columnName: $columnName)
+                            new QuickEditPostDataEvent(
+                                postId: $postId,
+                                columnName: $columnName
+                            )
                         )
                     );
                 }, 9999, accepted_args: 2);
