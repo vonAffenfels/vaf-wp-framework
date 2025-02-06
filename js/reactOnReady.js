@@ -17,6 +17,34 @@ export function reactOnReady(id, fn) {
     });
 }
 
+export function reactOnQuickEdit(id, fn) {
+    ready(() => {
+        const wp_inline_edit_function = inlineEditPost.edit;
+        let reactRoot = null;
+
+        inlineEditPost.edit = function (postId, ...args) {
+            wp_inline_edit_function.apply(this, [postId, ...args]);
+
+            if (!document.getElementById(id)) {
+                return;
+            }
+
+            const initialData = JSON.parse(
+                document.getElementById(id).dataset['initialData']
+            );
+
+            if(reactRoot) {
+                reactRoot.unmount();
+            }
+
+            reactRoot = createRoot(
+                document.getElementById(id)
+            );
+            reactRoot.render(fn({postId, initialData}));
+        };
+    });
+}
+
 export function reactBySelectorOnReady(selector, fn) {
     ready(() => {
         const elements = [...document.querySelectorAll(selector)];
