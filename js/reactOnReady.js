@@ -19,15 +19,15 @@ export function reactOnReady(id, fn) {
 
 export function reactOnQuickEdit(id, fn) {
     ready(() => {
-        if(!inlineEditPost) {
+        if(!window.inlineEditPost) {
             return;
         }
 
-        const wp_inline_edit_function = inlineEditPost.edit;
+        const wp_inline_edit_function = window.inlineEditPost.edit;
 
         let reactRoot = null;
 
-        inlineEditPost.edit = function (postId, ...args) {
+        window.inlineEditPost.edit = function (postId, ...args) {
             if ( typeof( postId ) == 'object' ) { // if it is object, get the ID number
                 postId = parseInt( this.getId( postId ) );
             }
