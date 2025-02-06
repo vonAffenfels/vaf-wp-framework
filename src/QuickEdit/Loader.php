@@ -22,7 +22,7 @@ final class Loader
 
     private function registerQuickEditField($serviceId, $data)
     {
-        add_action('admin_init', function () use ($data) {
+        add_action('admin_init', function () use ($data, $serviceId) {
             $postTypes = PostTypeList::fromPostTypes($data['postTypes'])->withSupporting($data['supporting'], fn($feature) => get_post_types_by_support($feature))
                 ->postTypes();
 
