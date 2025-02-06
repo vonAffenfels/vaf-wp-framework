@@ -38,12 +38,5 @@ final class Loader
                 }, 9999, accepted_args: 2);
             }
         });
-
-        add_action('hidden_columns', function ($columns) use ($data) {
-            return [
-                ...$columns,
-                $data['name'],
-            ];
-        });
     }
 }

@@ -50,7 +50,7 @@ final class Loader
             }
         });
 
-        add_action('quick_edit_custom_box', function ($columnName, $postId) use ($serviceId, $data) {
+        add_action('quick_edit_custom_box', function ($columnName) use ($serviceId, $data) {
             if ($columnName !== $data['name']) {
                 return;
             }
@@ -58,7 +58,6 @@ final class Loader
             $methodName = $data['method'];
             echo ($this->kernel->getContainer()->get($serviceId)->{$methodName}()->formField)(
                 new RenderQuickEditFormFieldEvent(
-                    postId: $postId,
                     columnName: $data['name']
                 )
             );
