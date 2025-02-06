@@ -9,8 +9,8 @@ export class QuickEdit {
     }
 
     get initialValue() {
-        JSON.parse(
-            document.querySelector(`#post-${this.postId} .${this.fieldName}`).innerText()
+        return JSON.parse(
+            document.querySelector(`#post-${this.postId} .${this.fieldName}`).innerText
         );
     }
 }

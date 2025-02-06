@@ -19,7 +19,12 @@ export function reactOnReady(id, fn) {
 
 export function reactOnQuickEdit(id, fn) {
     ready(() => {
+        if(!inlineEditPost) {
+            return;
+        }
+
         const wp_inline_edit_function = inlineEditPost.edit;
+
         let reactRoot = null;
 
         inlineEditPost.edit = function (postId, ...args) {
