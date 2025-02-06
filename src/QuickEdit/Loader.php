@@ -41,7 +41,9 @@ final class Loader
 
                     $methodName = $data['method'];
                     echo json_encode(
-                        ($this->kernel->getContainer()->get($serviceId)->{$methodName}($postId)->data)()
+                        ($this->kernel->getContainer()->get($serviceId)->{$methodName}()->data)(
+                            new QuickEditPostDataEvent(postId: $postId, columnName: $data['name'])
+                        )
                     );
                 }, 9999, accepted_args: 2);
             }
@@ -53,8 +55,11 @@ final class Loader
             }
 
             $methodName = $data['method'];
-            echo ($this->kernel->getContainer()->get($serviceId)->{$methodName}($postId)->formField)(
-                new RenderQuickEditFormFieldEvent(name: $data['name'])
+            echo ($this->kernel->getContainer()->get($serviceId)->{$methodName}()->formField)(
+                new RenderQuickEditFormFieldEvent(
+                    postId: $postId,
+                    columnName: $data['name']
+                )
             );
         }, accepted_args: 2);
 
