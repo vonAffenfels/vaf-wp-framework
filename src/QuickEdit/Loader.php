@@ -33,17 +33,30 @@ final class Loader
                         $data['name'] => $data['title'],
                     ];
                 }, 9999);
+
+                add_action("manage_{$postType}_posts_custom_column", function ($columnName, $postId) use ($data, $serviceId) {
+                    if ($columnName !== $data['name']) {
+                        return;
+                    }
+
+                    $methodName = $data['method'];
+                    echo json_encode(
+                        $this->kernel->getContainer()->get($serviceId)->{$methodName}($postId)->data()
+                    );
+                }, 9999, accepted_args: 2);
             }
         });
 
-        add_action('quick_edit_custom_box', function ($columnName) use ($serviceId, $data) {
+        add_action('quick_edit_custom_box', function ($columnName, $postId) use ($serviceId, $data) {
             if ($columnName !== $data['name']) {
                 return;
             }
 
             $methodName = $data['method'];
-            echo $this->kernel->getContainer()->get($serviceId)->$methodName();
-        });
+            echo $this->kernel->getContainer()->get($serviceId)->{$methodName}($postId)->formField(
+                new RenderQuickEditFormFieldEvent(name: $data['name'])
+            );
+        }, accepted_args: 2);
 
         add_action('hidden_columns', function ($columns) use ($data) {
             return [
