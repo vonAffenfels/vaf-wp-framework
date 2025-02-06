@@ -171,6 +171,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerMetaboxContainer($builder);
         $this->registerBulkeditContainer($builder);
         $this->registerQuickeditContainer($builder);
+        $this->registerCustomColumnContainer($builder);
         $this->registerGutenbergBlock($builder);
         $this->registerShortcodeContainer($builder);
         $this->registerSettingsContainer($builder);
