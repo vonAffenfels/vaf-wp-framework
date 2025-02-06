@@ -28,13 +28,20 @@ final class Loader
                 ->postTypes();
 
             foreach ($postTypes as $postType) {
-                add_action("manage_{$postType}_posts_custom_column", function ($columnName) use ($data, $serviceId) {
+                add_action("manage_edit-{$postType}_columns", function ($columns) use ($data) {
+                    return [
+                        ...$columns,
+                        $data['name'] => $data['title'],
+                    ];
+                }, 9999);
+
+                add_action("manage_{$postType}_posts_custom_column", function ($columnName, $postId) use ($data, $serviceId) {
                     if ($columnName !== $data['name']) {
                         return;
                     }
 
                     $methodName = $data['method'];
-                    echo $this->kernel->getContainer()->get($serviceId)->{$methodName}();
+                    echo $this->kernel->getContainer()->get($serviceId)->{$methodName}($postId);
                 }, 9999, accepted_args: 2);
             }
         });
