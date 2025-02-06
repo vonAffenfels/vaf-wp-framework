@@ -23,6 +23,10 @@ export function reactOnQuickEdit(id, fn) {
         let reactRoot = null;
 
         inlineEditPost.edit = function (postId, ...args) {
+            if ( typeof( postId ) == 'object' ) { // if it is object, get the ID number
+                postId = parseInt( this.getId( postId ) );
+            }
+
             wp_inline_edit_function.apply(this, [postId, ...args]);
 
             if (!document.getElementById(id)) {
