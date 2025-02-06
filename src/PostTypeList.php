@@ -1,8 +1,6 @@
 <?php
 
-namespace VAF\WP\Framework\BulkEdit;
-
-use VAF\WP\Framework\Metabox\EmptySupportingScreensException;
+namespace VAF\WP\Framework;
 
 class PostTypeList
 {

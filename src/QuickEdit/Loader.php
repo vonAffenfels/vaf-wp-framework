@@ -2,6 +2,7 @@
 
 namespace VAF\WP\Framework\QuickEdit;
 
+use VAF\WP\Framework\PostTypeList;
 use VAF\WP\Framework\Kernel\WordpressKernel;
 
 final class Loader

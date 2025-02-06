@@ -15,6 +15,7 @@ use VAF\WP\Framework\AdminPages\TabbedPageCompilerPass;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\BulkEdit\Attribute\AsBulkEditContainer;
 use VAF\WP\Framework\QuickEdit\Attribute\AsQuickEditContainer;
+use VAF\WP\Framework\CustomColumn\Attribute\AsCustomColumnContainer;
 use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
 use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
 use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
@@ -31,6 +32,8 @@ use VAF\WP\Framework\BulkEdit\Loader as BulkeditLoader;
 use VAF\WP\Framework\BulkEdit\LoaderCompilerPass as BulkeditLoaderCompilerPass;
 use VAF\WP\Framework\QuickEdit\Loader as QuickeditLoader;
 use VAF\WP\Framework\QuickEdit\LoaderCompilerPass as QuickeditLoaderCompilerPass;
+use VAF\WP\Framework\CustomColumn\Loader as CustomColumnLoader;
+use VAF\WP\Framework\CustomColumn\LoaderCompilerPass as CustomColumnLoaderCompilerPass;
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
 use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
 use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
@@ -97,6 +100,10 @@ abstract class WordpressKernel extends Kernel
         /** @var QuickEditLoader $quickeditLoader */
         $quickeditLoader = $this->getContainer()->get('quickedit.loader');
         $quickeditLoader->registerQuickEditFields();
+
+        /** @var CustomColumnLoader $quickeditLoader */
+        $customColumnLoader = $this->getContainer()->get('customColumn.loader');
+        $customColumnLoader->registerCustomColumnFields();
 
         /** @var GutenbergBlockLoader $gutenbergBlockLoader */
         $gutenbergBlockLoader = $this->getContainer()->get('gutenbergblock.loader');
@@ -506,6 +513,24 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $definition
             ): void {
                 $definition->addTag('quickedit.container');
+            }
+        );
+    }
+
+    private function registerCustomColumnContainer(ContainerBuilder $builder)
+    {
+        $builder->register('customColumn.loader', CustomColumnLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new CustomColumnLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsCustomColumnContainer::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('customColumn.container');
             }
         );
     }
