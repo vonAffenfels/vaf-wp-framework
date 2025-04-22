@@ -1,51 +1,33 @@
 <?php
 
-namespace VAF\WP\FrameworkTests\Unit;
-
+uses(\VAF\WP\FrameworkTests\TestCase::class);
 use VAF\WP\Framework\Permalink\Permalink;
 use VAF\WP\Framework\Permalink\PermalinkResolver;
-use VAF\WP\FrameworkTests\TestCase;
 
-class PermalinkTest extends TestCase
-{
+test('should be able to fake permalink before creating permalink', function () {
+    $resolver = \Mockery::mock(PermalinkResolver::class);
+    $resolver->shouldReceive('permalinkForPostId')->with(15)->andReturn('expected permalink');
 
-    /**
-     * @test
-     */
-    public function should_be_able_to_fake_permalink_before_creating_permalink()
-    {
-        $resolver = \Mockery::mock(PermalinkResolver::class);
-        $resolver->shouldReceive('permalinkForPostId')->with(15)->andReturn('expected permalink');
+    Permalink::fake($resolver);
+    $permalink = Permalink::fromPostId(15);
 
-        Permalink::fake($resolver);
-        $permalink = Permalink::fromPostId(15);
+    expect((string)$permalink)->toEqual('expected permalink');
+});
 
-        $this->assertEquals('expected permalink', (string)$permalink);
-    }
+test('should be able to fake permalink after creating permalink', function () {
+    $resolver = \Mockery::mock(PermalinkResolver::class);
+    $resolver->shouldReceive('permalinkForPostId')->with(15)->andReturn('expected permalink');
 
-    /**
-     * @test
-     */
-    public function should_be_able_to_fake_permalink_after_creating_permalink()
-    {
-        $resolver = \Mockery::mock(PermalinkResolver::class);
-        $resolver->shouldReceive('permalinkForPostId')->with(15)->andReturn('expected permalink');
+    $permalink = Permalink::fromPostId(15);
+    Permalink::fake($resolver);
 
-        $permalink = Permalink::fromPostId(15);
-        Permalink::fake($resolver);
+    expect((string)$permalink)->toEqual('expected permalink');
+});
 
-        $this->assertEquals('expected permalink', (string)$permalink);
-    }
+test('should be able to easily fake a passthrough url', function () {
+    Permalink::fakePassthrough();
 
-    /**
-     * @test
-     */
-    public function should_be_able_to_easily_fake_a_passthrough_url()
-    {
-        Permalink::fakePassthrough();
+    $permalink = Permalink::fromPostId(15);
 
-        $permalink = Permalink::fromPostId(15);
-
-        $this->assertEquals('permalink_for_15', (string)$permalink);
-    }
-}
+    expect((string)$permalink)->toEqual('permalink_for_15');
+});

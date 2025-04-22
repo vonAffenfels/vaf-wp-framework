@@ -1,80 +1,55 @@
 <?php
 
-namespace VAF\WP\FrameworkTests\Unit;
-
-use Mockery;
+uses(\VAF\WP\FrameworkTests\TestCase::class);
 use VAF\WP\Framework\Filter\Filter;
 use VAF\WP\Framework\Filter\WordpressFilters;
-use VAF\WP\FrameworkTests\TestCase;
 
-class FilterTest extends TestCase
-{
-    private WordpressFilters|Mockery\LegacyMockInterface|Mockery\MockInterface $mockFilters;
+beforeEach(function () {
+    $mockFilters = Mockery::spy(WordpressFilters::class);
 
-    public function setUp(): void
-    {
-        parent::setUp();
+    Filter::fakeFilters(
+        $mockFilters
+    );
+    $this->mockFilters = $mockFilters;
+});
 
-        $mockFilters = Mockery::spy(WordpressFilters::class);
+test('should call filter with passed arguments', function () {
+    $this->mockFilters->shouldReceive('resultFrom')
+        ->once()
+        ->with('filter-name', 'arg1', 'arg2');
 
-        Filter::fakeFilters(
-            $mockFilters
-        );
-        $this->mockFilters = $mockFilters;
-    }
+    Filter::fromName('filter-name')
+        ->result('arg1', 'arg2');
+});
 
+test('should return filter result', function () {
+    $this->mockFilters->shouldReceive('resultFrom')
+        ->andReturn('filter-result');
 
-    /**
-     * @test
-     */
-    public function should_call_filter_with_passed_arguments()
-    {
-        $this->mockFilters->shouldReceive('resultFrom')
-            ->once()
-            ->with('filter-name', 'arg1', 'arg2');
+    $result = Filter::fromName('filter-name')
+        ->result('result');
 
-        Filter::fromName('filter-name')
-            ->result('arg1', 'arg2');
-    }
+    expect($result)->toEqual('filter-result');
+});
 
-    /**
-     * @test
-     */
-    public function should_return_filter_result()
-    {
-        $this->mockFilters->shouldReceive('resultFrom')
-            ->andReturn('filter-result');
+test('should pass result through legacy filters', function () {
+    $this->mockFilters->shouldReceive('resultFrom')
+        ->once()
+        ->with('legacy-name-1', 'initial-args')
+        ->andReturn('legacy-name-1-result');
+    $this->mockFilters->shouldReceive('resultFrom')
+        ->once()
+        ->with('legacy-name-2', 'legacy-name-1-result')
+        ->andReturn('legacy-name-2-result');
+    $this->mockFilters->shouldReceive('resultFrom')
+        ->once()
+        ->with('filter-name', 'legacy-name-2-result')
+        ->andReturn('final-result');
 
-        $result = Filter::fromName('filter-name')
-            ->result('result');
+    $result = Filter::fromName('filter-name')
+        ->withLegacyName('legacy-name-1')
+        ->withLegacyName('legacy-name-2')
+        ->result('initial-args');
 
-        $this->assertEquals('filter-result', $result);
-    }
-
-    /**
-     * @test
-     */
-    public function should_pass_result_through_legacy_filters()
-    {
-        $this->mockFilters->shouldReceive('resultFrom')
-            ->once()
-            ->with('legacy-name-1', 'initial-args')
-            ->andReturn('legacy-name-1-result');
-        $this->mockFilters->shouldReceive('resultFrom')
-            ->once()
-            ->with('legacy-name-2', 'legacy-name-1-result')
-            ->andReturn('legacy-name-2-result');
-        $this->mockFilters->shouldReceive('resultFrom')
-            ->once()
-            ->with('filter-name', 'legacy-name-2-result')
-            ->andReturn('final-result');
-
-        $result = Filter::fromName('filter-name')
-            ->withLegacyName('legacy-name-1')
-            ->withLegacyName('legacy-name-2')
-            ->result('initial-args');
-
-        $this->assertEquals('final-result', $result);
-    }
-
-}
+    expect($result)->toEqual('final-result');
+});

@@ -1,50 +1,28 @@
 <?php
 
-namespace VAF\WP\FrameworkTests\Unit;
-
+uses(\VAF\WP\FrameworkTests\TestCase::class);
 use VAF\WP\Framework\Slug;
-use VAF\WP\FrameworkTests\TestCase;
 
-class SlutTest extends TestCase
-{
+test('should keep a to z', function () {
+    $slug = Slug::fromName('abcdefghijklmnopqrstuvwxyz');
 
-    /**
-     * @test
-     */
-    public function should_keep_a_to_z()
-    {
-        $slug = Slug::fromName('abcdefghijklmnopqrstuvwxyz');
+    expect((string)$slug)->toEqual('abcdefghijklmnopqrstuvwxyz');
+});
 
-        $this->assertEquals('abcdefghijklmnopqrstuvwxyz', (string)$slug);
-    }
+test('should change capital a to z to lowercase a to z', function () {
+    $slug = Slug::fromName('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
-    /**
-     * @test
-     */
-    public function should_change_capital_a_to_z_to_lowercase_a_to_z()
-    {
-        $slug = Slug::fromName('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+    expect((string)$slug)->toEqual('abcdefghijklmnopqrstuvwxyz');
+});
 
-        $this->assertEquals('abcdefghijklmnopqrstuvwxyz', (string)$slug);
-    }
+test('should change anything not a to z to dash', function () {
+    $slug = Slug::fromName('a b');
 
-    /**
-     * @test
-     */
-    public function should_change_anything_not_a_to_z_to_dash()
-    {
-        $slug = Slug::fromName('a b');
+    expect((string)$slug)->toEqual('a-b');
+});
 
-        $this->assertEquals('a-b', (string)$slug);
-    }
+test('should reduce multiple dashes to single dash', function () {
+    $slug = Slug::fromName('a!@#b');
 
-    /**
-     * @test
-     */
-    public function should_reduce_multiple_dashes_to_single_dash()
-    {
-        $slug = Slug::fromName('a!@#b');
-
-        $this->assertEquals('a-b', (string)$slug);
-    }
-}
+    expect((string)$slug)->toEqual('a-b');
+});

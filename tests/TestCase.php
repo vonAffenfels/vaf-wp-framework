@@ -8,7 +8,7 @@ use VAF\WP\Framework\Filter\Filter;
 class TestCase extends MockeryTestCase
 {
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         Filter::resetFake();

@@ -1,21 +1,10 @@
 <?php
 
-namespace VAF\WP\FrameworkTests\Unit;
-
+uses(\VAF\WP\FrameworkTests\TestCase::class);
 use VAF\WP\Framework\Metabox\MetaboxId;
-use VAF\WP\FrameworkTests\TestCase;
 
-class MetaboxIdTest extends TestCase
-{
+test('should generate classname without namespace underscore methodname', function () {
+    $id = (string)MetaboxId::fromClassMethodName('Namespace\\Subnamespace\\Classname', 'methodName');
 
-    /**
-     * @test
-     */
-    public function should_generate_classname_without_namespace_underscore_methodname()
-    {
-        $id = (string)MetaboxId::fromClassMethodName('Namespace\\Subnamespace\\Classname', 'methodName');
-
-        $this->assertEquals('classname_methodname', $id);
-    }
-
-}
+    expect($id)->toEqual('classname_methodname');
+});

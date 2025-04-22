@@ -27,7 +27,10 @@
     "platform": {
       "php": "8.1"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
@@ -64,7 +67,8 @@
     "friendsofphp/php-cs-fixer": "^3.22",
     "humbug/php-scoper": "^0.18.3",
     "mockery/mockery": "^1.6",
-    "phpunit/phpunit": "^9.6",
+    "pestphp/pest": "^2.36",
+    "pestphp/pest-plugin-drift": "^2.5",
     "squizlabs/php_codesniffer": "^3.6"
   }
 }
