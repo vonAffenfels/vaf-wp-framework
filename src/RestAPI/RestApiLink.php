@@ -16,8 +16,6 @@ class RestApiLink
 
     public static function forContainerPluginRoute(string $container, BaseWordpress $wordpress, string $route): self
     {
-        $restApiLink = new static();
-
         $reflection = new ReflectionClass($container);
         $attributes = $reflection->getAttributes(AsRestContainer::class);
         if (empty($attributes)) {
