@@ -26,10 +26,6 @@ final class Loader
 
         foreach ($this->restContainer as $serviceId => $restContainer) {
             foreach ($restContainer as $restRoute) {
-                $namespace = $name;
-                if (!empty($restRoute['namespace'])) {
-                    $namespace .= '/' . $restRoute['namespace'];
-                }
 
                 $params = [];
                 foreach ($restRoute['serviceParams'] as $param => $service) {
@@ -135,7 +131,11 @@ final class Loader
                     }
                 ];
 
-                register_rest_route($namespace, '/' . $restRoute['uri'], $options);
+                register_rest_route(
+                    RestApiLink::forNamespacePluginRoute($restRoute['namespace'], $this->base, $restRoute['uri'])->namespace(),
+                    RestApiLink::forNamespacePluginRoute($restRoute['namespace'], $this->base, $restRoute['uri'])->uri(),
+                    $options
+                );
             }
         }
     }
