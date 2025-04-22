@@ -19,13 +19,12 @@ class RestApiLink
         $restApiLink = new static();
 
         $reflection = new ReflectionClass($container);
-        /** @var AsRestContainer[] $attributes */
         $attributes = $reflection->getAttributes(AsRestContainer::class);
         if (empty($attributes)) {
             throw new \LogicException("RestApiLink requested for non rest api class");
         }
 
-        return self::forNamespacePluginRoute($attributes[0]->namespace, $wordpress, $route);
+        return self::forNamespacePluginRoute($attributes[0]->newInstance()->namespace, $wordpress, $route);
     }
 
     public static function forNamespacePluginRoute(string $namespace, BaseWordpress $wordpress, string $route): self
