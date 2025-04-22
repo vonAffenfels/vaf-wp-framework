@@ -3,6 +3,7 @@
 namespace VAF\WP\Framework\RestAPI;
 
 use Closure;
+use ReflectionClass;
 use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
 
