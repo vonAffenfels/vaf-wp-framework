@@ -4,6 +4,9 @@ namespace VAF\WP\Framework\Setting;
 
 use VAF\WP\Framework\BaseWordpress;
 
+/**
+ * @template T
+ */
 abstract class Setting
 {
     private bool $loaded = false;
@@ -69,6 +72,10 @@ abstract class Setting
         }
     }
 
+    /**
+     * @param ...$args
+     * @return mixed|Setting|null|T
+     */
     final public function __invoke(...$args)
     {
         if (count($args) === 1) {
