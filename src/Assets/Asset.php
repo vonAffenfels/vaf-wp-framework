@@ -53,4 +53,14 @@ class Asset
             ver: $this->hash
         );
     }
+
+    public function withExtraDependency(string $extraDependency): self
+    {
+        return new Asset(
+            $this->name,
+            $this->path,
+            $this->hash,
+            [...$this->dependencies, $extraDependency],
+        );
+    }
 }
