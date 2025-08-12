@@ -8,5 +8,9 @@ directory for a good start.
 ## Table of Contents
 
 - [Bulk Edit](./docs/BulkEdit.md)
+- [Custom Column](./docs/CustomColumn.md)
 - [Dynamic Blocks](./docs/DynamicBlocks.md)
+- [Facade](./docs/Facade.md)
 - [Metabox](./docs/Metabox.md)
+- [Quick Edit](./docs/QuickEdit.md)
+- [REST API](./docs/RestApi.md)
