@@ -34,6 +34,9 @@ use VAF\WP\Framework\QuickEdit\Loader as QuickeditLoader;
 use VAF\WP\Framework\QuickEdit\LoaderCompilerPass as QuickeditLoaderCompilerPass;
 use VAF\WP\Framework\CustomColumn\Loader as CustomColumnLoader;
 use VAF\WP\Framework\CustomColumn\LoaderCompilerPass as CustomColumnLoaderCompilerPass;
+use VAF\WP\Framework\Facade\Attribute\AsFacade;
+use VAF\WP\Framework\Facade\Loader as FacadeLoader;
+use VAF\WP\Framework\Facade\LoaderCompilerPass as FacadeLoaderCompilerPass;
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
 use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
 use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
@@ -85,6 +88,10 @@ abstract class WordpressKernel extends Kernel
 
     protected function bootHandler(): void
     {
+        /** @var FacadeLoader $facadeLoader */
+        $facadeLoader = $this->getContainer()->get('facade.loader');
+        $facadeLoader->registerFacades();
+
         /** @var HookLoader $hookLoader */
         $hookLoader = $this->getContainer()->get('hook.loader');
         $hookLoader->registerHooks();
@@ -167,6 +174,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerTemplateRenderer($builder);
         $this->registerTemplate($builder);
 
+        $this->registerFacadeContainer($builder);
         $this->registerHookContainer($builder);
         $this->registerMetaboxContainer($builder);
         $this->registerBulkeditContainer($builder);
@@ -568,6 +576,24 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $definition
             ): void {
                 $definition->addTag('restapi.container');
+            }
+        );
+    }
+
+    private function registerFacadeContainer(ContainerBuilder $builder): void
+    {
+        $builder->register('facade.loader', FacadeLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new FacadeLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsFacade::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('facade.container');
             }
         );
     }

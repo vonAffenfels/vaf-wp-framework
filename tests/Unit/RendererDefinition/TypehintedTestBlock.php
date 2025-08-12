@@ -13,5 +13,4 @@ class TypehintedTestBlock
 
         return '';
     }
-
 }

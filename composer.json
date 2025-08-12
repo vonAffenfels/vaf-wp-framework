@@ -52,7 +52,7 @@
       "phpcs --standard=PSR12 src ; phpcs --standard=tests/.codestyle.xml --extensions=php tests"
     ],
     "fixstyle": [
-      "phpcbf --standard=PSR12 --extensions=php app ; phpcbf --standard=tests/.codestyle.xml --extensions=php tests"
+      "phpcbf --standard=PSR12 --extensions=php src ; phpcbf --standard=tests/.codestyle.xml --extensions=php tests"
     ]
   },
   "require": {

@@ -13,5 +13,4 @@ class TestCase extends MockeryTestCase
         parent::setUp();
         Filter::resetFake();
     }
-
 }

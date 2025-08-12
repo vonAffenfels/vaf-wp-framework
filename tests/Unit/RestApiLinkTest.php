@@ -8,7 +8,7 @@ beforeEach(function () {
     $this->base = TestBase::forName('plugin-name');
 });
 
-describe('namespace', function() {
+describe('namespace', function () {
 
     it('should start with plugin name', function () {
         $link = RestApiLink::forNamespacePluginRoute('', $this->base, '');
@@ -27,10 +27,9 @@ describe('namespace', function() {
 
         expect($link->namespace())->toBe('plugin-name/expected-namespace');
     });
-
 });
 
-describe('route', function() {
+describe('route', function () {
 
     it('should start with slash', function () {
         $link = RestApiLink::forNamespacePluginRoute('', $this->base, 'expected-route');
@@ -43,10 +42,9 @@ describe('route', function() {
 
         expect($link->uri())->toBe('/expected-route');
     });
-
 });
 
-describe('publicUrl', function() {
+describe('publicUrl', function () {
 
     it('should return wordpress rest_url return value', function () {
         $link = RestApiLink::forNamespacePluginRoute('', $this->base, 'expected-route');
@@ -59,13 +57,11 @@ describe('publicUrl', function() {
 
         $link = RestApiLink::forNamespacePluginRoute('expected-namespace', $this->base, 'expected-route');
 
-        $link->withFakeWordpressCall(function($passedParameter) use (&$actualParameter) {
+        $link->withFakeWordpressCall(function ($passedParameter) use (&$actualParameter) {
             $actualParameter = $passedParameter;
             return '';
         })->publicUrl();
 
         expect($actualParameter)->toBe($link->namespace().$link->uri());
     });
-
 });
-

@@ -9,11 +9,10 @@ class TestAttributes
 
     public static function fromBlockAttributes($blockAttributes): self
     {
-    	$testAttributes = new static();
+        $testAttributes = new static();
 
         $testAttributes->test = $blockAttributes['test'] ?? 'not set';
 
-    	return $testAttributes;
+        return $testAttributes;
     }
-
 }

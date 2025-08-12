@@ -7,7 +7,6 @@ use VAF\WP\FrameworkTests\Unit\RendererDefinition\PlainTestBlock;
 use VAF\WP\FrameworkTests\Unit\RendererDefinition\TestAttributes;
 use VAF\WP\FrameworkTests\Unit\RendererDefinition\TypehintedTestBlock;
 
-
 test('should create typehinted renderer for typehinted test block', function () {
     $definition = RendererDefinition::fromClassReflection(new ReflectionClass(TypehintedTestBlock::class))->definition();
 
