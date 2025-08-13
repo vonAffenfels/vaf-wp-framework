@@ -37,6 +37,7 @@ use VAF\WP\Framework\CustomColumn\LoaderCompilerPass as CustomColumnLoaderCompil
 use VAF\WP\Framework\Facade\Attribute\AsFacade;
 use VAF\WP\Framework\Facade\Loader as FacadeLoader;
 use VAF\WP\Framework\Facade\LoaderCompilerPass as FacadeLoaderCompilerPass;
+use VAF\WP\Framework\Paths\Paths;
 use VAF\WP\Framework\PostObjects\Attributes\PostType;
 use VAF\WP\Framework\PostObjects\Attributes\PostTypeExtension;
 use VAF\WP\Framework\PostObjects\ExtensionLoader as PostObjectExtensionLoader;
@@ -175,6 +176,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerTemplate($builder);
 
         $this->registerFacadeContainer($builder);
+        $this->registerPathsContainer($builder);
         $this->registerHookContainer($builder);
         $this->registerMetaboxContainer($builder);
         $this->registerBulkeditContainer($builder);
@@ -596,6 +598,15 @@ abstract class WordpressKernel extends Kernel
                 $definition->addTag('facade.container');
             }
         );
+    }
+
+    private function registerPathsContainer(ContainerBuilder $builder): void
+    {
+        $builder->register(Paths::class, Paths::class)
+            ->setArgument('$basePath', $this->base->getPath())
+            ->setArgument('$baseUrl', $this->base->getUrl())
+            ->setPublic(true)
+            ->setAutowired(false);
     }
 
 }

@@ -12,5 +12,6 @@ directory for a good start.
 - [Dynamic Blocks](./docs/DynamicBlocks.md)
 - [Facade](./docs/Facade.md)
 - [Metabox](./docs/Metabox.md)
+- [Paths](./docs/Paths.md)
 - [Quick Edit](./docs/QuickEdit.md)
 - [REST API](./docs/RestApi.md)
