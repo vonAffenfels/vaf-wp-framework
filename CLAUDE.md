@@ -9,7 +9,7 @@ This is the vonAffenfels WordPress Framework - a PHP framework that simplifies W
 ## Development Commands
 
 ### Testing
-- Run all tests: `composer test` or `phpunit`
+- Run all tests: `composer test` or `./vendor/bin/pest`
 - Run specific test file: `./vendor/bin/pest tests/Unit/ExampleTest.php`
 - The framework uses Pest PHP testing framework
 
@@ -68,6 +68,12 @@ The framework is built around a Symfony-based kernel system that provides depend
    - Automatic class aliasing for clean syntax
    - Cache resolved instances for performance
 
+7. **Testing System** (`src/Wordpress/`)
+   - `Wordpress` wrapper class for mocking WordPress global functions
+   - Enables testable code without loading WordPress environment
+   - Uses `__callStatic` magic method to proxy function calls
+   - Provides `fake()`, `resetFake()`, `mock()` methods for easy mocking
+
 ## Key Development Patterns
 
 1. **Service Registration**: Services are registered using Symfony DI container with attribute-based autoconfiguration
@@ -76,6 +82,7 @@ The framework is built around a Symfony-based kernel system that provides depend
 4. **Admin AJAX**: Admin AJAX actions are registered via attributes and handled through a unified loader
 5. **Settings**: Framework provides a `Setting` base class with conversion support for handling WordPress options
 6. **Facades**: Use `#[AsFacade(ServiceClass::class)]` attribute on facade classes extending `Facade` for static access to services
+7. **Testing**: Use `Wordpress::function_name()` instead of direct WordPress function calls to enable mocking in tests
 
 ### Facade Usage Example
 
@@ -105,6 +112,28 @@ $user = UserServiceFacade::getUser(123);
 ```
 
 The facade will automatically resolve `UserService` from the container with all its dependencies when first accessed.
+
+### Testing WordPress Functions Example
+
+```php
+// Instead of direct WordPress function calls (untestable):
+if (is_admin()) {
+    add_action('admin_init', $callback);
+}
+
+// Use the Wordpress wrapper (testable):
+use VAF\WP\Framework\Wordpress\Wordpress;
+
+if (Wordpress::is_admin()) {
+    Wordpress::add_action('admin_init', $callback);
+}
+
+// In tests:
+Wordpress::fake();
+Wordpress::mock()->shouldReceive('is_admin')->andReturn(true);
+```
+
+The wrapper automatically forwards calls to WordPress functions in production but allows easy mocking during testing.
 
 ## Entry Points
 

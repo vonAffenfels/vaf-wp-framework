@@ -1,7 +1,7 @@
 <?php
 
 uses(\VAF\WP\FrameworkTests\TestCase::class);
-use VAF\WP\Framework\Testing\Wordpress;
+use VAF\WP\Framework\Wordpress\Wordpress;
 
 beforeEach(function () {
     Wordpress::resetFake();

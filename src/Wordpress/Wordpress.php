@@ -1,6 +1,6 @@
 <?php
 
-namespace VAF\WP\Framework\Testing;
+namespace VAF\WP\Framework\Wordpress;
 
 class Wordpress
 {

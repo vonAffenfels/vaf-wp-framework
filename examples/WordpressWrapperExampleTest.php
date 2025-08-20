@@ -5,7 +5,7 @@
  */
 
 uses(\VAF\WP\FrameworkTests\TestCase::class);
-use VAF\WP\Framework\Testing\Wordpress;
+use VAF\WP\Framework\Wordpress\Wordpress;
 
 // Include the example class for testing
 require_once __DIR__ . '/WordpressWrapperExample.php';

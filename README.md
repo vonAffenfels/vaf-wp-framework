@@ -15,3 +15,4 @@ directory for a good start.
 - [Paths](./docs/Paths.md)
 - [Quick Edit](./docs/QuickEdit.md)
 - [REST API](./docs/RestApi.md)
+- [Testing](./docs/testing.md)

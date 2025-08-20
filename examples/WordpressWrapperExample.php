@@ -5,7 +5,7 @@
  * for better testability
  */
 
-use VAF\WP\Framework\Testing\Wordpress;
+use VAF\WP\Framework\Wordpress\Wordpress;
 
 class PluginManager
 {

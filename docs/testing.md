@@ -13,7 +13,7 @@ WordPress provides its functionality through global functions like `is_admin()`,
 
 ## The Solution: Wordpress Wrapper Class
 
-The framework provides a `Wordpress` class in `VAF\WP\Framework\Testing\Wordpress` that acts as a proxy to WordPress global functions. This enables easy mocking and testing without requiring WordPress to be loaded.
+The framework provides a `Wordpress` class in `VAF\WP\Framework\Wordpress\Wordpress` that acts as a proxy to WordPress global functions. This enables easy mocking and testing without requiring WordPress to be loaded.
 
 ### How It Works
 
@@ -26,7 +26,7 @@ if (is_admin()) {
 }
 
 // Use the Wordpress wrapper:
-use VAF\WP\Framework\Testing\Wordpress;
+use VAF\WP\Framework\Wordpress\Wordpress;
 
 if (Wordpress::is_admin()) {
     Wordpress::add_action('admin_init', $callback);
@@ -205,7 +205,7 @@ class UserService
 ### After (Testable)
 
 ```php
-use VAF\WP\Framework\Testing\Wordpress;
+use VAF\WP\Framework\Wordpress\Wordpress;
 
 class UserService
 {
