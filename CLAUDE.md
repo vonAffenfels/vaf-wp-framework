@@ -81,6 +81,9 @@ The framework is built around a Symfony-based kernel system that provides depend
 3. **Template Rendering**: Use `TemplateRenderer` service to render templates with proper context
 4. **Admin AJAX**: Admin AJAX actions are registered via attributes and handled through a unified loader
 5. **Settings**: Framework provides a `Setting` base class with conversion support for handling WordPress options
+   - Uses `Wordpress` wrapper class for all WordPress function calls (get_option, update_option)
+   - Provides built-in fake system for high-level testing with `Setting::fakeSetting()` and `Setting::clearFakes()`
+   - Supports conversions between database and application formats
 6. **Facades**: Use `#[AsFacade(ServiceClass::class)]` attribute on facade classes extending `Facade` for static access to services
 7. **Testing**: Use `Wordpress::function_name()` instead of direct WordPress function calls to enable mocking in tests
 
@@ -135,6 +138,31 @@ Wordpress::mock()->shouldReceive('is_admin')->andReturn(true);
 
 The wrapper automatically forwards calls to WordPress functions in production but allows easy mocking during testing.
 
+### Settings Testing Example
+
+The Settings system provides two complementary testing approaches:
+
+```php
+// 1. High-level testing with Setting fakes (easy for simple scenarios):
+Setting::fakeSetting('my_option', 'fake_value');
+$setting = new MySetting('my_option', 'plugin_name');
+expect($setting->getValue())->toBe('fake_value');
+
+// 2. Lower-level WordPress function mocking (for integration testing):
+Wordpress::fake();
+Wordpress::mock()->shouldReceive('get_option')
+    ->with('plugin_name_my_option', 'default')
+    ->andReturn('db_value');
+$setting = new MySetting('my_option', 'plugin_name', 'default');
+expect($setting->getValue())->toBe('db_value');
+
+// Always clean up in tests:
+beforeEach(function () {
+    Setting::clearFakes();
+    Wordpress::resetFake();
+});
+```
+
 ## Entry Points
 
 - Plugins extend `Plugin` class and call `Plugin::registerPlugin($file)` 
@@ -146,3 +174,13 @@ The wrapper automatically forwards calls to WordPress functions in production bu
 - When writing a new system add a new docs/{system name}.md file similar to the files already in the docs directory and
   add a link to this file in the README.md
 - When changing an existing system, update the corresponding docs/{system name}.md file
+
+## Testing Best Practices
+
+- **Always use the Wordpress wrapper class** for WordPress functions to ensure testability
+- **Follow TDD cycle**: Write test first (red), implement functionality (green), then refactor
+- **Use appropriate testing level**: 
+  - Setting fakes for high-level behavior testing
+  - Wordpress mocks for WordPress integration testing
+- **Clean up after tests**: Always reset fakes and mocks in beforeEach/afterEach hooks
+- **Mock at the right level**: Don't over-mock; use the simplest approach that tests your code properly

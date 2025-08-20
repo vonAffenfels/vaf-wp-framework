@@ -2,6 +2,8 @@
 
 namespace VAF\WP\Framework\Setting;
 
+use VAF\WP\Framework\Wordpress\Wordpress;
+
 /**
  * @template T
  */
@@ -30,19 +32,16 @@ abstract class Setting
     protected function get(?string $key = null)
     {
         // Check if this setting is faked
-        if (isset(self::$fakes[$this->name])) {
-            $fakeValue = self::$fakes[$this->name];
-            if (is_null($key)) {
-                return $fakeValue;
-            }
-            // For keyed access, check if key exists in fake, otherwise fall back to default
-            return $fakeValue[$key] ?? (is_array($this->default) && isset($this->default[$key]) ? $this->default[$key] : null);
+        if (isset(self::$fakes[$this->name]) && !$this->loaded) {
+            // Treat the fake value as a database value and apply fromDb conversion
+            $this->value = ($this->conversion()->fromDb)(self::$fakes[$this->name]);
+            $this->loaded = true;
         }
 
         $this->migrateIfNecessary();
 
         if (!$this->loaded) {
-            $this->value = ($this->conversion()->fromDb)(get_option($this->getOptionName(), $this->default));
+            $this->value = ($this->conversion()->fromDb)(Wordpress::get_option($this->getOptionName(), $this->default));
 
             $this->loaded = true;
         }
@@ -52,9 +51,9 @@ abstract class Setting
 
     protected function set($value, ?string $key = null, bool $doSave = true): self
     {
-        // If faked, load the fake value first
+        // If faked, load the fake value first with conversion
         if (isset(self::$fakes[$this->name]) && !$this->loaded) {
-            $this->value = self::$fakes[$this->name];
+            $this->value = ($this->conversion()->fromDb)(self::$fakes[$this->name]);
             $this->loaded = true;
         }
 
@@ -82,15 +81,15 @@ abstract class Setting
 
     final public function save(): void
     {
-        // If this setting is faked, update the fake value instead
+        // If this setting is faked, update the fake value with toDb conversion
         if (isset(self::$fakes[$this->name])) {
-            self::$fakes[$this->name] = $this->value;
+            self::$fakes[$this->name] = ($this->conversion()->toDb)($this->value);
             $this->dirty = false;
             return;
         }
 
         if ($this->dirty) {
-            update_option($this->getOptionName(), ($this->conversion()->toDb)($this->value));
+            Wordpress::update_option($this->getOptionName(), ($this->conversion()->toDb)($this->value));
             $this->dirty = false;
         }
     }
@@ -139,9 +138,11 @@ abstract class Setting
     /**
      * Fake a setting value for testing purposes.
      * The fake will be used instead of calling WordPress functions.
+     * The value should be in database format (as it would be stored in WordPress options table).
+     * It will be converted using fromDb when retrieved and toDb when saved.
      *
      * @param string $settingName The setting name (without prefix)
-     * @param mixed $value The fake value to use
+     * @param mixed $value The fake value in database format
      */
     public static function fakeSetting(string $settingName, mixed $value): void
     {

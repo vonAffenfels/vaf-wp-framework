@@ -7,14 +7,14 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final class Metabox
 {
-    const PRIORITY_HIGH = 'high';
-    const PRIORITY_CORE = 'core';
-    const PRIORITY_DEFAULT = 'default';
-    const PRIORITY_LOW = 'low';
+    public const PRIORITY_HIGH = 'high';
+    public const PRIORITY_CORE = 'core';
+    public const PRIORITY_DEFAULT = 'default';
+    public const PRIORITY_LOW = 'low';
 
-    const CONTEXT_NORMAL = 'normal';
-    const CONTEXT_SIDE = 'side';
-    const CONTEXT_ADVANCED = 'advanced';
+    public const CONTEXT_NORMAL = 'normal';
+    public const CONTEXT_SIDE = 'side';
+    public const CONTEXT_ADVANCED = 'advanced';
 
     public function __construct(
         public readonly string $title,

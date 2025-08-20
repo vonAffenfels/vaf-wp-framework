@@ -1,8 +1,5 @@
 <?php
 
-// Include bootstrap file for WordPress function mocks
-require_once __DIR__ . '/bootstrap.php';
-
 /*
 |--------------------------------------------------------------------------
 | Test Case
