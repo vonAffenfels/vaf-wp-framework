@@ -2,8 +2,6 @@
 
 namespace VAF\WP\Framework\Setting;
 
-use VAF\WP\Framework\BaseWordpress;
-
 /**
  * @template T
  */
@@ -15,20 +13,32 @@ abstract class Setting
 
     private bool $dirty = false;
 
+    private static array $fakes = [];
+
     public function __construct(
         private readonly string $name,
-        private readonly BaseWordpress $base,
+        private readonly string $baseName,
         protected readonly mixed $default = null
     ) {
     }
 
     private function getOptionName(): string
     {
-        return $this->base->getName() . '_' . $this->name;
+        return $this->baseName . '_' . $this->name;
     }
 
     protected function get(?string $key = null)
     {
+        // Check if this setting is faked
+        if (isset(self::$fakes[$this->name])) {
+            $fakeValue = self::$fakes[$this->name];
+            if (is_null($key)) {
+                return $fakeValue;
+            }
+            // For keyed access, check if key exists in fake, otherwise fall back to default
+            return $fakeValue[$key] ?? (is_array($this->default) && isset($this->default[$key]) ? $this->default[$key] : null);
+        }
+
         $this->migrateIfNecessary();
 
         if (!$this->loaded) {
@@ -42,6 +52,12 @@ abstract class Setting
 
     protected function set($value, ?string $key = null, bool $doSave = true): self
     {
+        // If faked, load the fake value first
+        if (isset(self::$fakes[$this->name]) && !$this->loaded) {
+            $this->value = self::$fakes[$this->name];
+            $this->loaded = true;
+        }
+
         $convertedValue = fn() => $this->conversion()->fromInput !== null
             ? ($this->conversion()->fromInput)($value)
             : $value;
@@ -66,6 +82,13 @@ abstract class Setting
 
     final public function save(): void
     {
+        // If this setting is faked, update the fake value instead
+        if (isset(self::$fakes[$this->name])) {
+            self::$fakes[$this->name] = $this->value;
+            $this->dirty = false;
+            return;
+        }
+
         if ($this->dirty) {
             update_option($this->getOptionName(), ($this->conversion()->toDb)($this->value));
             $this->dirty = false;
@@ -111,5 +134,36 @@ abstract class Setting
     protected function conversion(): Conversion
     {
         return Conversion::identity();
+    }
+
+    /**
+     * Fake a setting value for testing purposes.
+     * The fake will be used instead of calling WordPress functions.
+     *
+     * @param string $settingName The setting name (without prefix)
+     * @param mixed $value The fake value to use
+     */
+    public static function fakeSetting(string $settingName, mixed $value): void
+    {
+        self::$fakes[$settingName] = $value;
+    }
+
+    /**
+     * Clear all fake settings.
+     */
+    public static function clearFakes(): void
+    {
+        self::$fakes = [];
+    }
+
+    /**
+     * Check if a setting is currently faked.
+     *
+     * @param string $settingName The setting name (without prefix)
+     * @return bool
+     */
+    public static function isFaked(string $settingName): bool
+    {
+        return isset(self::$fakes[$settingName]);
     }
 }

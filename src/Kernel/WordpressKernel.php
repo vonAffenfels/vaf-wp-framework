@@ -170,6 +170,7 @@ abstract class WordpressKernel extends Kernel
         } elseif (is_file($configDir . '/services.php')) {
             $container->import($configDir . '/services.php');
         }
+        $builder->setParameter('wordpress.base.name', $this->base->getName());
 
         $this->registerRequestService($builder);
         $this->registerTemplateRenderer($builder);

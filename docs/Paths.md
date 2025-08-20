@@ -280,9 +280,9 @@ class FileBasedSetting extends Setting
 {
     public function __construct(
         private readonly Paths $paths,
-        BaseWordpress $base
+        string $baseName
     ) {
-        parent::__construct('file_setting', $base);
+        parent::__construct('file_setting', $baseName);
     }
 
     protected function getDefaultConfigPath(): string

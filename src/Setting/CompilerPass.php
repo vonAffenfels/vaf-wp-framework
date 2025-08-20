@@ -26,6 +26,8 @@ final class CompilerPass implements CompilerPassInterface
             $attrInstance = $attributes[0]->newInstance();
 
             $definition->setArgument('$name', $attrInstance->name);
+            // Inject the base name from container parameter instead of BaseWordpress instance
+            $definition->setArgument('$baseName', '%wordpress.base.name%');
             $definition->setArgument('$default', $attrInstance->default);
         }
     }
