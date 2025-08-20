@@ -4,16 +4,15 @@ namespace VAF\WP\Framework;
 
 class Slug
 {
-
     private string $name;
 
     public static function fromName(string $name): self
     {
-    	$slug = new static();
+        $slug = new static();
 
         $slug->name = $name;
 
-    	return $slug;
+        return $slug;
     }
 
     public function __toString(): string

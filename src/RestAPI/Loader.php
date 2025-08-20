@@ -14,10 +14,9 @@ final class Loader
 {
     public function __construct(
         private readonly WordpressKernel $kernel,
-        private readonly BaseWordpress   $base,
-        private readonly array           $restContainer
-    )
-    {
+        private readonly BaseWordpress $base,
+        private readonly array $restContainer
+    ) {
     }
 
     public function registerRestRoutes(): void
@@ -26,7 +25,6 @@ final class Loader
 
         foreach ($this->restContainer as $serviceId => $restContainer) {
             foreach ($restContainer as $restRoute) {
-
                 $params = [];
                 foreach ($restRoute['serviceParams'] as $param => $service) {
                     $params[$param] = $this->kernel->getContainer()->get($service);

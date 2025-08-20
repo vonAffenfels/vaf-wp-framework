@@ -10,7 +10,6 @@ class Migration
         public readonly Closure $migrated,
         public readonly Closure $value,
         public readonly Closure $clear,
-    )
-    {
+    ) {
     }
 }

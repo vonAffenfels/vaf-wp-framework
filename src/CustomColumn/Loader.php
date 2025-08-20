@@ -17,7 +17,6 @@ final class Loader
             foreach ($customColumnContainer as $data) {
                 $this->registerCustomColumnField($serviceId, $data);
             }
-
         }
     }
 

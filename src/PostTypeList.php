@@ -4,7 +4,6 @@ namespace VAF\WP\Framework;
 
 class PostTypeList
 {
-
     private string|array|null $postTypes;
     private ?string $feature;
     private array $supportingPostTypes = [];
@@ -34,15 +33,14 @@ class PostTypeList
             return $this->postTypes;
         }
 
-        if($this->postTypes === null && empty($this->supportingPostTypes)) {
+        if ($this->postTypes === null && empty($this->supportingPostTypes)) {
             throw new EmptySupportingPostTypesException();
         }
 
-        if($this->postTypes === null) {
+        if ($this->postTypes === null) {
             return $this->supportingPostTypes;
         }
 
         return [$this->postTypes, ...$this->supportingPostTypes];
     }
-
 }

@@ -4,7 +4,6 @@ namespace VAF\WP\Framework\Assets;
 
 class Assets
 {
-
     private array $assets;
 
     public static function fromVaV1InDirectory($directory): self

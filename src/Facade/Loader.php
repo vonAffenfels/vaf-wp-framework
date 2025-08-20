@@ -15,12 +15,12 @@ final class Loader
     public function registerFacades(): void
     {
         Facade::setKernel($this->kernel);
-        
+
         foreach ($this->facades as $facadeClass => $facadeData) {
             if (!class_exists($facadeClass)) {
                 continue;
             }
-            
+
             class_alias($facadeClass, $facadeData['alias']);
         }
     }

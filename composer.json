@@ -46,7 +46,7 @@
   },
   "scripts": {
     "test": [
-      "phpunit"
+      "pest"
     ],
     "codestyle": [
       "phpcs --standard=PSR12 src ; phpcs --standard=tests/.codestyle.xml --extensions=php tests"

@@ -6,22 +6,20 @@ use ReflectionClass;
 
 class RendererDefinition
 {
-
     private string $type;
     private string $class;
 
     public static function fromClassReflection(ReflectionClass $reflection): self
     {
-    	$rendererDefinition = new static();
+        $rendererDefinition = new static();
 
         $renderReflection = $reflection->getMethod('render');
-        if(
+        if (
             empty($renderReflection->getParameters())
             || !$renderReflection->getParameters()[0]->hasType()
             || $renderReflection->getParameters()[0]->getType()->isBuiltin()
             || !($renderReflection->getParameters()[0]->getType() instanceof \ReflectionNamedType)
         ) {
-
             $rendererDefinition->type = 'plain';
             return $rendererDefinition;
         }
@@ -30,7 +28,7 @@ class RendererDefinition
             $renderReflection->getParameters()[0]->getType()->getName()
         );
 
-        if(
+        if (
             !$attributeReflection->hasMethod('fromBlockAttributes')
             || !$attributeReflection->getMethod('fromBlockAttributes')->isStatic()
         ) {
@@ -41,23 +39,23 @@ class RendererDefinition
         $rendererDefinition->type = 'typehinted';
         $rendererDefinition->class = $attributeReflection->getName();
 
-    	return $rendererDefinition;
+        return $rendererDefinition;
     }
 
     public static function fromRendererDefinition($blockDefinition): self
     {
-    	$rendererDefinition = new static();
+        $rendererDefinition = new static();
 
         $rendererDefinition->type = $blockDefinition['type'];
         $rendererDefinition->class = $blockDefinition['class'] ?? '';
 
-    	return $rendererDefinition;
+        return $rendererDefinition;
     }
 
     public function renderer($instance): array|callable
     {
-        if($this->type === 'typehinted') {
-            return function($blockArguments, $content) use ($instance) {
+        if ($this->type === 'typehinted') {
+            return function ($blockArguments, $content) use ($instance) {
                 return $instance->render(
                     call_user_func([$this->class, 'fromBlockAttributes'], $blockArguments),
                     $content
@@ -70,7 +68,7 @@ class RendererDefinition
 
     public function definition(): array
     {
-        if($this->type === 'typehinted') {
+        if ($this->type === 'typehinted') {
             return [
                 'type' => 'typehinted',
                 'class' => $this->class,

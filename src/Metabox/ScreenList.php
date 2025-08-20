@@ -4,7 +4,6 @@ namespace VAF\WP\Framework\Metabox;
 
 class ScreenList
 {
-
     private string|array|null $screen;
     private ?string $feature;
     private array $supportedScreens = [];
@@ -34,15 +33,14 @@ class ScreenList
             return $this->screen;
         }
 
-        if($this->screen === null && empty($this->supportedScreens)) {
+        if ($this->screen === null && empty($this->supportedScreens)) {
             throw new EmptySupportingScreensException();
         }
 
-        if($this->screen === null) {
+        if ($this->screen === null) {
             return $this->supportedScreens;
         }
 
         return [$this->screen, ...$this->supportedScreens];
     }
-
 }

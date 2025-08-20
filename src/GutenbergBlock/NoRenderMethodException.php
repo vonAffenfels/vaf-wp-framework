@@ -4,7 +4,6 @@ namespace VAF\WP\Framework\GutenbergBlock;
 
 class NoRenderMethodException extends \LogicException
 {
-
     public function __construct($class)
     {
         parent::__construct(
@@ -19,5 +18,4 @@ class NoRenderMethodException extends \LogicException
             )
         );
     }
-
 }

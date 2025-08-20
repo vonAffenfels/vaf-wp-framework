@@ -102,7 +102,7 @@ class PluginSkeletonAction
         }
 
         $composerData['autoload']['psr-4'] = [
-            $namespace.'\\' => 'src/',
+            $namespace . '\\' => 'src/',
         ];
         $composerData['autoload']['classmap'] = ['vendor_prefixed'];
 

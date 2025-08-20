@@ -4,16 +4,15 @@ namespace VAF\WP\Framework;
 
 class EnvironmentVariable
 {
-
     private string $name;
 
     public static function fromName(string $name): self
     {
-    	$environmentVariable = new static();
+        $environmentVariable = new static();
 
         $environmentVariable->name = $name;
 
-    	return $environmentVariable;
+        return $environmentVariable;
     }
 
     public function boolOrNull(): ?bool
@@ -27,7 +26,7 @@ class EnvironmentVariable
 
     public function intOrNull(): ?int
     {
-        if(!getenv($this->name) && getenv($this->name) !== '0') {
+        if (!getenv($this->name) && getenv($this->name) !== '0') {
             return null;
         }
 

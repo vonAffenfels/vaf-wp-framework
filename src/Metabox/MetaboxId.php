@@ -4,7 +4,6 @@ namespace VAF\WP\Framework\Metabox;
 
 class MetaboxId
 {
-
     private string $class;
     private string $methodName;
 
@@ -20,7 +19,7 @@ class MetaboxId
 
     public function __toString(): string
     {
-        return strtolower($this->classWithoutPath().'_'.$this->methodName);
+        return strtolower($this->classWithoutPath() . '_' . $this->methodName);
     }
 
     private function classWithoutPath(): string

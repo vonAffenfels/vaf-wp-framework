@@ -13,5 +13,4 @@ final class CustomColumn
         public readonly string|null $supporting = null,
     ) {
     }
-
 }

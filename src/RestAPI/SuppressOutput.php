@@ -4,21 +4,20 @@ namespace VAF\WP\Framework\RestAPI;
 
 class SuppressOutput
 {
-
     private bool $enabled;
 
     public static function enabled(bool $enabled): self
     {
-    	$suppressOutput = new static();
+        $suppressOutput = new static();
 
         $suppressOutput->enabled = $enabled;
 
-    	return $suppressOutput;
+        return $suppressOutput;
     }
 
     public function start(): void
     {
-        if(!$this->enabled) {
+        if (!$this->enabled) {
             return;
         }
 
@@ -27,7 +26,7 @@ class SuppressOutput
 
     public function finish(): void
     {
-        if(!$this->enabled) {
+        if (!$this->enabled) {
             return;
         }
 

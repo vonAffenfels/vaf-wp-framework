@@ -25,5 +25,4 @@ final class Metabox
         public readonly string $priority = self::PRIORITY_DEFAULT,
     ) {
     }
-
 }

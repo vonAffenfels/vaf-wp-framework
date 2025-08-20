@@ -15,11 +15,10 @@ final class Loader
         foreach ($this->dynamicBlocks as $dynamicBlock) {
             $instance = $this->kernel->getContainer()->get($dynamicBlock['class']);
 
-            register_block_type( $dynamicBlock['type'], [
+            register_block_type($dynamicBlock['type'], [
                 ...$dynamicBlock['options'],
                 'render_callback' => RendererDefinition::fromRendererDefinition($dynamicBlock['renderer'])->renderer($instance),
             ]);
         }
     }
-
 }

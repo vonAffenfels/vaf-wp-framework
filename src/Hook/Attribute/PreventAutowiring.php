@@ -7,5 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 final class PreventAutowiring
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }

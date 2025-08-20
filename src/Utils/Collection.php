@@ -8,11 +8,11 @@ class Collection
 
     public static function make(array $data = []): self
     {
-    	$collection = new static();
+        $collection = new static();
 
         $collection->data = $data;
 
-    	return $collection;
+        return $collection;
     }
 
     public function doesNotContain(callable $callback): bool
@@ -22,8 +22,8 @@ class Collection
 
     public function contains(callable $callback): bool
     {
-        foreach($this->data as $entry) {
-            if($callback($entry)) {
+        foreach ($this->data as $entry) {
+            if ($callback($entry)) {
                 return true;
             }
         }

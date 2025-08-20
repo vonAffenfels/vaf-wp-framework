@@ -17,7 +17,6 @@ final class Loader
             foreach ($quickeditContainer as $data) {
                 $this->registerQuickEditField($serviceId, $data);
             }
-
         }
     }
 

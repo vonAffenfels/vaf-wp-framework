@@ -32,11 +32,11 @@ final class LoaderCompilerPass implements CompilerPassInterface
     private function getDynamicBlockDefinition(string $class, ContainerBuilder $container): array
     {
         $reflection = new ReflectionClass($class);
-        if(!$reflection->hasMethod('render')) {
+        if (!$reflection->hasMethod('render')) {
             throw new NoRenderMethodException($class);
         }
 
-        if( empty($reflection->getAttributes(AsDynamicBlock::class)) ) {
+        if (empty($reflection->getAttributes(AsDynamicBlock::class))) {
             throw new LogicException("DynamicBlock without AsDynamicBlock Attribute - should be impossible");
         }
 
@@ -52,5 +52,4 @@ final class LoaderCompilerPass implements CompilerPassInterface
             ]
         ];
     }
-
 }

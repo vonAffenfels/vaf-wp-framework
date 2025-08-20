@@ -6,7 +6,6 @@ use VAF\WP\Framework\Plugin;
 
 class Asset
 {
-
     public static function fromVaV1($name, array $assetDefinition, array $dependencies): self
     {
         $asset = new static(

@@ -9,7 +9,6 @@ use VAF\WP\Framework\RestAPI\Attribute\AsRestContainer;
 
 class RestApiLink
 {
-
     private string $route;
     private string $namespace;
     private Closure $askWordpress;
@@ -33,7 +32,7 @@ class RestApiLink
                 empty($namespace) => '',
                 !empty($namespace) && str_starts_with($namespace, '/') => $namespace,
                 !empty($namespace) && !str_starts_with($namespace, '/') => '/' . $namespace,
-            };
+        };
         $restApiLink->route = str_starts_with($route, '/') ? $route : ('/' . $route);
 
         return $restApiLink;

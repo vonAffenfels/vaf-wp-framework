@@ -17,7 +17,6 @@ final class Loader
             foreach ($bulkeditContainer as $data) {
                 $this->registerBulkEditField($serviceId, $data);
             }
-
         }
     }
 

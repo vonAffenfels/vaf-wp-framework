@@ -42,10 +42,9 @@ abstract class Kernel
 
     public function __construct(
         protected readonly string $projectDir,
-        protected readonly bool   $debug,
+        protected readonly bool $debug,
         protected readonly string $namespace
-    )
-    {
+    ) {
     }
 
     private function __clone()
@@ -90,8 +89,8 @@ abstract class Kernel
 
     abstract protected function configureContainer(
         ContainerConfigurator $container,
-        LoaderInterface       $loader,
-        ContainerBuilder      $builder
+        LoaderInterface $loader,
+        ContainerBuilder $builder
     ): void;
 
     /**

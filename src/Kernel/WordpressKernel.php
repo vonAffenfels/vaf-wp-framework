@@ -609,5 +609,4 @@ abstract class WordpressKernel extends Kernel
             ->setPublic(true)
             ->setAutowired(false);
     }
-
 }

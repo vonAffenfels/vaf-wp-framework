@@ -4,7 +4,6 @@ namespace VAF\WP\Framework\Permalink;
 
 class Permalink
 {
-
     static ?PermalinkResolver $permalinkResolver = null;
     private int $postId;
 
@@ -20,11 +19,11 @@ class Permalink
 
     public static function fromPostId(int $postId): self
     {
-    	$permalink = new static();
+        $permalink = new static();
 
         $permalink->postId = $postId;
 
-    	return $permalink;
+        return $permalink;
     }
 
     public function __toString(): string
@@ -34,11 +33,10 @@ class Permalink
 
     private static function resolver(): PermalinkResolver
     {
-        if(self::$permalinkResolver === null) {
+        if (self::$permalinkResolver === null) {
             self::$permalinkResolver = new PermalinkResolver();
         }
 
         return self::$permalinkResolver;
     }
-
 }

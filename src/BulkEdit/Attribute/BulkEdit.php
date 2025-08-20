@@ -13,5 +13,4 @@ final class BulkEdit
         public readonly string|null $supporting = null,
     ) {
     }
-
 }

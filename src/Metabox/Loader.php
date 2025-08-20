@@ -14,7 +14,6 @@ final class Loader
     {
         foreach ($this->metaboxContainer as $serviceId => $metaboxContainer) {
             foreach ($metaboxContainer as $data) {
-
                 add_action('add_meta_boxes', function () use ($data, $serviceId) {
                     $methodName = $data['method'];
 

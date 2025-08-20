@@ -52,7 +52,7 @@ final class LoaderCompilerPass implements CompilerPassInterface
 
                 $data[] = [
                     'method' => $methodName,
-                    'name' => Slug::fromName($instance->title).'-custom',
+                    'name' => Slug::fromName($instance->title) . '-custom',
                     'title' => $instance->title,
                     'postTypes' => $instance->postTypes,
                     'supporting' => $instance->supporting,

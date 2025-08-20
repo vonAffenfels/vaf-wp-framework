@@ -79,7 +79,6 @@ final class PHPScoperConfigGenerator
                 );
             }
         );
-
     }
 
     public function ignorePackage(string $package): void
@@ -246,5 +245,4 @@ final class PHPScoperConfigGenerator
             $content
         );
     }
-
 }

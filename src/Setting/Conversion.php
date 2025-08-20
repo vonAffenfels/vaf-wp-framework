@@ -6,13 +6,11 @@ use Closure;
 
 class Conversion
 {
-
     public function __construct(
         public readonly Closure $fromDb,
         public readonly Closure $toDb,
         public readonly ?Closure $fromInput = null,
-    )
-    {
+    ) {
     }
 
     public static function identity(): self

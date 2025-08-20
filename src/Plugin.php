@@ -35,8 +35,7 @@ abstract class Plugin extends BaseWordpress
      */
     final public static function buildContainer(): void
     {
-        if (!self::pluginVendorExists())
-        {
+        if (!self::pluginVendorExists()) {
             die('Please run "composer install" to ensure all dependencies are installed.' . PHP_EOL);
         }
 

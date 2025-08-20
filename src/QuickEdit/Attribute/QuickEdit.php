@@ -13,5 +13,4 @@ final class QuickEdit
         public readonly string|null $supporting = null,
     ) {
     }
-
 }
