@@ -84,6 +84,7 @@ The framework is built around a Symfony-based kernel system that provides depend
    - Uses `Wordpress` wrapper class for all WordPress function calls (get_option, update_option)
    - Provides built-in fake system for high-level testing with `Setting::fakeSetting()` and `Setting::clearFakes()`
    - Supports conversions between database and application formats
+   - Fake values are treated as database values and go through the same conversion pipeline
 6. **Facades**: Use `#[AsFacade(ServiceClass::class)]` attribute on facade classes extending `Facade` for static access to services
 7. **Testing**: Use `Wordpress::function_name()` instead of direct WordPress function calls to enable mocking in tests
 
@@ -144,9 +145,16 @@ The Settings system provides two complementary testing approaches:
 
 ```php
 // 1. High-level testing with Setting fakes (easy for simple scenarios):
-Setting::fakeSetting('my_option', 'fake_value');
+// IMPORTANT: Fake values should be in DATABASE FORMAT (as stored in WordPress)
+// They will be converted using fromDb when retrieved and toDb when saved
+Setting::fakeSetting('my_option', 'fake_value'); // String as stored in DB
 $setting = new MySetting('my_option', 'plugin_name');
 expect($setting->getValue())->toBe('fake_value');
+
+// For settings with conversions (e.g., JSON):
+Setting::fakeSetting('json_option', '{"key":"value"}'); // JSON string (DB format)
+$setting = new JsonSetting('json_option', 'plugin_name');
+expect($setting->getValue())->toBe(['key' => 'value']); // Converted to array
 
 // 2. Lower-level WordPress function mocking (for integration testing):
 Wordpress::fake();
@@ -161,6 +169,27 @@ beforeEach(function () {
     Setting::clearFakes();
     Wordpress::resetFake();
 });
+```
+
+#### Setting Fakes and Conversions
+
+The Setting fake system respects conversion functions, treating faked values as database values:
+
+- **When faking**: Provide the value in database format (e.g., JSON string, 'true'/'false' for booleans)
+- **When getting**: The `fromDb` conversion is applied to the faked value
+- **When saving**: The `toDb` conversion is applied before updating the fake
+- This ensures conversion logic is tested even when using fakes
+
+Example with boolean conversion:
+```php
+// Fake with database format string
+Setting::fakeSetting('bool_setting', 'true'); // Database stores as string
+
+$setting = new BooleanSetting('bool_setting', 'plugin');
+expect($setting->getValue())->toBe(true); // Converted to boolean
+
+$setting->setValue(false);
+// Fake is now 'false' (string) after toDb conversion
 ```
 
 ## Entry Points
