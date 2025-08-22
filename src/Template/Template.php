@@ -7,14 +7,14 @@ use VAF\WP\Framework\TemplateRenderer\TemplateRenderer;
 
 abstract class Template
 {
-    final public function __construct(
+    public function __construct(
         private readonly BaseWordpress $base,
         private readonly TemplateRenderer $renderer,
         private readonly string $templateFile
     ) {
     }
 
-    final public function render(): string
+    public function render(): string
     {
         $jsData = $this->getJavascriptData();
         if ($jsData !== false) {
@@ -29,12 +29,12 @@ abstract class Template
         return $this->renderer->render($this->templateFile, $this->getContextData());
     }
 
-    final public function output(): void
+    public function output(): void
     {
         echo $this->render();
     }
 
-    final public function addScript(string $src, array $deps = [], array $adminAjaxActions = []): self
+    public function addScript(string $src, array $deps = [], array $adminAjaxActions = []): self
     {
         $handle = $this->base->getName() . '_' . pathinfo($src, PATHINFO_FILENAME);
         $src = $this->base->getAssetUrl($src);
