@@ -43,7 +43,8 @@ abstract class Kernel
     public function __construct(
         protected readonly string $projectDir,
         protected readonly bool $debug,
-        protected readonly string $namespace
+        protected readonly string $namespace,
+        protected readonly bool $preventAutomaticContainerCache = false
     ) {
     }
 
@@ -171,11 +172,13 @@ abstract class Kernel
             $container = $this->buildContainer();
             $container->compile();
 
-            try {
-                $this->writeCachedContainer($container);
-            } catch (RuntimeException $e) {
-                // Do nothing if directories can't be created
-                // We simply can't cache the container then
+            if (!$this->preventAutomaticContainerCache) {
+                try {
+                    $this->writeCachedContainer($container);
+                } catch (RuntimeException $e) {
+                    // Do nothing if directories can't be created
+                    // We simply can't cache the container then
+                }
             }
         }
 
