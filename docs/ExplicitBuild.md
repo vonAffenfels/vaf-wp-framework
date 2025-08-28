@@ -156,43 +156,8 @@ For each `REPOSITORY_*` environment variable:
 
 ### Complete Workflow Example
 
-Here's a complete GitHub Actions workflow for testing that cached containers are up to date:
-
-```yaml
-name: wp-plugin-conversion CachedContainerTest
-run-name: Test cached container to be up to date and working
-on: [ push ]
-jobs:
-  CachedContainer_up_to_date:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup SSH for private repos
-        env:
-          REPOSITORY_ELOQUENT: ${{ secrets.REPOSITORY_ELOQUENT }}
-        run: bash prepare-composer-for-actions.sh
-      - name: Setup PHP with PECL extension
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-      - name: composer install
-        run: composer install
-      - uses: php-actions/composer@v6
-      - name: move existing CachedContainer
-        run: mv container committed_container
-      - name: composer build-container
-        run: composer build-container
-      - name: compare built CachedContainer.php with commited CachedContainer.php
-        run: diff container/CachedContainer.php committed_container/CachedContainer.php
-      - name: Microsoft Teams Notification
-        uses: skitionek/notify-microsoft-teams@master
-        if: failure()
-        with:
-          webhook_url: ${{ vars.VONAFFENFELS_TEAMS_WEBHOOK_URL }}
-          needs: ${{ toJson(needs) }}
-          job: ${{ toJson(job) }}
-          steps: ${{ toJson(steps) }}
-```
+See [update-on-tag.yml](../examples/update-on-tag.yml) for a working example with a single private repository dependency
+saved in the `REPOSITORY_CONVERSION` github repository secret.
 
 ### Step-by-Step Setup
 

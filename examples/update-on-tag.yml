@@ -1,0 +1,124 @@
+name: Update Plugin Version and Build Container on Tag Push
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup SSH for private repos
+        run: bash prepare-composer-for-actions.sh
+        env:
+          REPOSITORY_ELOQUENT: ${{ secrets.REPOSITORY_ELOQUENT }}
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: composer install
+        run: composer install
+
+      - name: build-container
+        run: composer build-container
+
+      - name: Upload built container
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-container
+          path: container/
+          include-hidden-files: true
+
+  update-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Read plugin file path from composer.json
+        run: |
+          NAME=$(jq -r '.name' composer.json)
+          PLUGIN_NAME=${NAME#*/}
+          PLUGIN_FILE="$PLUGIN_NAME.php"
+          echo "PLUGIN_FILE=$PLUGIN_FILE" >> $GITHUB_ENV
+          echo "Plugin file path: $PLUGIN_FILE"
+
+      - name: Update plugin version in PHP file
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          ESCAPED_TAG=$(printf '%s\n' "$TAG" | sed 's/[\/&]/\\&/g')
+
+          echo "Before replacement:"
+          head -n 10 "$PLUGIN_FILE"
+
+          sed -i \
+            "s/^\(\s*\*\s*[Vv]ersion:\s*\).*/\1$ESCAPED_TAG/" \
+            "$PLUGIN_FILE"
+
+          echo "After replacement:"
+          head -n 10 "$PLUGIN_FILE"
+
+      - name: Upload updated plugin file
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-plugin
+          path: ${{ env.PLUGIN_FILE }}
+
+  combine-and-tag:
+    runs-on: ubuntu-latest
+    needs: [build-container, update-plugin]
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Read plugin file path from composer.json
+        run: |
+          NAME=$(jq -r '.name' composer.json)
+          PLUGIN_NAME=${NAME#*/}
+          PLUGIN_FILE="$PLUGIN_NAME.php"
+          echo "PLUGIN_FILE=$PLUGIN_FILE" >> $GITHUB_ENV
+
+      - name: Download built container
+        uses: actions/download-artifact@v4
+        with:
+          name: built-container
+          path: container/
+
+      - name: Download updated plugin file
+        uses: actions/download-artifact@v4
+        with:
+          name: updated-plugin
+          path: .
+
+      - name: Commit changes and update tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "$PLUGIN_FILE" container/
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: Build release $TAG [skip ci]"
+            echo "Updating tag $TAG to point to the new commit..."
+            git tag -f "$TAG"
+            git push --force origin "$TAG"
+          fi
