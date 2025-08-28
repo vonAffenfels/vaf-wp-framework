@@ -53,12 +53,7 @@ processed_repos=()
 
 log "Starting repository authentication setup..."
 
-# Process all REPOSITORY_* environment variables
-for var_line in $(env | grep ^REPOSITORY_); do
-    # Extract variable name and value
-    var_name=$(echo "$var_line" | cut -d'=' -f1)
-    var_value=$(echo "$var_line" | cut -d'=' -f2-)
-
+while IFS='=' read -r -d '' var_name var_value; do
     log "Processing $var_name"
 
     # Split matcher and private key at first semicolon
@@ -143,7 +138,8 @@ EOF
     # Clear the private key from environment for security
     unset "$var_name"
     log "Cleared $var_name from environment"
-done
+done < <(env -0 | grep -z '^REPOSITORY_')
+
 ls -ld ~/.ssh
 ls -l ~/.ssh
 
