@@ -391,6 +391,8 @@ ssh-keygen -t ed25519 -f ~/.ssh/deploy-key-my-private-repo -N ""
 # ~/.ssh/deploy-key-my-private-repo.pub (public key)
 ```
 
+Alternatively vault offers to create ssh keys directly in their UI.
+
 #### 3.2 Add Public Key to Repository
 
 1. Go to your private repository on GitHub
