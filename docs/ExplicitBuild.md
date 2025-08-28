@@ -5,6 +5,7 @@ the Symfony container cache is created.
 
 ## Table of Contents
 
+- [TL;DR](#tldr)
 - [Overview](#overview)
 - [Container Cache Management](#container-cache-management)
 - [Build Process](#build-process)
@@ -13,6 +14,24 @@ the Symfony container cache is created.
 - [Technical Details](#technical-details)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
+
+## TL;DR
+
+**Problem**: Framework automatically creates container cache files during development, causing unwanted cache directories and potential permission issues.
+
+**Solution**: Add `use OnlyCreateCacheExplicitlyOnBuild;` to your Plugin/Theme class to prevent automatic caching. Use GitHub Actions with `composer build-container` for production builds.
+
+**Quick Setup**:
+```php
+use VAF\WP\Framework\Plugin;
+use VAF\WP\Framework\Traits\OnlyCreateCacheExplicitlyOnBuild;
+
+class MyPlugin extends Plugin {
+    use OnlyCreateCacheExplicitlyOnBuild; // Prevents automatic cache creation
+}
+```
+
+**Result**: Clean development environment + optimized production builds via CI/CD.
 
 ## Overview
 
