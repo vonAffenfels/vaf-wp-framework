@@ -17,11 +17,14 @@ the Symfony container cache is created.
 
 ## TL;DR
 
-**Problem**: Framework automatically creates container cache files during development, causing unwanted cache directories and potential permission issues.
+**Problem**: Framework automatically creates container cache files during development, causing unwanted cache
+directories and potential permission issues.
 
-**Solution**: Add `use OnlyCreateCacheExplicitlyOnBuild;` to your Plugin/Theme class to prevent automatic caching. Use GitHub Actions with `composer build-container` for production builds.
+**Solution**: Add `use OnlyCreateCacheExplicitlyOnBuild;` to your Plugin/Theme class to prevent automatic caching. Use
+GitHub Actions with `composer build-container` for production builds.
 
 **Quick Setup**:
+
 ```php
 use VAF\WP\Framework\Plugin;
 use VAF\WP\Framework\Traits\OnlyCreateCacheExplicitlyOnBuild;
@@ -114,7 +117,8 @@ multiple private repositories.
 
 ### Automated Solution
 
-We've implemented an automated solution using the `prepare-composer-for-actions.sh` script that:
+We've implemented an automated solution using
+the [prepare-composer-for-actions.sh](../examples/prepare-composer-for-actions.sh) script that:
 
 1. **Parses environment variables** in format: `REPOSITORY_NAME="matcher;private_key"`
 2. **Automatically detects git hostnames** from repository URLs in composer.json
