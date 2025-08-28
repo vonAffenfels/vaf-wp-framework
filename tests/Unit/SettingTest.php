@@ -212,15 +212,18 @@ describe('Fake conversion behavior', function () {
     it('applies boolean conversion with fakes', function () {
         // Create a boolean conversion setting
         $booleanSetting = new class('bool_setting', 'test_plugin', false) extends Setting {
-            public function getValue(?string $key = null) {
+            public function getValue(?string $key = null)
+            {
                 return $this->get($key);
             }
             
-            public function setValue($value, ?string $key = null): self {
+            public function setValue($value, ?string $key = null): self
+            {
                 return $this->set($value, $key);
             }
             
-            protected function conversion(): Conversion {
+            protected function conversion(): Conversion
+            {
                 return Conversion::boolean();
             }
         };

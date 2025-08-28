@@ -4,36 +4,36 @@ namespace VAF\WP\Framework\Wordpress;
 
 /**
  * WordPress function wrapper for improved testability
- * 
+ *
  * This class provides a testable wrapper around WordPress global functions.
  * It allows you to mock WordPress functions in tests while transparently
  * forwarding calls to the actual WordPress functions in production.
- * 
+ *
  * Usage in production code:
  * ```php
  * use VAF\WP\Framework\Wordpress\Wordpress;
- * 
+ *
  * // Instead of: if (is_admin()) { ... }
  * if (Wordpress::is_admin()) { ... }
  * ```
- * 
+ *
  * Usage in tests:
  * ```php
  * Wordpress::fake();
  * Wordpress::mock()->shouldReceive('is_admin')->andReturn(true);
  * ```
- * 
+ *
  * Note: The @method annotations below provide IDE autocomplete support.
  * For full parameter documentation, refer to the WordPress Developer Reference.
- * 
+ *
  * @see https://developer.wordpress.org/reference/functions/
- * 
+ *
  * Core Functions - Options API
  * @method static mixed get_option(string $option, mixed $default_value = false) @see https://developer.wordpress.org/reference/functions/get_option/
  * @method static bool update_option(string $option, mixed $value, bool $autoload = null) @see https://developer.wordpress.org/reference/functions/update_option/
  * @method static bool delete_option(string $option) @see https://developer.wordpress.org/reference/functions/delete_option/
  * @method static bool add_option(string $option, mixed $value = '', string $deprecated = '', bool $autoload = 'yes') @see https://developer.wordpress.org/reference/functions/add_option/
- * 
+ *
  * Core Functions - Hooks (Actions & Filters)
  * @method static bool add_action(string $hook_name, callable $callback, int $priority = 10, int $accepted_args = 1) @see https://developer.wordpress.org/reference/functions/add_action/
  * @method static bool remove_action(string $hook_name, callable $callback, int $priority = 10) @see https://developer.wordpress.org/reference/functions/remove_action/
@@ -47,7 +47,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static bool doing_filter(string|null $hook_name = null) @see https://developer.wordpress.org/reference/functions/doing_filter/
  * @method static int did_action(string $hook_name) @see https://developer.wordpress.org/reference/functions/did_action/
  * @method static mixed current_filter() @see https://developer.wordpress.org/reference/functions/current_filter/
- * 
+ *
  * Core Functions - Plugin Functions
  * @method static string plugin_dir_url(string $file) @see https://developer.wordpress.org/reference/functions/plugin_dir_url/
  * @method static string plugin_dir_path(string $file) @see https://developer.wordpress.org/reference/functions/plugin_dir_path/
@@ -58,7 +58,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static array get_plugin_data(string $plugin_file, bool $markup = true, bool $translate = true) @see https://developer.wordpress.org/reference/functions/get_plugin_data/
  * @method static bool is_plugin_active(string $plugin) @see https://developer.wordpress.org/reference/functions/is_plugin_active/
  * @method static bool is_plugin_inactive(string $plugin) @see https://developer.wordpress.org/reference/functions/is_plugin_inactive/
- * 
+ *
  * Core Functions - Admin & User
  * @method static bool is_admin() @see https://developer.wordpress.org/reference/functions/is_admin/
  * @method static bool is_network_admin() @see https://developer.wordpress.org/reference/functions/is_network_admin/
@@ -73,7 +73,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static string wp_registration_url() @see https://developer.wordpress.org/reference/functions/wp_registration_url/
  * @method static string wp_lostpassword_url(string $redirect = '') @see https://developer.wordpress.org/reference/functions/wp_lostpassword_url/
  * @method static void auth_redirect() @see https://developer.wordpress.org/reference/functions/auth_redirect/
- * 
+ *
  * Content Management - Posts
  * @method static \WP_Post|null get_post(int|\WP_Post|null $post = null, string $output = OBJECT, string $filter = 'raw') @see https://developer.wordpress.org/reference/functions/get_post/
  * @method static array get_posts(array $args = []) @see https://developer.wordpress.org/reference/functions/get_posts/
@@ -83,19 +83,19 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static \WP_Post|false|\WP_Error|null wp_trash_post(int $postid) @see https://developer.wordpress.org/reference/functions/wp_trash_post/
  * @method static \WP_Post|false|\WP_Error|null wp_untrash_post(int $postid) @see https://developer.wordpress.org/reference/functions/wp_untrash_post/
  * @method static int wp_count_posts(string $type = 'post', string $perm = '') @see https://developer.wordpress.org/reference/functions/wp_count_posts/
- * 
+ *
  * Content Management - Post Meta
  * @method static mixed get_post_meta(int $post_id, string $key = '', bool $single = false) @see https://developer.wordpress.org/reference/functions/get_post_meta/
  * @method static int|bool update_post_meta(int $post_id, string $meta_key, mixed $meta_value, mixed $prev_value = '') @see https://developer.wordpress.org/reference/functions/update_post_meta/
  * @method static bool delete_post_meta(int $post_id, string $meta_key, mixed $meta_value = '') @see https://developer.wordpress.org/reference/functions/delete_post_meta/
  * @method static int|bool add_post_meta(int $post_id, string $meta_key, mixed $meta_value, bool $unique = false) @see https://developer.wordpress.org/reference/functions/add_post_meta/
- * 
+ *
  * Content Management - User Meta
  * @method static mixed get_user_meta(int $user_id, string $key = '', bool $single = false) @see https://developer.wordpress.org/reference/functions/get_user_meta/
  * @method static int|bool update_user_meta(int $user_id, string $meta_key, mixed $meta_value, mixed $prev_value = '') @see https://developer.wordpress.org/reference/functions/update_user_meta/
  * @method static bool delete_user_meta(int $user_id, string $meta_key, mixed $meta_value = '') @see https://developer.wordpress.org/reference/functions/delete_user_meta/
  * @method static int|bool add_user_meta(int $user_id, string $meta_key, mixed $meta_value, bool $unique = false) @see https://developer.wordpress.org/reference/functions/add_user_meta/
- * 
+ *
  * Content Management - Terms & Taxonomies
  * @method static array|\WP_Error get_terms(array|string $args = [], array $deprecated = null) @see https://developer.wordpress.org/reference/functions/get_terms/
  * @method static \WP_Term|array|\WP_Error|null get_term(int|\WP_Term|object $term, string $taxonomy = '', string $output = OBJECT, string $filter = 'raw') @see https://developer.wordpress.org/reference/functions/get_term/
@@ -104,7 +104,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static array|\WP_Error wp_insert_term(string $term, string $taxonomy, array $args = []) @see https://developer.wordpress.org/reference/functions/wp_insert_term/
  * @method static array|\WP_Error wp_update_term(int $term_id, string $taxonomy, array $args = []) @see https://developer.wordpress.org/reference/functions/wp_update_term/
  * @method static bool|\WP_Error wp_delete_term(int $term, string $taxonomy, array $args = []) @see https://developer.wordpress.org/reference/functions/wp_delete_term/
- * 
+ *
  * URLs & Navigation
  * @method static string admin_url(string $path = '', string $scheme = 'admin') @see https://developer.wordpress.org/reference/functions/admin_url/
  * @method static string home_url(string $path = '', string $scheme = null) @see https://developer.wordpress.org/reference/functions/home_url/
@@ -120,7 +120,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static string network_home_url(string $path = '', string $scheme = null) @see https://developer.wordpress.org/reference/functions/network_home_url/
  * @method static string network_site_url(string $path = '', string $scheme = null) @see https://developer.wordpress.org/reference/functions/network_site_url/
  * @method static string network_admin_url(string $path = '', string $scheme = 'admin') @see https://developer.wordpress.org/reference/functions/network_admin_url/
- * 
+ *
  * Security - Nonces
  * @method static string wp_nonce_field(string $action = -1, string $name = '_wpnonce', bool $referer = true, bool $display = true) @see https://developer.wordpress.org/reference/functions/wp_nonce_field/
  * @method static int|false wp_verify_nonce(string $nonce, string $action = -1) @see https://developer.wordpress.org/reference/functions/wp_verify_nonce/
@@ -128,7 +128,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static int|false check_admin_referer(string $action = -1, string $query_arg = '_wpnonce') @see https://developer.wordpress.org/reference/functions/check_admin_referer/
  * @method static int|false check_ajax_referer(string $action = -1, string|false $query_arg = false, bool $stop = true) @see https://developer.wordpress.org/reference/functions/check_ajax_referer/
  * @method static string wp_nonce_url(string $actionurl, string $action = -1, string $name = '_wpnonce') @see https://developer.wordpress.org/reference/functions/wp_nonce_url/
- * 
+ *
  * Security - Sanitization
  * @method static string sanitize_text_field(string $str) @see https://developer.wordpress.org/reference/functions/sanitize_text_field/
  * @method static string sanitize_textarea_field(string $str) @see https://developer.wordpress.org/reference/functions/sanitize_textarea_field/
@@ -141,7 +141,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static string sanitize_html_class(string $classname, string $fallback = '') @see https://developer.wordpress.org/reference/functions/sanitize_html_class/
  * @method static string sanitize_hex_color(string $color) @see https://developer.wordpress.org/reference/functions/sanitize_hex_color/
  * @method static string sanitize_hex_color_no_hash(string $color) @see https://developer.wordpress.org/reference/functions/sanitize_hex_color_no_hash/
- * 
+ *
  * Security - Escaping
  * @method static string esc_html(string $text) @see https://developer.wordpress.org/reference/functions/esc_html/
  * @method static string esc_attr(string $text) @see https://developer.wordpress.org/reference/functions/esc_attr/
@@ -154,7 +154,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static string wp_kses_post(string $text) @see https://developer.wordpress.org/reference/functions/wp_kses_post/
  * @method static string wp_kses_data(string $text) @see https://developer.wordpress.org/reference/functions/wp_kses_data/
  * @method static array wp_kses_allowed_html(string|array $context = '') @see https://developer.wordpress.org/reference/functions/wp_kses_allowed_html/
- * 
+ *
  * Scripts & Styles
  * @method static void wp_enqueue_script(string $handle, string $src = '', array $deps = [], string|bool|null $ver = false, array|bool $args = []) @see https://developer.wordpress.org/reference/functions/wp_enqueue_script/
  * @method static void wp_enqueue_style(string $handle, string $src = '', array $deps = [], string|bool|null $ver = false, string $media = 'all') @see https://developer.wordpress.org/reference/functions/wp_enqueue_style/
@@ -169,7 +169,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static bool wp_localize_script(string $handle, string $object_name, array $l10n) @see https://developer.wordpress.org/reference/functions/wp_localize_script/
  * @method static bool wp_add_inline_script(string $handle, string $data, string $position = 'after') @see https://developer.wordpress.org/reference/functions/wp_add_inline_script/
  * @method static bool wp_add_inline_style(string $handle, string $data) @see https://developer.wordpress.org/reference/functions/wp_add_inline_style/
- * 
+ *
  * Transients API
  * @method static mixed get_transient(string $transient) @see https://developer.wordpress.org/reference/functions/get_transient/
  * @method static bool set_transient(string $transient, mixed $value, int $expiration = 0) @see https://developer.wordpress.org/reference/functions/set_transient/
@@ -177,7 +177,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static mixed get_site_transient(string $transient) @see https://developer.wordpress.org/reference/functions/get_site_transient/
  * @method static bool set_site_transient(string $transient, mixed $value, int $expiration = 0) @see https://developer.wordpress.org/reference/functions/set_site_transient/
  * @method static bool delete_site_transient(string $transient) @see https://developer.wordpress.org/reference/functions/delete_site_transient/
- * 
+ *
  * Registration Functions
  * @method static \WP_Post_Type|\WP_Error register_post_type(string $post_type, array $args = []) @see https://developer.wordpress.org/reference/functions/register_post_type/
  * @method static \WP_Taxonomy|\WP_Error register_taxonomy(string $taxonomy, array|string $object_type, array $args = []) @see https://developer.wordpress.org/reference/functions/register_taxonomy/
@@ -189,7 +189,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static void register_widget(string|\WP_Widget $widget) @see https://developer.wordpress.org/reference/functions/register_widget/
  * @method static void add_shortcode(string $tag, callable $callback) @see https://developer.wordpress.org/reference/functions/add_shortcode/
  * @method static string|int|false add_meta_box(string $id, string $title, callable $callback, string|array|\WP_Screen $screen = null, string $context = 'advanced', string $priority = 'default', array $callback_args = null) @see https://developer.wordpress.org/reference/functions/add_meta_box/
- * 
+ *
  * Localization & Internationalization
  * @method static string __(string $text, string $domain = 'default') @see https://developer.wordpress.org/reference/functions/__/
  * @method static void _e(string $text, string $domain = 'default') @see https://developer.wordpress.org/reference/functions/_e/
@@ -203,7 +203,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static void esc_attr_e(string $text, string $domain = 'default') @see https://developer.wordpress.org/reference/functions/esc_attr_e/
  * @method static bool load_plugin_textdomain(string $domain, string|false $deprecated = false, string|false $plugin_rel_path = false) @see https://developer.wordpress.org/reference/functions/load_plugin_textdomain/
  * @method static bool load_theme_textdomain(string $domain, string|false $path = false) @see https://developer.wordpress.org/reference/functions/load_theme_textdomain/
- * 
+ *
  * Database & Cache
  * @method static mixed wp_cache_get(int|string $key, string $group = '', bool $force = false, bool &$found = null) @see https://developer.wordpress.org/reference/functions/wp_cache_get/
  * @method static bool wp_cache_set(int|string $key, mixed $data, string $group = '', int $expire = 0) @see https://developer.wordpress.org/reference/functions/wp_cache_set/
@@ -213,7 +213,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static bool wp_cache_flush() @see https://developer.wordpress.org/reference/functions/wp_cache_flush/
  * @method static int wp_cache_incr(int|string $key, int $offset = 1, string $group = '') @see https://developer.wordpress.org/reference/functions/wp_cache_incr/
  * @method static int wp_cache_decr(int|string $key, int $offset = 1, string $group = '') @see https://developer.wordpress.org/reference/functions/wp_cache_decr/
- * 
+ *
  * HTTP API
  * @method static array|\WP_Error wp_remote_get(string $url, array $args = []) @see https://developer.wordpress.org/reference/functions/wp_remote_get/
  * @method static array|\WP_Error wp_remote_post(string $url, array $args = []) @see https://developer.wordpress.org/reference/functions/wp_remote_post/
@@ -227,7 +227,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static array wp_remote_retrieve_cookies(array|\WP_Error $response) @see https://developer.wordpress.org/reference/functions/wp_remote_retrieve_cookies/
  * @method static \WP_Http_Cookie|string wp_remote_retrieve_cookie(array|\WP_Error $response, string $name) @see https://developer.wordpress.org/reference/functions/wp_remote_retrieve_cookie/
  * @method static string wp_remote_retrieve_cookie_value(array|\WP_Error $response, string $name) @see https://developer.wordpress.org/reference/functions/wp_remote_retrieve_cookie_value/
- * 
+ *
  * Conditional Tags
  * @method static bool is_home() @see https://developer.wordpress.org/reference/functions/is_home/
  * @method static bool is_front_page() @see https://developer.wordpress.org/reference/functions/is_front_page/
@@ -259,7 +259,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static bool is_multisite() @see https://developer.wordpress.org/reference/functions/is_multisite/
  * @method static bool is_main_site(int $network_id = null) @see https://developer.wordpress.org/reference/functions/is_main_site/
  * @method static bool is_super_admin(int|false $user_id = false) @see https://developer.wordpress.org/reference/functions/is_super_admin/
- * 
+ *
  * Utility Functions
  * @method static int absint(mixed $maybeint) @see https://developer.wordpress.org/reference/functions/absint/
  * @method static array wp_parse_args(string|array|object $args, array $defaults = []) @see https://developer.wordpress.org/reference/functions/wp_parse_args/
@@ -280,7 +280,7 @@ namespace VAF\WP\Framework\Wordpress;
  * @method static string wp_strip_all_tags(string $text, bool $remove_breaks = false) @see https://developer.wordpress.org/reference/functions/wp_strip_all_tags/
  * @method static string wp_trim_words(string $text, int $num_words = 55, string $more = null) @see https://developer.wordpress.org/reference/functions/wp_trim_words/
  * @method static string wp_trim_excerpt(string $text = '', \WP_Post|object|int $post = null) @see https://developer.wordpress.org/reference/functions/wp_trim_excerpt/
- * 
+ *
  * Miscellaneous Functions
  * @method static string get_bloginfo(string $show = '', string $filter = 'raw') @see https://developer.wordpress.org/reference/functions/get_bloginfo/
  * @method static int get_the_ID() @see https://developer.wordpress.org/reference/functions/get_the_ID/
@@ -327,19 +327,19 @@ class Wordpress
 
     /**
      * Set up a mock object for testing WordPress functions
-     * 
+     *
      * This method enables mocking of WordPress functions for testing purposes.
      * When a mock is set, all calls to WordPress functions through this wrapper
      * will be directed to the mock object instead of the actual WordPress functions.
-     * 
+     *
      * @param object|null $mock The mock object to use, or null to create a default Mockery spy
      * @return void
-     * 
+     *
      * @example
      * ```php
      * // Create a default spy mock
      * Wordpress::fake();
-     * 
+     *
      * // Or provide a custom mock
      * $mock = \Mockery::mock();
      * Wordpress::fake($mock);
@@ -355,13 +355,13 @@ class Wordpress
 
     /**
      * Reset the mock object and return to normal WordPress function calls
-     * 
+     *
      * This method clears any mock object that was set with fake(),
      * returning the wrapper to its normal behavior of calling actual
      * WordPress functions.
-     * 
+     *
      * @return void
-     * 
+     *
      * @example
      * ```php
      * Wordpress::fake();
@@ -376,12 +376,12 @@ class Wordpress
 
     /**
      * Get the current mock object
-     * 
+     *
      * Returns the mock object that was set with fake(), allowing you to
      * configure expectations and assertions on it.
-     * 
+     *
      * @return object|null The current mock object, or null if no mock is set
-     * 
+     *
      * @example
      * ```php
      * Wordpress::fake();
@@ -395,16 +395,16 @@ class Wordpress
 
     /**
      * Magic method to handle static calls to WordPress functions
-     * 
+     *
      * This method intercepts all static method calls and either:
      * - Forwards them to the mock object if one is set (for testing)
      * - Forwards them to the actual WordPress function (in production)
-     * 
+     *
      * @param string $name The name of the WordPress function being called
      * @param array $arguments The arguments passed to the function
      * @return mixed The return value from the WordPress function or mock
      * @throws \BadMethodCallException If the WordPress function doesn't exist
-     * 
+     *
      * @internal This method is called automatically by PHP when accessing undefined static methods
      */
     public static function __callStatic(string $name, array $arguments): mixed

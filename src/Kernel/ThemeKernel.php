@@ -14,6 +14,7 @@ class ThemeKernel extends WordpressKernel
 {
     protected function bootHandler(): void
     {
+        $this->initializeContainer();
         $this->getContainer()->set('theme', $this->base);
 
         add_filter('after_setup_theme', function (): void {

@@ -82,9 +82,10 @@ abstract class WordpressKernel extends Kernel
         string $projectDir,
         bool $debug,
         string $namespace,
-        protected readonly BaseWordpress $base
+        protected readonly BaseWordpress $base,
+        bool $preventAutomaticContainerCache = false
     ) {
-        parent::__construct($projectDir, $debug, $namespace);
+        parent::__construct($projectDir, $debug, $namespace, $preventAutomaticContainerCache);
     }
 
     protected function bootHandler(): void

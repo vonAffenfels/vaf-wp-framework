@@ -44,10 +44,27 @@ abstract class Plugin extends BaseWordpress
         $obj->kernel->forceContainerCacheUpdate();
     }
 
+    /**
+     * Determines whether automatic container cache creation should be prevented.
+     * Override via trait to prevent automatic caching during normal bootup.
+     *
+     * @return bool
+     */
+    protected static function preventAutomaticContainerCache(): bool
+    {
+        return false;
+    }
+
     final protected function createKernel(): Kernel
     {
         $namespace = substr(static::class, 0, strrpos(static::class, '\\'));
-        return new PluginKernel($this->getPath(), $this->getDebug(), $namespace, $this);
+        return new PluginKernel(
+            $this->getPath(),
+            $this->getDebug(),
+            $namespace,
+            $this,
+            static::preventAutomaticContainerCache()
+        );
     }
 
     private function registerPluginApi(): void
