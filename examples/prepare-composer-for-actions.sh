@@ -140,9 +140,6 @@ EOF
     log "Cleared $var_name from environment"
 done < <(env -0 | grep -z '^REPOSITORY_')
 
-ls -ld ~/.ssh
-ls -l ~/.ssh
-
 if [[ $index -eq 0 ]]; then
     warn "No repositories were configured for authentication"
 else
