@@ -13,6 +13,7 @@ the Symfony container cache is created.
 - [GitHub Actions Integration](#github-actions-integration)
 - [Technical Details](#technical-details)
 - [Examples](#examples)
+- [Migration Guide](#migration-guide-from-manual-builds-to-automated-cicd)
 - [Troubleshooting](#troubleshooting)
 
 ## TL;DR
@@ -267,6 +268,313 @@ services:
     environment:
       HOME: /root
 ```
+
+## Migration Guide: From Manual Builds to Automated CI/CD
+
+This section provides a complete step-by-step guide for migrating from the old manual approach (where containers were hopefully built and committed during development) to the new automated CI/CD system.
+
+### Prerequisites
+
+Before starting, ensure you have:
+- A plugin/theme using the vonAffenfels WordPress Framework
+- Private composer dependencies configured with SSH URLs in composer.json
+- Admin access to your private repositories on GitHub/GitLab
+- Access to your company's secret management system (1Password, Vault, etc.)
+
+### Step 1: Clear Old Git Hooks (Keep the Package!)
+
+If your project uses `brainmaestro/composer-git-hooks` with a pre-commit hook that attempts to build the container, you need to clear it **without removing the package** to ensure all developers get their hooks cleared automatically.
+
+**Why keep the package?** Removing the dependency would leave lingering git hooks on developers' machines. By keeping it and clearing the hooks, everyone gets automatic cleanup on their next `composer install/update`.
+
+#### Edit composer.json
+
+Find the current hooks configuration (example from existing projects):
+
+```json
+{
+    "require-dev": {
+        "brainmaestro/composer-git-hooks": "^3.0"
+    },
+    "scripts": {
+        "post-install-cmd": "cghooks add --ignore-lock",
+        "post-update-cmd": "cghooks update"
+    },
+    "extra": {
+        "hooks": {
+            "config": {
+                "stop-on-failure": ["pre-commit"]
+            },
+            "pre-commit": [
+                "echo 'Building container...' && pwd && if [ ! -d 'vendor' ] ; then composer install ; fi && composer build-container && git add container/"
+            ]
+        }
+    }
+}
+```
+
+**Change it to:**
+
+```json
+{
+    "require-dev": {
+        "brainmaestro/composer-git-hooks": "^3.0"
+    },
+    "scripts": {
+        "post-install-cmd": "cghooks add --ignore-lock",
+        "post-update-cmd": "cghooks update"
+    },
+    "extra": {
+        "hooks": {
+            "pre-commit": []
+        }
+    }
+}
+```
+
+#### Update and commit the changes
+
+```bash
+# Clear hooks for all developers
+composer update brainmaestro/composer-git-hooks
+
+# Commit the change
+git add composer.json composer.lock
+git commit -m "Clear git pre-commit hooks - migrating to CI/CD builds"
+git push
+```
+
+**Verify**: After other developers pull and run `composer install`, their pre-commit hooks will be automatically removed.
+
+### Step 2: Update Your Plugin/Theme Class
+
+Add the `OnlyCreateCacheExplicitlyOnBuild` trait to prevent automatic container cache creation:
+
+```php
+<?php
+
+namespace MyCompany\MyPlugin;
+
+use VAF\WP\Framework\Plugin;
+use VAF\WP\Framework\Traits\OnlyCreateCacheExplicitlyOnBuild;
+
+class MyPlugin extends Plugin
+{
+    // Prevent automatic container cache creation in development
+    use OnlyCreateCacheExplicitlyOnBuild;
+    
+    // Your existing plugin implementation...
+}
+```
+
+**Commit this change:**
+
+```bash
+git add src/MyPlugin.php  # Your plugin class file
+git commit -m "Add OnlyCreateCacheExplicitlyOnBuild trait to prevent automatic caching"
+```
+
+### Step 3: Create SSH Deploy Keys for Private Dependencies
+
+For each private repository in your composer.json, you need to create a dedicated SSH deploy key.
+
+#### 3.1 Generate SSH Key Pair
+
+For each private repository dependency:
+
+```bash
+# Replace 'my-private-repo' with a descriptive name
+ssh-keygen -t ed25519 -f ~/.ssh/deploy-key-my-private-repo -N ""
+
+# This creates:
+# ~/.ssh/deploy-key-my-private-repo (private key)
+# ~/.ssh/deploy-key-my-private-repo.pub (public key)
+```
+
+#### 3.2 Add Public Key to Repository
+
+1. Go to your private repository on GitHub
+2. Navigate to **Settings** → **Deploy keys**
+3. Click **Add deploy key**
+4. Enter a title like "CI/CD Build Access for [Main Plugin Name]"
+5. Paste the contents of the `.pub` file:
+   ```bash
+   cat ~/.ssh/deploy-key-my-private-repo.pub
+   ```
+6. **Do NOT check** "Allow write access" (read-only is sufficient)
+7. Click **Add key**
+
+#### 3.3 Store Private Key in Company Vault
+
+**🔐 CRITICAL SECURITY STEP:**
+
+1. Copy the private key content:
+   ```bash
+   cat ~/.ssh/deploy-key-my-private-repo
+   ```
+2. Store it in your company's secret management system (1Password, HashiCorp Vault, etc.)
+3. Use a clear naming convention like: "Deploy Key: [Repository Name] - [Main Plugin Name]"
+4. Include metadata: repository URL, main plugin/project name, creation date
+5. **Delete the local key files after storing in vault:**
+   ```bash
+   rm ~/.ssh/deploy-key-my-private-repo*
+   ```
+
+#### 3.4 Add to GitHub Actions Secrets
+
+1. Go to your main plugin repository on GitHub
+2. Navigate to **Settings** → **Secrets and variables** → **Actions**
+3. Click **New repository secret**
+4. Name it using the pattern: `REPOSITORY_[DESCRIPTIVE_NAME]`
+5. For the value, use the format: `repository-matcher;private-key-content`  
+   The repository matcher is the organization/repo path (e.g., `vnrag/wp-plugin-x-auth`), and the private key is the full multiline private key.
+
+**Example:**
+- Secret name: `REPOSITORY_X_AUTH`
+- Secret value: 
+  ```
+  vnrag/wp-plugin-x-auth;-----BEGIN OPENSSH PRIVATE KEY-----
+  b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAFwAAAAdzc2gtcn
+  ...
+  -----END OPENSSH PRIVATE KEY-----
+  ```
+
+### Step 4: Setup Build Scripts and GitHub Actions
+
+#### 4.1 Add the Composer SSH Script
+
+Copy the authentication script from the framework examples to your repository:
+
+```bash
+# Copy the script from the framework examples
+cp vendor/vonaffenfels/vaf-wp-framework/examples/prepare-composer-for-actions.sh .
+
+# Make it executable
+chmod +x prepare-composer-for-actions.sh
+
+# Commit it
+git add prepare-composer-for-actions.sh
+git commit -m "Add SSH authentication script for private repositories"
+```
+
+#### 4.2 Create GitHub Actions Workflows
+
+Copy and customize the build workflow from the framework examples. Create `.github/workflows/build-container.yml` by copying the example:
+
+```bash
+mkdir -p .github/workflows
+cp vendor/vonaffenfels/vaf-wp-framework/examples/update-on-tag.yml .github/workflows/build-container.yml
+```
+
+Edit `.github/workflows/build-container.yml` to customize it for your project:
+- Update the `REPOSITORY_*` environment variables to match your secrets
+- Adjust the PHP version if needed
+- Modify the workflow name and description
+
+**Note**: The workflow uses `git add -f container/` to force-add container files that are ignored by .gitignore. This is intentional - it keeps development environments clean while allowing CI/CD to commit the built containers for production.
+
+For additional workflows like testing container freshness or running unit tests, you can create similar workflows following the same pattern:
+- Copy the build workflow as a starting point
+- Modify the trigger events (e.g., `on: [push, pull_request]`)
+- Adjust the steps for your specific needs (testing vs building)
+
+The key components that remain consistent across all workflows:
+- SSH setup using `bash prepare-composer-for-actions.sh`
+- PHP setup and composer installation
+- Environment variables for `REPOSITORY_*` secrets
+
+### Step 5: Test and Verify the Setup
+
+#### 5.1 Test Private Repository Access
+
+Push your changes and verify the workflows can access private repositories:
+
+```bash
+git push origin main
+```
+
+Check the Actions tab in GitHub to see if the container freshness test passes.
+
+#### 5.2 Test Container Build on Tag
+
+Create and push a tag to trigger the build:
+
+```bash
+git tag v1.0.0-test
+git push origin v1.0.0-test
+```
+
+Verify that:
+1. The build workflow runs successfully
+2. A container is built and committed
+3. The commit appears in your repository
+
+#### 5.3 Verify Development Environment
+
+On developer machines, after pulling the changes:
+
+```bash
+# Ensure no automatic cache creation during development
+# (Container directory should not be created during normal plugin usage)
+```
+
+### Step 6: Clean Up and Finalize
+
+#### 6.1 Update .gitignore
+
+Ensure your `.gitignore` includes:
+
+```gitignore
+# Ignore all container cache files
+# CI/CD will force-add them when building for production
+/container/
+```
+
+#### 6.2 Remove Old Container Files (if needed)
+
+If you have old, manually-created container files:
+
+```bash
+# Remove old containers but keep the directory
+rm -rf container/*
+
+# Let CI build and commit the new container
+git add -A
+git commit -m "Remove manually-built containers, CI will build them"
+```
+
+#### 6.3 Optional: Remove composer-git-hooks (Later)
+
+After a few weeks when all developers have pulled the changes, you can optionally remove the git hooks package entirely:
+
+```bash
+# After all developers have updated their local repos:
+composer remove --dev brainmaestro/composer-git-hooks
+
+# Remove the entire "extra.hooks" section from composer.json
+# Remove the cghooks scripts from composer.json
+```
+
+### Step 7: Team Documentation
+
+Document the new process for your team:
+
+1. **Development**: No container caching, runs on-the-fly
+2. **Production**: Container automatically built and committed on tags
+3. **Releases**: Create tags to trigger production builds
+4. **Dependencies**: Private repo access handled automatically in CI
+
+### Verification Checklist
+
+- [ ] Old git hooks cleared on all developer machines
+- [ ] Plugin class has `OnlyCreateCacheExplicitlyOnBuild` trait
+- [ ] Deploy keys created for all private repositories
+- [ ] Private keys stored in company vault
+- [ ] GitHub Actions secrets configured
+- [ ] Build workflows created and tested
+- [ ] Container freshness test passes
+- [ ] Tag-based builds work correctly
+- [ ] Development environment clean (no automatic caching)
 
 ## Troubleshooting
 
