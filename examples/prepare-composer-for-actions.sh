@@ -62,7 +62,7 @@ for var_line in $(env | grep ^REPOSITORY_); do
     log "Processing $var_name"
 
     # Split matcher and private key at first semicolon
-    IFS=';' ARR=($REPOSITORY_ELOQUENT)
+    IFS=';' ARR=($var_value)
     matcher="${ARR[0]}"
     private_key="${ARR[1]}"
 
