@@ -157,55 +157,61 @@ abstract class Kernel
         $container = $this->buildContainer();
         $container->compile();
 
-        $this->updateContainerCache($container);
+        $this->writeCachedContainer($container);
     }
 
-    public function getContainer(): ContainerInterface
+    public function initializeContainer(): void
     {
         if (!is_null($this->container)) {
-            return $this->container;
+            return;
         }
 
-        $cache = new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
-        if ($cache->isFresh() && is_readable($cache->getPath())) {
-            // Load cached container if cache is still good
-            // If not in debug mode and cache file exists cache will always be good
-
-            // Load cached container if exists
-            require_once $cache->getPath();
-
-            $class = $this->namespace . "\\" . self::CONTAINER_CLASS;
-            $container = new $class();
-        } else {
-            // Cache is not good so we compile the container
+        $container = $this->loadCachedContainer();
+        if (is_null($container)) {
             $container = $this->buildContainer();
             $container->compile();
 
-            // Try to cache the container if possible
             try {
-                $this->updateContainerCache($container, $cache);
+                $this->writeCachedContainer($container);
             } catch (RuntimeException $e) {
                 // Do nothing if directories can't be created
                 // We simply can't cache the container then
             }
         }
 
-        if (!is_null($container)) {
-            $this->container = $container;
-            $this->container->set('kernel', $this);
+        $this->container = $container;
+        $this->container->set('kernel', $this);
+    }
+
+    public function getContainer(): ContainerInterface
+    {
+        if (is_null($this->container)) {
+            throw new RuntimeException('Container not initialized. Call initializeContainer() first.');
         }
 
         return $this->container;
     }
 
-    public function updateContainerCache(ContainerBuilder $container, ?ConfigCache $cache = null): void
+    private function loadCachedContainer(): ?Container
     {
-        $cache ??= new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
+        $cache = new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
 
+        if (!$cache->isFresh() || !is_readable($cache->getPath())) {
+            return null;
+        }
 
+        require_once $cache->getPath();
+        $class = $this->namespace . "\\" . self::CONTAINER_CLASS;
+
+        return new $class();
+    }
+
+    private function writeCachedContainer(ContainerBuilder $container): void
+    {
+        $cache = new ConfigCache($this->getBuildDir() . '/' . self::CONTAINER_CLASS . '.php', $this->isDebug());
         $this->checkBuildDirectories();
-        $dumper = new PhpDumper($container);
 
+        $dumper = new PhpDumper($container);
         $code = $dumper->dump([
             'class' => self::CONTAINER_CLASS,
             'namespace' => $this->namespace
@@ -213,6 +219,7 @@ abstract class Kernel
 
         $cache->write($code, $container->getResources());
     }
+
 
 
     private function checkBuildDirectories(): void
