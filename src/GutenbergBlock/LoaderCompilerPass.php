@@ -41,9 +41,12 @@ final class LoaderCompilerPass implements CompilerPassInterface
         }
 
         $attribute = $reflection->getAttributes(AsDynamicBlock::class)[0]->newInstance();
+
+        $hasDynamicAttributes = $attribute->hasDynamicAttributes && $reflection->hasMethod('getDynamicAttributes');
         return [
             'type' => $attribute->blockType,
             'class' => $class,
+            'hasDynamicAttributes' => $hasDynamicAttributes,
             'renderer' => RendererDefinition::fromClassReflection($reflection)->definition(),
             'options' => [
                 'api_version' => $attribute->version,
