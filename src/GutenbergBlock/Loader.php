@@ -15,6 +15,10 @@ final class Loader
         foreach ($this->dynamicBlocks as $dynamicBlock) {
             $instance = $this->kernel->getContainer()->get($dynamicBlock['class']);
 
+            if ($dynamicBlock['hasDynamicAttributes'] ?? false) {
+                $dynamicBlock['options']['attributes'] = $instance->getDynamicAttributes();
+            }
+
             register_block_type($dynamicBlock['type'], [
                 ...$dynamicBlock['options'],
                 'render_callback' => RendererDefinition::fromRendererDefinition($dynamicBlock['renderer'])->renderer($instance),
