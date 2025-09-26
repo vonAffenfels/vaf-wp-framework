@@ -20,7 +20,9 @@ final class TwigEngine extends TemplateEngine
         FileLoader $loader,
         Extension $extension
     ) {
-        $this->twig = new Environment($loader);
+        $this->twig = new Environment($loader, [
+            'autoescape' => apply_filters('vaf/twig/autoescape', 'html'),
+        ]);
         $this->twig->enableDebug();
         $this->twig->addExtension($extension);
     }
