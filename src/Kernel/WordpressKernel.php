@@ -16,6 +16,9 @@ use VAF\WP\Framework\BaseWordpress;
 use VAF\WP\Framework\BulkEdit\Attribute\AsBulkEditContainer;
 use VAF\WP\Framework\QuickEdit\Attribute\AsQuickEditContainer;
 use VAF\WP\Framework\CustomColumn\Attribute\AsCustomColumnContainer;
+use VAF\WP\Framework\Elementor\Attribute\AsElementorWidget;
+use VAF\WP\Framework\Elementor\Loader as ElementorLoader;
+use VAF\WP\Framework\Elementor\LoaderCompilerPass as ElementorLoaderCompilerPass;
 use VAF\WP\Framework\GutenbergBlock\Attribute\AsDynamicBlock;
 use VAF\WP\Framework\GutenbergBlock\Loader as GutenbergBlockLoader;
 use VAF\WP\Framework\GutenbergBlock\LoaderCompilerPass as GutenbergBlockCompilerPass;
@@ -122,6 +125,10 @@ abstract class WordpressKernel extends Kernel
         $shortcodeLoader = $this->getContainer()->get('shortcode.loader');
         $shortcodeLoader->registerShortcodes();
 
+        /** @var ElementorLoader $elementorLoader */
+        $elementorLoader = $this->getContainer()->get('elementor.loader');
+        $elementorLoader->registerWidgets();
+
         /** @var AdminAjaxLoader $adminAjaxLoader */
         $adminAjaxLoader = $this->getContainer()->get('adminajax.loader');
         $adminAjaxLoader->registerAdminAjaxActions();
@@ -186,6 +193,7 @@ abstract class WordpressKernel extends Kernel
         $this->registerCustomColumnContainer($builder);
         $this->registerGutenbergBlock($builder);
         $this->registerShortcodeContainer($builder);
+        $this->registerElementorContainer($builder);
         $this->registerSettingsContainer($builder);
         $this->registerRestAPIContainer($builder);
         $this->registerMenuContainer($builder);
@@ -454,6 +462,24 @@ abstract class WordpressKernel extends Kernel
                 ChildDefinition $defintion
             ): void {
                 $defintion->addTag('shortcode.container');
+            }
+        );
+    }
+
+    private function registerElementorContainer(ContainerBuilder $builder): void
+    {
+        $builder->register('elementor.loader', ElementorLoader::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $builder->addCompilerPass(new ElementorLoaderCompilerPass());
+
+        $builder->registerAttributeForAutoconfiguration(
+            AsElementorWidget::class,
+            static function (
+                ChildDefinition $definition
+            ): void {
+                $definition->addTag('elementor.widget');
             }
         );
     }

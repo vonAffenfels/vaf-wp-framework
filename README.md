@@ -10,6 +10,7 @@ directory for a good start.
 - [Bulk Edit](./docs/BulkEdit.md)
 - [Custom Column](./docs/CustomColumn.md)
 - [Dynamic Blocks](./docs/DynamicBlocks.md)
+- [Elementor](./docs/elementor.md)
 - [Explicit Build](./docs/ExplicitBuild.md)
 - [Facade](./docs/Facade.md)
 - [Metabox](./docs/Metabox.md)
