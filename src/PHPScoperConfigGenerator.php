@@ -32,6 +32,7 @@ final class PHPScoperConfigGenerator
         $this->ignorePackage('mockery/mockery');
         $this->ignorePackage('twig/twig');
         $this->ignoreNamespace('/^Twig/');
+        $this->ignoreNamespace('/^Elementor/');
 
         $this->addPackagePatcher(
             'symfony/dependency-injection',
