@@ -143,6 +143,7 @@ final class PHPScoperConfigGenerator
         return Finder::create()
             ->files()
             ->ignoreVCS(true)
+            ->notName('composer.json')
             ->in(['vendor/' . $package]);
     }
 
