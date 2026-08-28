@@ -11,6 +11,7 @@ use VAF\WP\Framework\Kernel\Kernel;
 abstract class BaseWordpress
 {
     protected Kernel $kernel;
+    private readonly string $url;
 
     /**
      * @throws Exception
@@ -18,9 +19,10 @@ abstract class BaseWordpress
     protected function __construct(
         private readonly string $name,
         private readonly string $path,
-        private readonly string $url,
+        string $url,
         private readonly bool $debug = false
     ) {
+        $this->url = rtrim($url, '/');
         $this->kernel = $this->createKernel();
     }
 
@@ -57,6 +59,6 @@ abstract class BaseWordpress
 
     public function getAssetUrl(string $asset): string
     {
-        return $this->url . 'public/' . $asset;
+        return $this->url . '/public/' . $asset;
     }
 }
